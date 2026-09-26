@@ -7986,7 +7986,8 @@ defineMount("quiz", (root) => {
     const verdict = score === total ? "A perfect climb. You could teach this page."
       : score >= total - 3 ? "Strong. Just a couple of layers to revisit."
       : score >= total / 2 ? "Solid footing. The misses below show where to look again."
-      : "A good start. The review below walks through every miss.";
+      : score >= 4 ? "A good start. The review below walks through every miss."
+      : "Worth another climb. The review below walks through every miss.";
     // per-layer strip, bottom of the stack first
     const byLayer = [...LAYERS.map((l) => l.n), 0].map((n) => {
       const idxs = order.map((o, i) => (QUIZ[o.i].n === n ? i : -1)).filter((i) => i >= 0);
