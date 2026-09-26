@@ -40,7 +40,10 @@ before committing so the generated file matches `src/`.
 
 ## Accuracy
 
-Numbers are rounded; `~` means approximate and "est." means an outside estimate. Every interactive is
-a simplified model and says so in its "Simplified" line. Sources are listed at the bottom of the page.
+Numbers are rounded; `~` means approximate and "est." means an outside estimate.
+For hardware, data-center, power and cost figures, SemiAnalysis is the preferred source, with
+primary sources (vendor datasheets, IEA, company statements) or Epoch AI where it has no public figure.
+Every interactive is a simplified model and says so in its "Simplified" line. Sources are listed at the
+bottom of the page.
 Figures are dated to 2026. The tokenizer and the next-word generator are real but tiny models trained
 on small English samples; the attention weights are hand-set for illustration.
