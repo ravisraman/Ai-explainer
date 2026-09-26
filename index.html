@@ -496,7 +496,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
     <div class="spec">
       <div class="stat"><div class="stat-num">~1.5%</div><div class="stat-label">of the world's electricity went to data centers in 2024 (IEA estimate). AI is the fastest-growing part.</div></div>
       <div class="stat"><div class="stat-num">~2×</div><div class="stat-label">projected growth in data-center electricity use by 2030, to roughly 950 TWh (IEA base case)</div></div>
-      <div class="stat"><div class="stat-num">~120 kW</div><div class="stat-label">for one modern AI server rack, versus roughly 5–15 kW for a traditional rack</div></div>
+      <div class="stat"><div class="stat-num">~120 kW</div><div class="stat-label">for one of the densest AI racks (NVIDIA NVL72), versus roughly 5–15 kW for a traditional server rack</div></div>
     </div>
 
     <div class="qgrid">
@@ -506,7 +506,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       </div>
       <div class="q">
         <h3>Why it matters</h3>
-        <p>Power has become one of AI's main bottlenecks. As of 2026, the largest new AI campuses are planned at around a gigawatt, the output of a large nuclear reactor. In many regions a new grid connection of that size takes years, and big transformers and gas turbines have long waiting lists. Where the power comes from also decides most of AI's carbon footprint.</p>
+        <p>Power has become one of AI's main bottlenecks. As of 2026, the largest new AI campuses are planned at a gigawatt or more; one gigawatt is about the output of a large nuclear reactor. In many regions a new grid connection of that size takes years, and big transformers and gas turbines have long waiting lists. Where the power comes from also decides most of AI's operating carbon footprint.</p>
       </div>
       <div class="q conn">
         <h3>How it connects</h3>
@@ -528,7 +528,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
 
   <div class="wrap deepers">
     <details class="deeper"><summary>Go deeper: air versus liquid cooling</summary><div class="body">
-      <p><b>Air cooling</b> pushes chilled air through racks with fans. It is simple and familiar, but air carries heat poorly, so it becomes impractical somewhere around 30–50 kW per rack.</p>
+      <p><b>Air cooling</b> pushes chilled air through racks with fans. It is simple and familiar, but air carries heat poorly, so it becomes impractical somewhere around 20–40 kW per rack.</p>
       <p><b>Direct-to-chip liquid cooling</b> bolts cold plates onto the hottest chips and pumps coolant through them. Water holds roughly 3,500 times more heat than the same volume of air, which is why today's 100+ kW AI racks are almost all liquid-cooled. <b>Immersion cooling</b> goes further by dunking whole servers in non-conductive fluid.</p>
       <p><b>Water use</b> is a separate question. Many sites reject heat through evaporative cooling towers, which consume water. Closed-loop and dry coolers save water but use more electricity, so operators trade one resource against the other depending on climate.</p>
     </div></details>
@@ -586,8 +586,8 @@ details[open] > .body{animation:fadeUp .35s ease both}
 
   <div class="wrap deepers">
     <details class="deeper"><summary>Go deeper: two networks, two speeds</summary><div class="body">
-      <p><b>Scale-up</b> links connect GPUs inside a server or rack. NVIDIA's NVLink gives each current-generation GPU about 1.8 terabytes per second to its neighbors.</p>
-      <p><b>Scale-out</b> links connect racks to each other over InfiniBand or Ethernet, at about 400–800 gigabits per second per GPU, which is roughly 50–100 gigabytes per second. That's 10–20 times slower, so engineers place the chattiest parts of a computation inside a rack and the least chatty parts across racks.</p>
+      <p><b>Scale-up</b> links connect GPUs inside a server or rack. NVIDIA's NVLink gives each current-generation GPU about 1.8 terabytes per second to its neighbors (counting both directions).</p>
+      <p><b>Scale-out</b> links connect racks to each other over InfiniBand or Ethernet, at about 400–800 gigabits per second per GPU in each direction, roughly 50–100 gigabytes per second. Compared direction for direction, that's about 10–20 times slower, so engineers place the chattiest parts of a computation inside a rack and the least chatty parts across racks.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: the fabric</summary><div class="body">
       <p>Big clusters use layered "fat-tree" (Clos) networks: tiers of switches arranged so any GPU can reach any other at close to full speed. Long runs use optical transceivers that turn electrical signals into light. The biggest clusters contain hundreds of thousands of them (est.), and each one is a part that can fail.</p>
@@ -616,7 +616,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
     <div class="qgrid">
       <div class="q">
         <h3>What it is</h3>
-        <p>Quartz sand is reduced to silicon, then purified to about 99.9999999% ("nine nines"). A single crystal is pulled from the melt and sliced into 300 mm wafers. Each wafer then goes through many hundreds of steps: deposit a thin film, coat it with light-sensitive resist, print a pattern with light, etch, implant, polish, and repeat for dozens of layers. The trip takes around three months. Finally the wafer is tested and cut into individual chips (dies).</p>
+        <p>Quartz sand is reduced to silicon, then purified to about 99.9999999% ("nine nines"). A single crystal is pulled from the melt and sliced into 300 mm wafers. Each wafer then goes through hundreds to more than a thousand steps: deposit a thin film, coat it with light-sensitive resist, print a pattern with light, etch, implant, polish, and repeat for dozens of layers. The trip takes around three months. Finally the wafer is tested and cut into individual chips (dies).</p>
       </div>
       <div class="q">
         <h3>Why it matters</h3>
@@ -646,7 +646,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p>A scanner is roughly the size of a bus and ships in dozens of containers. ASML in the Netherlands is the only supplier.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: what "3 nm" actually means</summary><div class="body">
-      <p>Node names like "3 nm" and "2 nm" are marketing labels. No feature on a "3 nm" chip is 3 nm wide; transistor gates sit roughly 45–50 nm apart. The names keep counting down because density and efficiency keep improving, now mostly by changing the transistor's 3-D shape: from FinFETs to "gate-all-around" nanosheets at the 2 nm-class nodes arriving in 2025–26.</p>
+      <p>Node names like "3 nm" and "2 nm" are marketing labels. No feature on a "3 nm" chip is 3 nm wide; transistor gates sit roughly 45–50 nm apart. The names keep counting down because density and efficiency keep improving, now mostly by changing the transistor's 3-D shape: from FinFETs to "gate-all-around" nanosheets, which Samsung introduced at its 3 nm node in 2022 and TSMC and Intel adopt at their 2 nm-class nodes arriving in 2025–26.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: why the biggest chips are two chips glued together</summary><div class="body">
       <p>A scanner can print an area of at most about 26 × 33 mm (roughly 850 mm²) in one exposure, so no single die can be larger. Bigger dies also catch more defects. About 60 H100-sized dies fit on a 300 mm wafer before accounting for defects.</p>
@@ -665,7 +665,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
     </header>
 
     <div class="spec">
-      <div class="stat"><div class="stat-num">~10<sup>15</sup></div><div class="stat-label">16-bit operations per second (a quadrillion) for an H100-class GPU from 2023; newer chips do several times more at lower precision</div></div>
+      <div class="stat"><div class="stat-num">~10<sup>15</sup></div><div class="stat-label">16-bit operations per second (a quadrillion) for an H100-class GPU from 2022–23; newer chips do several times more at lower precision</div></div>
       <div class="stat"><div class="stat-num">~300</div><div class="stat-label">math operations an H100 must do per byte it reads from memory to stay fully busy (≈ 1,000 TFLOPS ÷ 3.35 TB/s)</div></div>
     </div>
 
@@ -673,7 +673,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <div class="q">
         <h3>What it is</h3>
         <p><b>CPUs</b> have a few dozen to about two hundred powerful cores, great at branching, step-by-step logic. <b>GPUs</b> have thousands of simpler cores plus <em>tensor cores</em> that each multiply small blocks of numbers in a single step. <b>TPUs and other custom accelerators</b> go further, laying out a grid of multiply-add units that pass numbers to their neighbors like a bucket brigade (a "systolic array").</p>
-        <p>Beside the processor sit stacks of <b>high-bandwidth memory (HBM)</b>: 8 to 12 memory dies piled up and wired with thousands of connections, holding roughly 80–200+ GB per chip.</p>
+        <p>Beside the processor sit stacks of <b>high-bandwidth memory (HBM)</b>: 8 to 12 memory dies piled up and wired with thousands of connections, holding roughly 80–300 GB per chip.</p>
       </div>
       <div class="q">
         <h3>Why it matters</h3>
@@ -681,7 +681,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       </div>
       <div class="q conn">
         <h3>How it connects</h3>
-        <p><b class="dir">↓ Below</b> Made from silicon wafers. Each top-end chip draws about 700–1,200 W, which drives the rack and cooling design.</p>
+        <p><b class="dir">↓ Below</b> Made from silicon wafers. Each top-end chip draws about 700–1,400 W, which drives the rack and cooling design.</p>
         <p><b class="dir">↑ Above</b> Software has to arrange every computation so these units stay fed. Idle tensor cores are wasted money.</p>
       </div>
     </div>
@@ -708,7 +708,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p>Over 20 years, a 3× versus 1.6× trend compounds to roughly 60,000× more compute but only about 100× more bandwidth. Engineers push back with bigger on-chip caches, stacked HBM, processing many requests together (batching) so each weight fetched is reused, fusing operations so data stays on-chip, and lower precision.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: TPUs and custom chips</summary><div class="body">
-      <p>Google has run its own TPUs since 2015. Amazon (Trainium), Meta (MTIA) and Microsoft (Maia) build custom accelerators too, and startups try wafer-sized chips (Cerebras) or designs that keep the model in fast on-chip memory (Groq). They trade flexibility for efficiency on a narrower set of tasks. NVIDIA GPUs still did most AI training as of 2026, with AMD as the main GPU alternative.</p>
+      <p>Google has run its own TPUs since 2015. Amazon (Trainium), Meta (MTIA) and Microsoft (Maia) build custom accelerators too, and startups try wafer-sized chips (Cerebras) or designs that keep the model in fast on-chip memory (Groq). They trade flexibility for efficiency on a narrower set of tasks. As of 2026 NVIDIA still sold the large majority of AI accelerators, though Google's TPUs and Amazon's Trainium carry major workloads, and AMD is the main alternative GPU maker.</p>
     </div></details>
   </div>
 </section>
@@ -847,7 +847,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
     <div class="qgrid">
       <div class="q">
         <h3>What it is</h3>
-        <p>An artificial <b>neuron</b> multiplies each input by a weight, adds the results, and passes the total through a simple bend (a nonlinearity). An <b>embedding</b> turns each token ID into a list of thousands of numbers, a position in a kind of "meaning space." The <b>transformer</b> (2017) then applies the same kind of block again and again, about 30 to 130 times: an <b>attention</b> step, where each token gathers information from earlier tokens, and a <b>feed-forward</b> step, where each token is processed by wide layers of neurons. At the end, the final vector is turned into a score for every token in the vocabulary.</p>
+        <p>An artificial <b>neuron</b> multiplies each input by a weight, adds the results, and passes the total through a simple bend (a nonlinearity). An <b>embedding</b> turns each token ID into a list of thousands of numbers, a position in a kind of "meaning space." The <b>transformer</b> (2017) then applies the same kind of block again and again, from a few dozen to over a hundred times: an <b>attention</b> step, where each token gathers information from earlier tokens, and a <b>feed-forward</b> step, where each token is processed by wide layers of neurons. At the end, the final vector is turned into a score for every token in the vocabulary.</p>
       </div>
       <div class="q">
         <h3>Why it matters</h3>
@@ -896,7 +896,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p>Llama 3.1 405B represents each token as 16,384 numbers. Directions in this space loosely capture relationships. The famous "king − man + woman ≈ queen" comes from older word-embedding models and works only approximately, on well-chosen examples. Inside a transformer, each token's vector is rewritten layer by layer as it absorbs context.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: where the parameters live</summary><div class="body">
-      <p>In a typical dense transformer, roughly two-thirds of the parameters sit in the feed-forward blocks and one-third in attention. In <b>mixture-of-experts</b> models, the feed-forward part is split into many "experts" and a small router sends each token to just a few, so total size and per-token cost come apart.</p>
+      <p>In a typical dense transformer, two-thirds or more of the parameters sit in the feed-forward blocks and most of the rest in attention (modern attention designs share keys and values, which shrinks attention's share further). In <b>mixture-of-experts</b> models, the feed-forward part is split into many "experts" and a small router sends each token to just a few, so total size and per-token cost come apart.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: can we read the weights?</summary><div class="body">
       <p>Individual weights are almost never meaningful on their own. Interpretability research finds "features" (concepts such as a specific city, or code with a bug) spread across many neurons, and is beginning to trace how some behaviors are computed. Most of what a large model does is still not understood in detail.</p>
@@ -931,7 +931,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <div class="q conn">
         <h3>How it connects</h3>
         <p><b class="dir">↓ Below</b> Consumes data (Layer 6) through the model's architecture (Layer 7), running on distributed software and hardware.</p>
-        <p><b class="dir">↑ Above</b> Produces a fixed set of weights. Inference uses them unchanged: the model doesn't learn from your chat as it happens.</p>
+        <p><b class="dir">↑ Above</b> Produces a fixed set of weights. Inference uses them unchanged: the model doesn't learn from your chat as it happens (though, depending on settings, conversations may be used to train future versions).</p>
       </div>
     </div>
 
@@ -1333,11 +1333,11 @@ function segmented(options, value, onChange, label) {
   const root = $("#scale"); if (!root) return;
   const L = [
     { name: "Transistor", size: "~50 nm between gates", m: 5e-8, gpus: "—", tr: "1", power: "~5 nW on average", contains: "A switch: a voltage on the gate lets current through, or stops it.", draw: "transistor" },
-    { name: "GPU die", size: "~2.8 cm across (~800 mm²)", m: 0.028, gpus: "½", tr: "~100 billion", power: "~500 W", contains: "One piece of silicon: thousands of cores, tensor cores and on-chip memory.", draw: "die" },
+    { name: "GPU die", size: "~2.8 cm across (~800 mm²)", m: 0.028, gpus: "½", tr: "~100 billion", power: "~500 W", contains: "One piece of silicon: about 80 streaming multiprocessors, each packed with simple cores and tensor cores, plus on-chip memory.", draw: "die" },
     { name: "GPU package", size: "~palm-sized", m: 0.08, gpus: "1", tr: "~208 billion (logic)", power: "~1,000 W", contains: "2 dies + 8 stacks of high-bandwidth memory (~192 GB) on one base.", draw: "package" },
     { name: "Compute tray", size: "~1 m deep, a few cm tall", m: 0.9, gpus: "4", tr: "~1 trillion", power: "~6 kW", contains: "4 GPUs + 2 CPUs, cold plates and liquid pipes.", draw: "tray" },
     { name: "Rack", size: "~2.2 m tall, ~1.4 tonnes", m: 2.2, gpus: "72", tr: "~15 trillion", power: "~120 kW", contains: "18 compute trays + 9 network-switch trays, wired as one 72-GPU unit.", draw: "rack" },
-    { name: "Pod", size: "~a 15 m row", m: 15, gpus: "576", tr: "~120 trillion", power: "~1 MW", contains: "8 racks joined by the scale-out network.", draw: "pod" },
+    { name: "Pod", size: "~a 10 m row", m: 15, gpus: "576", tr: "~120 trillion", power: "~1 MW", contains: "8 racks joined by the scale-out network.", draw: "pod" },
     { name: "Data hall", size: "several football fields", m: 300, gpus: "~50,000", tr: "~10 quadrillion", power: "~100 MW", contains: "~90 pods, plus power rooms and cooling plant.", draw: "hall" },
     { name: "Campus", size: "~1–2 km across", m: 1500, gpus: "~400,000+", tr: "~80 quadrillion", power: "~1 GW", contains: "Several buildings, a substation and cooling, drawing about as much as a large power plant produces.", draw: "campus" },
   ];
@@ -1370,8 +1370,8 @@ function segmented(options, value, onChange, label) {
       g.push(sv("path", { d: "M100 140 H130 M230 140 H270", stroke: A, "stroke-width": 1.5, "stroke-dasharray": "3 3" }));
     } else if (kind === "die") {
       g.push(R(80, 10, 200, 200, { fill: "var(--surface-2)" }));
-      for (let r = 0; r < 12; r++) for (let c = 0; c < 12; c++) g.push(sv("rect", { x: 92 + c * 15, y: 22 + r * 15, width: 11, height: 11, rx: 1, fill: (r === 5 || r === 6) ? "var(--line-strong)" : "color-mix(in srgb, var(--accent) 45%, transparent)" }));
-      g.push(T(290, 60, "~140 cores"), T(290, 76, "(SMs), each with"), T(290, 92, "tensor cores"), T(290, 118, "cache"), T(290, 134, "in the middle"));
+      for (let r = 0; r < 10; r++) for (let c = 0; c < 10; c++) g.push(sv("rect", { x: 92 + c * 18, y: 22 + r * 18, width: 14, height: 14, rx: 1.5, fill: (r === 4 || r === 5) ? "var(--line-strong)" : "color-mix(in srgb, var(--accent) 45%, transparent)" }));
+      g.push(T(290, 60, "~80 SMs,"), T(290, 76, "each with"), T(290, 92, "tensor cores"), T(290, 118, "cache"), T(290, 134, "in the middle"));
     } else if (kind === "package") {
       g.push(R(30, 20, 300, 180, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }));
       g.push(R(100, 40, 78, 140, { fill: "color-mix(in srgb, var(--accent) 35%, transparent)" }), R(182, 40, 78, 140, { fill: "color-mix(in srgb, var(--accent) 35%, transparent)" }));
@@ -1934,14 +1934,14 @@ function segmented(options, value, onChange, label) {
   const S = [
     { l: 10, dir: "down", title: "You press Enter", t: "0 s", e: 0, text: "You type “Why is the sky blue?” The app adds its hidden instructions (the system prompt) and the conversation so far, and sends it all over an encrypted connection." },
     { l: 2, dir: "down", title: "Into a data center", t: "~0.05 s", e: 0, text: "The request crosses the internet to a data center, maybe hundreds of kilometers away. A load balancer routes it to a server that already has the model loaded in GPU memory." },
-    { l: 6, dir: "down", title: "Text becomes tokens", t: "~0.05 s", e: 0, text: "Your question becomes about six tokens: “Why”, “ is”, “ the”, “ sky”, “ blue”, “?”. With the system prompt, the model may receive a few thousand tokens in all." },
+    { l: 6, dir: "down", title: "Text becomes tokens", t: "~0.05 s", e: 0, text: "Your question becomes about six tokens: “Why”, “ is”, “ the”, “ sky”, “ blue”, “?”. With the system prompt and chat history, the model may receive a thousand tokens or more." },
     { l: 9, dir: "down", title: "Joining a batch", t: "~0.1 s", e: 0, text: "A scheduler slots your request into a batch with other people's requests on the same GPUs, and reserves memory for your KV cache." },
     { l: 8, dir: "down", title: "Frozen weights", t: "~0.1 s", e: 0, text: "The weights doing the work were fixed when training finished, months ago. Answering you doesn't change them; the model isn't learning from this chat." },
-    { l: 7, dir: "down", title: "Prefill: reading the prompt", t: "~0.3 s", e: 0.02, text: "All the tokens flow through every layer at once: embeddings, then about a hundred rounds of attention and feed-forward blocks. Each layer's keys and values are saved in the KV cache." },
-    { l: 5, dir: "down", title: "Kernels and collectives", t: "~0.3 s", e: 0.02, text: "Each layer runs as a sequence of GPU kernels: matrix multiplies, attention, normalizations. The model is split across several GPUs, which swap partial results over fast links many times per token." },
-    { l: 4, dir: "down", title: "Tensor cores and memory", t: "~0.3 s", e: 0.02, text: "Tensor cores do the multiplications. For every token the GPUs have to stream the model's active weights out of high-bandwidth memory, so memory speed sets the pace." },
-    { l: 3, dir: "down", title: "Transistors switching", t: "~0.3 s", e: 0.02, text: "Underneath, tens of billions of transistors per chip switch on and off about two billion times a second. Every switch turns a little energy into heat." },
-    { l: 1, dir: "down", title: "Power in, heat out", t: "~0.3 s", e: 0.02, text: "The GPUs, CPUs, network and cooling draw power from the grid. By the end of the answer your share will be roughly 0.3 Wh (est.), about one second of a microwave oven, and nearly all of it leaves as heat in the cooling water." },
+    { l: 7, dir: "down", title: "Prefill: reading the prompt", t: "~0.3 s", e: 0.1, text: "All the tokens flow through every layer at once: embeddings, then dozens to over a hundred rounds of attention and feed-forward blocks. Each layer's keys and values are saved in the KV cache." },
+    { l: 5, dir: "down", title: "Kernels and collectives", t: "~0.3 s", e: 0.1, text: "Each layer runs as a sequence of GPU kernels: matrix multiplies, attention, normalizations. The model is split across several GPUs, which swap partial results over fast links many times per token." },
+    { l: 4, dir: "down", title: "Tensor cores and memory", t: "~0.3 s", e: 0.1, text: "Tensor cores do the multiplications. For every token the GPUs have to stream the model's active weights out of high-bandwidth memory, so memory speed sets the pace." },
+    { l: 3, dir: "down", title: "Transistors switching", t: "~0.3 s", e: 0.1, text: "Underneath, each chip has tens of billions of transistors, clocked about two billion times a second. Every time one switches, a little energy turns into heat." },
+    { l: 1, dir: "down", title: "Power in, heat out", t: "~0.3 s", e: 0.1, text: "The GPUs, CPUs, network and cooling draw power from the grid. By the end of the answer your share will be roughly 0.3 Wh (est.), about one second of a microwave oven, and nearly all of it leaves as heat in the cooling water." },
     { l: 9, dir: "up", title: "Decode, one token at a time", t: "~3.5 s", e: 0.3, text: "Now the model writes. For each new token: run it through all the layers, look back at the KV cache, score every possible next token, sample one (temperature!), append it, repeat. About 300 tokens at roughly 100 per second." },
     { l: 10, dir: "up", title: "Back to your screen", t: "~3.5 s", e: 0.3, text: "Each token is turned back into text and streamed to you as it's made, which is why answers appear word by word: “The sky looks blue because air molecules scatter short, blue wavelengths of sunlight far more than long, red ones…”" },
   ];
