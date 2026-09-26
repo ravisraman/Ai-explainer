@@ -23,12 +23,13 @@ const STOPS = [
   { id: "zoom", kind: "marker", name: "Zoom out", tag: "Transistor to campus", color: 4 },
   ...LAYERS.slice(4).map((l) => ({ ...l, kind: "layer", color: l.n })),
   { id: "journey", kind: "marker", name: "Follow one prompt", tag: "All ten layers", color: 10 },
+  { id: "quiz", kind: "marker", name: "Test yourself", tag: "16 questions", color: 7 },
   { id: "limits", kind: "end", name: "Open questions", tag: "Limits", color: 9 },
 ];
 
 function stopLabel(s) {
   if (s.kind === "layer") return { kicker: `Layer ${s.n}`, name: s.name };
-  if (s.kind === "marker") return { kicker: s.id === "zoom" ? "Interlude" : "Finale", name: s.name };
+  if (s.kind === "marker") return { kicker: s.id === "zoom" ? "Interlude" : s.id === "quiz" ? "Quiz" : "Finale", name: s.name };
   if (s.kind === "end") return { kicker: "End", name: s.name };
   return { kicker: "Top", name: "The AI Stack" };
 }
