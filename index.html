@@ -878,6 +878,90 @@ h1 { margin-top: 18px; }
 .jr-cmp { margin-top: 10px; color: var(--muted); font-size: 0.92rem; }
 .jr-cmp b { color: var(--text); }
 
+/* =====================================================================
+   Pass 4: identity, motion and responsive polish
+   ===================================================================== */
+
+/* hero stack */
+.hero-mount { position: relative; margin-top: 0; }
+.hero-stage canvas { border-radius: 0; }
+.hero-labels { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; }
+.hero-labels li { position: absolute; transform: translateY(-50%); pointer-events: auto; }
+.hero-labels a {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 3px 6px; border-radius: 6px;
+  text-decoration: none; color: var(--muted); font-size: 0.86rem; white-space: nowrap;
+  transition: color 0.15s, background-color 0.15s;
+}
+.hero-labels a:hover, .hero-labels a:focus-visible { color: var(--text); background: color-mix(in srgb, var(--c) 16%, transparent); }
+.hl-n { font: 600 0.72rem/1 var(--font-mono); color: var(--c); min-width: 1.4em; text-align: right; }
+@media (max-width: 420px) { .hero-labels a { font-size: 0.78rem; gap: 5px; padding-inline: 4px; } }
+
+/* rail elevator marker */
+.rail { --marker-x: 2px; }
+.rail > .rail-stack { position: relative; }
+.rail-marker {
+  position: absolute; left: 6px; top: 0; width: 0; height: 0; opacity: 0;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 7px solid var(--mc, var(--text));
+  transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.3s;
+  pointer-events: none;
+}
+.rail { position: fixed; }
+.rail .rail-stack { margin-left: 10px; }
+
+/* layer numerals and floor lines */
+.layer { isolation: isolate; }
+.layer::before {
+  content: attr(data-layer);
+  position: absolute; z-index: -1; right: -8px; top: 36px;
+  font: 900 clamp(7rem, 17vw, 14rem)/0.8 var(--font-display); font-stretch: 125%;
+  color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--c) 30%, transparent);
+  letter-spacing: -0.04em; pointer-events: none; user-select: none;
+}
+.layer::after, .interlude::after, .finale::after, .limits::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+  background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 30%, transparent) 40%, transparent 85%);
+  opacity: 0.7;
+}
+.interlude, .finale { isolation: isolate; }
+
+/* figures carry a hint of their layer color */
+.fig { border-color: color-mix(in srgb, var(--c) 16%, var(--line)); }
+.fig-head h3::before { box-shadow: 0 0 12px color-mix(in srgb, var(--c) 70%, transparent); }
+
+/* readout change feedback */
+.ro-num.tick { animation: roTick 0.6s ease-out; }
+@keyframes roTick { from { color: var(--c); } to { color: inherit; } }
+
+/* scroll-driven reveal (progressive; everything is visible at rest) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fig, .spec, .analogy, .notes > *, .limit, .layer-head {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    @keyframes rise { from { opacity: 0.25; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  }
+}
+
+/* hardware / software boundary marker at the interlude */
+.interlude .layer-head h2 { font-size: clamp(2.2rem, 6vw, 4.2rem); }
+
+/* phones */
+@media (max-width: 600px) {
+  .fig { padding: 14px 12px; border-radius: 12px; }
+  .layer, .interlude, .finale, .limits { padding-block: 64px 24px; }
+  .bench { margin-top: 28px; }
+  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ro-val { font-size: 1.12rem; }
+  .ctl-row { gap: 12px 16px; }
+  .analogy p { padding: 14px 16px; }
+  .jr-dot { width: 18px; height: 18px; }
+}
+@media (hover: none) {
+  .jr-dots { gap: 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -2068,7 +2152,13 @@ function readout(label, opts = {}) {
   return {
     el,
     set(text, u, s) {
-      val.textContent = text;
+      const str = String(text);
+      if (val.textContent !== str && !reducedMotion()) {
+        val.classList.remove("tick");
+        void val.offsetWidth;
+        val.classList.add("tick");
+      }
+      val.textContent = str;
       if (u !== undefined) unit.textContent = u;
       if (s !== undefined) sub.textContent = s;
     },
@@ -2190,7 +2280,7 @@ function stopLabel(s) {
   if (s.kind === "layer") return { kicker: `Layer ${s.n}`, name: s.name };
   if (s.kind === "marker") return { kicker: s.id === "zoom" ? "Interlude" : "Finale", name: s.name };
   if (s.kind === "end") return { kicker: "End", name: s.name };
-  return { kicker: "The AI Stack", name: "Start at the bottom" };
+  return { kicker: "Top", name: "The AI Stack" };
 }
 
 function buildStackList(listEl, onPick) {
@@ -2221,7 +2311,19 @@ function buildStackList(listEl, onPick) {
 
 function initNav() {
   const root = document.documentElement;
-  const railItems = buildStackList($("#railStack"));
+  const railList = $("#railStack");
+  const railItems = buildStackList(railList);
+  const marker = h("span", { class: "rail-marker", "aria-hidden": "true" });
+  railList.parentElement.append(marker);
+  const moveMarker = () => {
+    const a = railItems.find((x) => x.classList.contains("is-current"));
+    if (!a || !railList.offsetParent) { marker.style.opacity = "0"; return; }
+    const r = a.getBoundingClientRect(), pr = railList.parentElement.getBoundingClientRect();
+    marker.style.opacity = "1";
+    marker.style.transform = `translateY(${r.top - pr.top + r.height / 2 - 6}px)`;
+    marker.style.setProperty("--mc", getComputedStyle(a).getPropertyValue("--sc"));
+  };
+  window.addEventListener("resize", () => moveMarker());
   const sheet = $("#sheet");
   let lastFocus = null;
   const closeSheet = () => {
@@ -2251,6 +2353,7 @@ function initNav() {
     $("#elevDown").disabled = i <= 0;
     $("#elevUp").disabled = i >= STOPS.length - 1;
     root.style.setProperty("--cur", Theme.c["l" + s.color] || "#ff6b4a");
+    moveMarker();
   };
   Theme.on(() => { const i = cur; cur = -1; setCurrent(Math.max(0, i)); });
 
@@ -2298,6 +2401,147 @@ function initNav() {
   Theme.on(syncThemeButtons);
   syncThemeButtons();
 }
+
+/* ---- 02-hero.js ---- */
+/* =====================================================================
+   Hero: an isometric stack of the ten layers. Particles start at the
+   bottom as electricity, climb through every layer (taking each layer's
+   color) and leave the top as letters. Labels are real links.
+   ===================================================================== */
+
+defineMount("hero", (root) => {
+  const WORDS = ["answers", "code", "poems", "plans", "summaries", "ideas", "translations"];
+  const list = h("ol", { class: "hero-labels" });
+  const links = LAYERS.slice().reverse().map((l) => {
+    const a = h("a", { href: "#" + l.id, style: `--c: var(--l${l.n})`, "data-n": l.n }, h("span", { class: "hl-n" }, String(l.n)), h("span", { class: "hl-name" }, l.name));
+    a.addEventListener("mouseenter", () => { hover = l.n; });
+    a.addEventListener("mouseleave", () => { hover = 0; });
+    a.addEventListener("focus", () => { hover = l.n; });
+    a.addEventListener("blur", () => { hover = 0; });
+    list.append(h("li", null, a));
+    return a;
+  });
+  let hover = 0, t0 = performance.now(), geo = null;
+  const stage = new Stage(root, {
+    cls: "hero-stage",
+    label: "",
+    height: (w) => clamp(w * 1.05, 330, 520),
+    onResize: (w, hh) => {
+      const labelW = w < 420 ? 156 : 170;
+      const sw = Math.min((w - labelW - 16) / 2, 150);
+      const cx = 12 + sw + 6;
+      const d = sw * 0.5; // isometric depth
+      const th = Math.max(9, hh * 0.028); // slab thickness
+      const gap = (hh - 90 - d * 2) / 10;
+      geo = { w, hh, sw, cx, d, th, gap, top: 70 + d, labelX: cx + sw + (w < 420 ? 10 : 22) };
+      // position label links beside each slab
+      links.forEach((a) => {
+        const n = +a.dataset.n;
+        const y = slabY(n);
+        a.parentElement.style.top = `${y - 4}px`;
+        a.parentElement.style.left = `${geo.labelX}px`;
+      });
+    },
+    draw: () => draw(0),
+  });
+  stage.canvas.setAttribute("aria-hidden", "true");
+  root.append(list);
+  const slabY = (n) => geo.top + (10 - n) * geo.gap; // y of the slab's top-face center
+
+  const parts = [];
+  const R = rng(3);
+  const letters = [];
+  let wordIdx = 0, letterTimer = 0;
+
+  function spawn() {
+    parts.push({ x: (R() - 0.5) * 0.9, z: (R() - 0.5) * 0.9, y: 0, v: 0.08 + R() * 0.06, ph: R() * 6.28 });
+  }
+  function tick(dt) {
+    const reduced = reducedMotion();
+    if (!reduced) {
+      if (parts.length < 46 && R() < 0.35) spawn();
+      for (const p of parts) { p.y += p.v * dt; p.ph += dt * 2; }
+      for (let i = parts.length - 1; i >= 0; i--) {
+        if (parts[i].y > 1) {
+          const p = parts.splice(i, 1)[0];
+          letterTimer -= 1;
+          if (letterTimer <= 0) {
+            const w = WORDS[wordIdx++ % WORDS.length];
+            letters.push({ text: w, x: p.x, life: 0 });
+            letterTimer = 14;
+          }
+        }
+      }
+      for (const L of letters) L.life += dt;
+      while (letters.length && letters[0].life > 3.2) letters.shift();
+    }
+    draw(dt);
+  }
+  function iso(x, z, y) {
+    // x, z in [-1, 1] across the slab; y = height fraction 0 (bottom) .. 1 (top)
+    const g = geo;
+    const baseY = g.top + 9 * g.gap + g.gap * 0.0;
+    const sy = lerp(baseY + g.gap * 0.6, g.top - g.d - 20, y);
+    return [g.cx + (x - z) * g.sw * 0.5, sy + (x + z) * g.d * 0.5];
+  }
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !geo) return;
+    stage.clear();
+    const g = geo;
+    const since = (performance.now() - t0) / 1000;
+    // slabs from bottom (1) to top (10)
+    for (let n = 1; n <= 10; n++) {
+      const appear = reducedMotion() ? 1 : clamp((since - (n - 1) * 0.07) / 0.45, 0, 1);
+      if (appear <= 0) continue;
+      const lift = (1 - easeOut(appear)) * 30 + (hover === n ? 6 : 0);
+      const y = slabY(n) - lift;
+      const col = C["l" + n];
+      const on = hover === n;
+      c.globalAlpha = appear * (hover && !on ? 0.55 : 1);
+      // faces
+      const L = [g.cx - g.sw, y], T = [g.cx, y - g.d], Rr = [g.cx + g.sw, y], B = [g.cx, y + g.d];
+      const th = g.th;
+      c.fillStyle = mix(col, "#000000", 0.45);
+      poly(c, [L, B, [B[0], B[1] + th], [L[0], L[1] + th]]);
+      c.fillStyle = mix(col, "#000000", 0.25);
+      poly(c, [B, Rr, [Rr[0], Rr[1] + th], [B[0], B[1] + th]]);
+      c.fillStyle = on ? mix(col, "#ffffff", 0.18) : col;
+      poly(c, [L, T, Rr, B]);
+      // etched grid on the top face for texture
+      c.strokeStyle = rgba("#000000", 0.12); c.lineWidth = 1;
+      for (let k = 1; k < 4; k++) {
+        const f = k / 4;
+        c.beginPath(); c.moveTo(lerp(L[0], T[0], f), lerp(L[1], T[1], f)); c.lineTo(lerp(B[0], Rr[0], f), lerp(B[1], Rr[1], f)); c.stroke();
+      }
+      c.globalAlpha = 1;
+    }
+    // particles (drawn over the slabs, climbing through)
+    for (const p of parts) {
+      const [px, py] = iso(p.x + Math.sin(p.ph) * 0.04, p.z, p.y);
+      const layer = clamp(Math.floor(p.y * 10) + 1, 1, 10);
+      c.fillStyle = C["l" + layer];
+      c.shadowColor = C["l" + layer]; c.shadowBlur = 6;
+      c.beginPath(); c.arc(px, py, 2.2, 0, Math.PI * 2); c.fill();
+    }
+    c.shadowBlur = 0;
+    // words leaving the top
+    c.font = `600 13px ${Theme.mono}`; c.textAlign = "center";
+    for (const L of letters) {
+      const [px, py] = iso(L.x, 0, 1);
+      const a = clamp(1 - L.life / 3.2, 0, 1);
+      c.fillStyle = rgba(C.l10, a);
+      c.fillText(L.text, px, py - L.life * 16);
+    }
+    // bottom label
+    c.fillStyle = rgba(C.l1, 0.9); c.font = `600 10px ${Theme.mono}`;
+    const [bx, by] = iso(0, 0, 0);
+    c.fillText("ELECTRONS IN", bx, Math.min(g.hh - 6, by + g.d + 26));
+  }
+  function poly(c, pts) { c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]))); c.closePath(); c.fill(); }
+  Theme.on(() => draw(0));
+  Loop.add(root, tick);
+});
 
 /* ---- l01-energy.js ---- */
 /* =====================================================================

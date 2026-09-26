@@ -480,7 +480,13 @@ function readout(label, opts = {}) {
   return {
     el,
     set(text, u, s) {
-      val.textContent = text;
+      const str = String(text);
+      if (val.textContent !== str && !reducedMotion()) {
+        val.classList.remove("tick");
+        void val.offsetWidth;
+        val.classList.add("tick");
+      }
+      val.textContent = str;
       if (u !== undefined) unit.textContent = u;
       if (s !== undefined) sub.textContent = s;
     },

@@ -865,3 +865,87 @@ h1 { margin-top: 18px; }
 .jr-dot.on { background: var(--c); border-color: var(--c); transform: scale(1.2); }
 .jr-cmp { margin-top: 10px; color: var(--muted); font-size: 0.92rem; }
 .jr-cmp b { color: var(--text); }
+
+/* =====================================================================
+   Pass 4: identity, motion and responsive polish
+   ===================================================================== */
+
+/* hero stack */
+.hero-mount { position: relative; margin-top: 0; }
+.hero-stage canvas { border-radius: 0; }
+.hero-labels { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; }
+.hero-labels li { position: absolute; transform: translateY(-50%); pointer-events: auto; }
+.hero-labels a {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 3px 6px; border-radius: 6px;
+  text-decoration: none; color: var(--muted); font-size: 0.86rem; white-space: nowrap;
+  transition: color 0.15s, background-color 0.15s;
+}
+.hero-labels a:hover, .hero-labels a:focus-visible { color: var(--text); background: color-mix(in srgb, var(--c) 16%, transparent); }
+.hl-n { font: 600 0.72rem/1 var(--font-mono); color: var(--c); min-width: 1.4em; text-align: right; }
+@media (max-width: 420px) { .hero-labels a { font-size: 0.78rem; gap: 5px; padding-inline: 4px; } }
+
+/* rail elevator marker */
+.rail { --marker-x: 2px; }
+.rail > .rail-stack { position: relative; }
+.rail-marker {
+  position: absolute; left: 6px; top: 0; width: 0; height: 0; opacity: 0;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 7px solid var(--mc, var(--text));
+  transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.3s;
+  pointer-events: none;
+}
+.rail { position: fixed; }
+.rail .rail-stack { margin-left: 10px; }
+
+/* layer numerals and floor lines */
+.layer { isolation: isolate; }
+.layer::before {
+  content: attr(data-layer);
+  position: absolute; z-index: -1; right: -8px; top: 36px;
+  font: 900 clamp(7rem, 17vw, 14rem)/0.8 var(--font-display); font-stretch: 125%;
+  color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--c) 30%, transparent);
+  letter-spacing: -0.04em; pointer-events: none; user-select: none;
+}
+.layer::after, .interlude::after, .finale::after, .limits::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+  background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 30%, transparent) 40%, transparent 85%);
+  opacity: 0.7;
+}
+.interlude, .finale { isolation: isolate; }
+
+/* figures carry a hint of their layer color */
+.fig { border-color: color-mix(in srgb, var(--c) 16%, var(--line)); }
+.fig-head h3::before { box-shadow: 0 0 12px color-mix(in srgb, var(--c) 70%, transparent); }
+
+/* readout change feedback */
+.ro-num.tick { animation: roTick 0.6s ease-out; }
+@keyframes roTick { from { color: var(--c); } to { color: inherit; } }
+
+/* scroll-driven reveal (progressive; everything is visible at rest) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fig, .spec, .analogy, .notes > *, .limit, .layer-head {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    @keyframes rise { from { opacity: 0.25; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  }
+}
+
+/* hardware / software boundary marker at the interlude */
+.interlude .layer-head h2 { font-size: clamp(2.2rem, 6vw, 4.2rem); }
+
+/* phones */
+@media (max-width: 600px) {
+  .fig { padding: 14px 12px; border-radius: 12px; }
+  .layer, .interlude, .finale, .limits { padding-block: 64px 24px; }
+  .bench { margin-top: 28px; }
+  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ro-val { font-size: 1.12rem; }
+  .ctl-row { gap: 12px 16px; }
+  .analogy p { padding: 14px 16px; }
+  .jr-dot { width: 18px; height: 18px; }
+}
+@media (hover: none) {
+  .jr-dots { gap: 8px; }
+}

@@ -30,7 +30,7 @@ function stopLabel(s) {
   if (s.kind === "layer") return { kicker: `Layer ${s.n}`, name: s.name };
   if (s.kind === "marker") return { kicker: s.id === "zoom" ? "Interlude" : "Finale", name: s.name };
   if (s.kind === "end") return { kicker: "End", name: s.name };
-  return { kicker: "The AI Stack", name: "Start at the bottom" };
+  return { kicker: "Top", name: "The AI Stack" };
 }
 
 function buildStackList(listEl, onPick) {
@@ -61,7 +61,19 @@ function buildStackList(listEl, onPick) {
 
 function initNav() {
   const root = document.documentElement;
-  const railItems = buildStackList($("#railStack"));
+  const railList = $("#railStack");
+  const railItems = buildStackList(railList);
+  const marker = h("span", { class: "rail-marker", "aria-hidden": "true" });
+  railList.parentElement.append(marker);
+  const moveMarker = () => {
+    const a = railItems.find((x) => x.classList.contains("is-current"));
+    if (!a || !railList.offsetParent) { marker.style.opacity = "0"; return; }
+    const r = a.getBoundingClientRect(), pr = railList.parentElement.getBoundingClientRect();
+    marker.style.opacity = "1";
+    marker.style.transform = `translateY(${r.top - pr.top + r.height / 2 - 6}px)`;
+    marker.style.setProperty("--mc", getComputedStyle(a).getPropertyValue("--sc"));
+  };
+  window.addEventListener("resize", () => moveMarker());
   const sheet = $("#sheet");
   let lastFocus = null;
   const closeSheet = () => {
@@ -91,6 +103,7 @@ function initNav() {
     $("#elevDown").disabled = i <= 0;
     $("#elevUp").disabled = i >= STOPS.length - 1;
     root.style.setProperty("--cur", Theme.c["l" + s.color] || "#ff6b4a");
+    moveMarker();
   };
   Theme.on(() => { const i = cur; cur = -1; setCurrent(Math.max(0, i)); });
 
