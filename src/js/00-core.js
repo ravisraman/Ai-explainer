@@ -382,7 +382,7 @@ function slider(o) {
 
 /* segmented({ label, options:[{value,label}], value, onChange }) */
 function segmented(o) {
-  const group = h("div", { class: "seg", role: "group", "aria-label": o.label || "" });
+  const group = h("div", { class: "seg" + (o.scroll ? " scroll" : ""), role: "group", "aria-label": o.label || "" });
   let value = o.value;
   const btns = o.options.map((opt) =>
     h("button", {
@@ -402,6 +402,13 @@ function segmented(o) {
     set(v, fire) {
       value = v;
       o.options.forEach((opt, i) => btns[i].setAttribute("aria-pressed", String(opt.value === v)));
+      if (o.scroll) {
+        const b = btns[o.options.findIndex((opt) => opt.value === v)];
+        if (b && group.scrollWidth > group.clientWidth) {
+          const left = b.offsetLeft - (group.clientWidth - b.offsetWidth) / 2;
+          group.scrollTo({ left: Math.max(0, left), behavior: reducedMotion() ? "auto" : "smooth" });
+        }
+      }
       if (fire && o.onChange) o.onChange(v);
     },
     buttons: btns,

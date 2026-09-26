@@ -271,7 +271,7 @@
     <p class="summary">The same pattern repeats at every scale: many small things, wired together, packed as tightly as heat and physics allow.</p>
   </header>
   <figure class="fig fig-full" id="fig-zoom">
-    <figcaption class="fig-head"><h3>Zoom out</h3><p>Drag the slider, scroll or pinch on the picture, or jump to a level. Everything is drawn to scale.</p></figcaption>
+    <figcaption class="fig-head"><h3>Zoom out</h3><p>Drag the slider, pinch the picture, or jump to a level. Everything is drawn to scale, from a switch smaller than a virus to a site the size of a neighborhood.</p></figcaption>
     <div class="mount" data-mount="zoom"></div>
     <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> sizes are to scale; layouts are illustrative. Counts assume NVIDIA GB200 NVL72-style racks (72 GPUs, ~130 kW each) and a 100,000-GPU campus.</p>
   </figure>
@@ -416,7 +416,7 @@
     <figure class="fig" id="fig-embed">
       <figcaption class="fig-head"><h3>Words as points</h3><p>A model turns every token into a list of numbers, a point in space. Related words land near each other, and some directions carry meaning. Hover or tap a word; try the arithmetic.</p></figcaption>
       <div class="mount" data-mount="embed"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Hand-built:</b> 12-number vectors designed for this page and flattened to 2-D for display. Real embeddings have thousands of numbers learned from data, and the arithmetic works only roughly. As in the classic demo, the three input words are excluded from the answer.</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Hand-built:</b> 25-number vectors designed for this page and flattened to 2-D for display. Real embeddings have thousands of numbers learned from data, and the arithmetic works only roughly. As in the classic demo, the three input words are excluded from the answer.</p>
     </figure>
     <aside class="notes">
       <div class="note"><h4>Arithmetic on meaning</h4><p>Take the step from "man" to "woman" and add it to "king". The nearest word is "queen". The same step works for other pairs, which suggests the space has a rough "gender" direction.</p></div>
@@ -502,13 +502,13 @@
     <figure class="fig" id="fig-scaling">
       <figcaption class="fig-head"><h3>Scaling laws</h3><p>Bigger models trained on more data reach lower loss, and the improvement is predictable. Choose a model size and an amount of data; see the predicted loss and what it would cost.</p></figcaption>
       <div class="mount" data-mount="scaling"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> the formula fitted in DeepMind's Chinchilla paper (2022) for one family of models and one dataset. Cost assumes H100-class GPUs at 40% utilization and ~$2 per GPU-hour; energy assumes ~1.5 kW per GPU with 20% building overhead.</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> the loss formula from DeepMind's Chinchilla paper (2022), with constants from a 2024 re-fit of its data by Epoch AI. It describes one family of models on one dataset; other models and data have different curves. Cost assumes H100-class GPUs at 40% utilization and ~$2 per GPU-hour; energy assumes ~1.5 kW per GPU with 20% building overhead.</p>
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="2" data-show="scaling:budget">
         <p class="predict-q"><b>Predict</b> You have a fixed compute budget. Should you spend it on the biggest possible model, the most possible data, or something in between?</p>
         <div class="predict-opts"><button type="button">Biggest model</button><button type="button">Most data</button><button type="button">In between</button></div>
-        <div class="predict-a" hidden><p>In between. For a fixed budget, this fit puts the lowest loss at roughly 20 training tokens per parameter (the "Chinchilla" rule of thumb). Many labs now train smaller models on far more data anyway, because smaller models are cheaper to run for users.</p></div>
+        <div class="predict-a" hidden><p>In between. For a fixed budget, the fit puts the lowest loss at roughly 20 training tokens per parameter (the "Chinchilla" rule of thumb). Many labs now train smaller models on far more data anyway, because smaller models are cheaper to run for users.</p></div>
       </div>
       <div class="note"><h4>Loss isn't ability</h4><p>Loss measures the model's average surprise at the next token. Lower loss has tracked better abilities, but specific skills don't improve smoothly, and loss says nothing about honesty or judgment.</p></div>
     </aside>
