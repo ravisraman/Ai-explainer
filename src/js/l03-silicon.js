@@ -16,7 +16,7 @@ defineMount("node", (root) => {
     { name: "NVIDIA V100", year: 2017, t: 21.1e9, area: 815, node: "12 nm" },
     { name: "NVIDIA A100", year: 2020, t: 54.2e9, area: 826, node: "7 nm" },
     { name: "NVIDIA H100", year: 2022, t: 80e9, area: 814, node: "4N (5 nm class)" },
-    { name: "NVIDIA B200", year: 2024, t: 208e9, area: 1600, node: "4NP, two dies" },
+    { name: "NVIDIA B200", year: 2024, t: 208e9, area: 1600, est: true, node: "4NP, two dies" },
   ];
   // side of the average square each transistor occupies, in µm
   const cellUm = (ch) => Math.sqrt(ch.area / ch.t) * 1000;
@@ -183,8 +183,8 @@ defineMount("node", (root) => {
     const ty0 = dy + Math.max(rs, side) + 34;
     c.fillText(L.wide ? `${ch.name} · ${ch.year}` : ch.name, D.x, ty0);
     c.fillStyle = C.muted; c.font = `500 ${L.wide ? 13 : 12}px ${Theme.body}`;
-    if (L.wide) c.fillText(`${fmtNum(ch.area, 3)} mm² · process "${ch.node}"`, D.x, ty0 + 19);
-    else { c.fillText(`${ch.year} · ${fmtNum(ch.area, 3)} mm²`, D.x, ty0 + 17); c.fillText(`"${ch.node.split(",")[0]}"`, D.x, ty0 + 33); }
+    if (L.wide) c.fillText(`${ch.est ? "~" : ""}${fmtNum(ch.area, 3)} mm²${ch.est ? " (est.)" : ""} · process "${ch.node}"`, D.x, ty0 + 19);
+    else { c.fillText(`${ch.year} · ${ch.est ? "~" : ""}${fmtNum(ch.area, 3)} mm²`, D.x, ty0 + 17); c.fillText(`"${ch.node.split(",")[0]}"`, D.x, ty0 + 33); }
 
     drawChart(c, C, mono);
   }
@@ -269,7 +269,7 @@ defineMount("node", (root) => {
     else cmp = "a little smaller than a flu virus";
     let extra = "";
     if (idx >= 8) extra = ` Process names like "7 nm" and "4N" are labels; no feature on the chip measures that. Transistor gates sit roughly 50–60 nm apart.`;
-    if (idx === 10) extra = " No single piece of silicon can be bigger than about 858 mm², so the B200 joins two.";
+    if (idx === 10) extra = " One exposure prints at most ~858 mm², so the B200 joins two dies of roughly that size (areas est.).";
     status.innerHTML = `<b>${ch.name} (${ch.year}): ${fmtWords(ch.t, 3)} transistors.</b> Each one, with its share of wiring, takes up a square ${fmtUm(cell)} across, ${cmp}.${extra}`;
     Loop.wake();
   }

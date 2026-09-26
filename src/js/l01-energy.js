@@ -3,10 +3,10 @@
    ===================================================================== */
 
 defineMount("power", (root) => {
-  const PER_GPU = 1500; // W per GPU, all-in: its share of CPUs, memory, network, fans
+  const PER_GPU = 1800; // W per GPU, all-in (Blackwell-class): its share of CPUs, memory, network, fans
   const HOME = 1200; // W, average US household draw over a year
   const MODES = {
-    air: { pue: 1.5, cool: 0.4, other: 0.1, perRack: 24, dT: 12, name: "Air" },
+    air: { pue: 1.5, cool: 0.4, other: 0.1, perRack: 16, dT: 12, name: "Air" },
     liquid: { pue: 1.15, cool: 0.1, other: 0.05, perRack: 72, dT: 10, name: "Liquid" },
   };
   const NAMED = [
@@ -15,7 +15,7 @@ defineMount("power", (root) => {
     { v: 72, name: "one liquid-cooled rack" },
     { v: 1000, name: "a row of racks" },
     { v: 10000, name: "a data hall" },
-    { v: 100000, name: "a frontier cluster" },
+    { v: 100000, name: "a 2024-scale frontier cluster" },
   ];
   let n = 8;
   let mode = "liquid";
@@ -356,7 +356,7 @@ defineMount("power", (root) => {
       tween(prevFac, fac, 450, (v) => { const [a, u] = siParts(v, "W"); roFac.set(a, u); }, true),
     ];
     prevIT = it; prevFac = fac;
-    roIT.set(...siParts(it, "W"), `${fmtInt(n)} × ~1.5 kW`);
+    roIT.set(...siParts(it, "W"), `${fmtInt(n)} × ~${fmtNum(PER_GPU / 1000, 2)} kW`);
     roFac.set(...siParts(fac, "W"), `+${Math.round((m.pue - 1) * 100)}% for cooling and power conversion`);
     const heatW = it; // essentially all IT power becomes heat
     if (mode === "liquid") {
@@ -384,10 +384,10 @@ defineMount("power", (root) => {
     const homes = homesTarget();
     const facTxt = fmtSI(facW(), "W", 2);
     if (n === 1) return `<b>One GPU with its share of the server: about a space heater.</b> Run it all year and it uses about as much electricity as ${fmtNum(homes, 2)} average US homes.`;
-    if (n === 8) return `<b>One server of eight GPUs: ~12 kW,</b> about what ${fmtInt(Math.round(homes))} homes draw on average.`;
-    if (n === 72 && mode === "liquid") return `<b>One rack: ~110 kW packed into less than a square meter.</b> Switch to air cooling and see how many racks the same 72 GPUs need.`;
-    if (n === 72 && mode === "air") return `<b>Air can't carry ~110 kW out of one rack.</b> The same 72 GPUs have to be spread over ${racks()} racks, with fans pushing ${fmtNum((itW() / (1.2 * 1005 * 12)), 2)} m³ of air per second.`;
-    if (n === 100000) return `<b>A frontier cluster: ${facTxt} for the whole site,</b> as much as ~${fmtInt(roundSig(homes, 2))} homes. Every one of those watts leaves as heat.`;
+    if (n === 8) return `<b>One server of eight GPUs: ~${fmtSI(8 * PER_GPU, "W", 2)},</b> about what ${fmtInt(Math.round(homes))} homes draw on average.`;
+    if (n === 72 && mode === "liquid") return `<b>One rack: ~${fmtSI(72 * PER_GPU, "W", 2)} packed into less than a square meter.</b> Switch to air cooling and see how many racks the same 72 GPUs need.`;
+    if (n === 72 && mode === "air") return `<b>Air can't carry ~${fmtSI(72 * PER_GPU, "W", 2)} out of one rack.</b> The same 72 GPUs have to be spread over ${racks()} racks, with fans pushing ${fmtNum(itW() / (1.2 * 1005 * 12), 2)} m³ of air per second.`;
+    if (n === 100000) return `<b>A 2024-scale frontier cluster: ${facTxt} for the whole site,</b> as much as ~${fmtInt(roundSig(homes, 2))} homes. Every one of those watts leaves as heat.`;
     if (named) return `<b>${named.name[0].toUpperCase() + named.name.slice(1)}: ${facTxt}</b>, as much as ~${fmtInt(roundSig(homes, 2))} homes.`;
     return `<b>${fmtInt(n)} GPUs: ${facTxt}</b> for the whole building, as much as ~${fmtHomes(roundSig(homes, 2))} homes.`;
   }

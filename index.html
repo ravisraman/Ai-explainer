@@ -1032,23 +1032,23 @@ h1 { margin-top: 18px; }
   </header>
   <div class="spec">
     <div class="stat"><div class="stat-num"><span class="est">~</span>1.5%</div><div class="stat-label">of the world's electricity went to data centers in 2024 (IEA est.). The IEA's base case roughly doubles that by 2030.</div></div>
-    <div class="stat"><div class="stat-num"><span class="est">~</span>1 GW</div><div class="stat-label">planned draw of the largest AI campuses under construction as of 2026, about the output of one large nuclear reactor.</div></div>
+    <div class="stat"><div class="stat-num">1–5 GW</div><div class="stat-label">planned draw of the largest AI campuses as of 2026 (reported plans). One gigawatt is about the output of a large nuclear reactor.</div></div>
   </div>
 
   <div class="bench">
     <figure class="fig" id="fig-power">
       <figcaption class="fig-head"><h3>Power a cluster</h3><p>Drag from one GPU to a hundred thousand, then switch the cooling.</p></figcaption>
       <div class="mount" data-mount="power"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> ~1.5 kW per GPU, counting its share of the server's processors, memory, network and fans. Cooling and power conversion add ~50% for a typical air-cooled building and ~15% for a liquid-cooled one. Coolant warms by 10 °C, air by 12 °C.</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> ~1.8 kW per GPU (Blackwell-class), counting its share of the server's processors, memory, network and fans. Cooling and power conversion add ~50% for a typical air-cooled building and ~15% for a liquid-cooled one. All heat is assumed to leave through the coolant (in real liquid-cooled racks ~85–90% does), which warms by 10 °C; air warms by 12 °C.</p>
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="2" data-show="power:100k">
         <p class="predict-q"><b>Predict</b> One GPU, with its share of the server around it, draws about as much as a space heater. How many homes' worth of power does a 100,000-GPU cluster draw?</p>
         <div class="predict-opts"><button type="button">About 1,000 homes</button><button type="button">About 10,000</button><button type="button">More than 100,000</button></div>
-        <div class="predict-a" hidden><p>Well over 100,000: roughly 140,000–190,000 homes, depending on the cooling. The chips and servers alone draw ~150 MW, and cooling and power conversion add another 15–50%. An average US home uses about 1.2 kW averaged over a year.</p></div>
+        <div class="predict-a" hidden><p>Well over 100,000: roughly 170,000–230,000 homes, depending on the cooling. The chips and servers alone draw ~180 MW, and cooling and power conversion add another 15–50%. An average US home uses about 1.2 kW averaged over a year.</p></div>
       </div>
       <div class="note"><h4>Watts in, heat out</h4><p>Chips turn electricity into computation, but physically nearly every joule ends up as heat. After computing, a data center's main job is carrying that heat outside.</p></div>
-      <div class="note"><h4>Why liquid</h4><p>Water carries about 3,500 times more heat than the same volume of air. Air cooling runs out around 30–40 kW per rack. The densest AI racks draw ~130 kW, so water is piped to cold plates sitting on the chips.</p></div>
+      <div class="note"><h4>Why liquid</h4><p>Water carries about 3,500 times more heat than the same volume of air. Air cooling runs out around 30–40 kW per rack. The densest AI racks draw ~130 kW (next-generation designs aim near 200 kW, est.), so water is piped to cold plates sitting on the chips.</p></div>
     </aside>
   </div>
 
@@ -1077,8 +1077,8 @@ h1 { margin-top: 18px; }
     <p class="summary">A data center wires thousands of chips into one computer, and the network decides how fast they can work together.</p>
   </header>
   <div class="spec">
-    <div class="stat"><div class="stat-num">100,000+</div><div class="stat-label">GPUs in the largest single training clusters as of 2026. Several planned sites aim for many times that.</div></div>
-    <div class="stat"><div class="stat-num"><span class="est">~</span>10–20×</div><div class="stat-label">faster links between GPUs inside one rack (~900 GB/s each way on NVIDIA's NVLink) than between racks (~50–100 GB/s per GPU).</div></div>
+    <div class="stat"><div class="stat-num">100,000s</div><div class="stat-label">of GPUs at the largest single AI sites as of 2026 (est.). In 2024 the frontier was about 100,000.</div></div>
+    <div class="stat"><div class="stat-num"><span class="est">~</span>10–20×</div><div class="stat-label">faster links between GPUs inside one rack (~900 GB/s each way on NVIDIA's Blackwell-generation NVLink) than between racks (~50–100 GB/s per GPU).</div></div>
   </div>
 
   <div class="bench">
@@ -1091,7 +1091,7 @@ h1 { margin-top: 18px; }
       <div class="predict" data-answer="1" data-show="cluster:cut">
         <p class="predict-q"><b>Predict</b> Rack 3 has four links to the switches. You cut one of them: one link out of 32 in the whole cluster. How much slower does training get?</p>
         <div class="predict-opts"><button type="button">About 3% (1 in 32)</button><button type="button">Much more than that</button></div>
-        <div class="predict-a" hidden><p>Much more. Every rack waits for the slowest one at every step, so the whole job drops to rack 3's pace. Cut a second link on the same rack and it gets worse fast.</p></div>
+        <div class="predict-a" hidden><p>Much more: about 8% in this model, nearly three times the naive guess. Every rack waits for the slowest one at every step, so the whole job drops to rack 3's pace. Cut a second link on the same rack and it gets worse fast.</p></div>
       </div>
       <div class="note"><h4>Lock-step</h4><p>In the most common setup, every chip trains on different data and then they all average what they learned. Nobody can start the next step until the average is done, so the slowest link sets the pace for everyone.</p></div>
       <div class="note"><h4>Two networks</h4><p>Inside a rack, GPUs share a very fast private network. Between racks, traffic goes through switches at roughly a tenth of the speed. Engineers put the chattiest work inside racks.</p></div>
@@ -1102,7 +1102,7 @@ h1 { margin-top: 18px; }
 
   <div class="deepers">
     <details class="deeper"><summary>Go deeper: two networks, two speeds</summary><div class="body">
-      <p><b>Scale-up</b> links connect GPUs inside a server or rack. NVIDIA's NVLink gives each current GPU about 1.8 terabytes per second to its neighbors, counting both directions.</p>
+      <p><b>Scale-up</b> links connect GPUs inside a server or rack. NVIDIA's NVLink gives each Blackwell-generation GPU about 1.8 terabytes per second to its neighbors, counting both directions; the next generation doubles that.</p>
       <p><b>Scale-out</b> links connect racks over InfiniBand or Ethernet at about 400–800 gigabits per second per GPU in each direction, roughly 50–100 gigabytes per second. Compared direction for direction, that's about 10–20 times slower.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: the fabric</summary><div class="body">
@@ -1140,9 +1140,9 @@ h1 { margin-top: 18px; }
 
   <div class="bench">
     <figure class="fig" id="fig-wafer">
-      <figcaption class="fig-head"><h3>Wafer yield</h3><p>A 300 mm wafer holds dozens to hundreds of chips. Random defects ruin any chip they land on. Change the defect rate and the chip size.</p></figcaption>
+      <figcaption class="fig-head"><h3>Wafer yield</h3><p>A 300 mm wafer holds dozens to thousands of chips, depending on their size. Random defects ruin any chip they land on. Change the defect rate and the chip size.</p></figcaption>
       <div class="mount" data-mount="wafer"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> defects land at random (real ones cluster), one defect kills a whole chip (real fabs often salvage chips by switching off the damaged part), and a wafer costs a fixed ~$20,000 (est. for a leading-edge process).</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> defects land at random (real ones cluster), one defect kills a whole chip (real fabs often salvage chips by switching off the damaged part), and a wafer costs a fixed ~$20,000 (est.; the newest processes cost more, ~$30,000).</p>
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="1" data-show="wafer:double">
@@ -1154,17 +1154,17 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
-  <aside class="analogy"><p><b>Analogy</b> Printing a photograph: light shines through a master pattern (the mask), shrunk four times, onto a wafer coated with light-sensitive chemical.</p><p class="breaks"><b>Where it breaks</b> EUV light is absorbed by glass and even by air, so there are no lenses. It bounces off ultra-smooth mirrors inside a vacuum. And each chip needs dozens of patterned layers, stacked with alignment errors of a few nanometers.</p></aside>
+  <aside class="analogy"><p><b>Analogy</b> Printing a photograph: light carries a master pattern (the mask), shrunk four times, onto a wafer coated with light-sensitive chemical.</p><p class="breaks"><b>Where it breaks</b> EUV light is absorbed by glass and even by air, so there are no lenses. It bounces off ultra-smooth mirrors inside a vacuum, and even the mask is a mirror: the light reflects off it rather than shining through. And each chip needs dozens of patterned layers, stacked with alignment errors of a few nanometers.</p></aside>
 
   <div class="deepers">
     <details class="deeper"><summary>Go deeper: from sand to wafer</summary><div class="body">
       <p>Quartz sand is reduced to silicon, then purified to about 99.9999999% ("nine nines"). A single crystal is pulled slowly from the melt and sliced into 300 mm wafers. Each wafer then goes through hundreds to more than a thousand steps: deposit a film, coat it, expose a pattern, etch, implant, polish, and repeat for dozens of layers. The trip takes around three months.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: how an EUV machine makes light</summary><div class="body">
-      <p>Droplets of molten tin fall through a chamber about 50,000 times a second. A powerful laser hits each one, turning it into a plasma that glows at a wavelength of 13.5 nm. Mirrors made by Zeiss collect and steer that light. Zeiss says that if one of these mirrors were scaled up to the size of Germany, its largest bump would be about 0.1 mm high.</p>
+      <p>Droplets of molten tin fall through a chamber about 50,000 times a second. A powerful laser hits each one twice, first to flatten it and then to turn it into a plasma that glows at a wavelength of 13.5 nm. Mirrors made by Zeiss collect and steer that light. Zeiss says that if one of these mirrors were scaled up to the size of Germany, its largest bump would be about 0.1 mm high.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: why the biggest chips are two chips</summary><div class="body">
-      <p>A scanner can print at most about 26 × 33 mm (~858 mm²) in one exposure, so no single die can be bigger. Big dies also catch more defects, as the wafer figure shows. So the newest AI chips join two large dies and several memory stacks on a shared base using <em>advanced packaging</em> (such as TSMC's CoWoS). Packaging capacity was one of the tightest AI bottlenecks of 2023–25.</p>
+      <p>A scanner can print at most about 26 × 33 mm (~858 mm²) in one exposure, so a conventional die can't be bigger without stitching exposures together (Cerebras' wafer-sized chip is the famous exception). Big dies also catch more defects, as the wafer figure shows. So the newest AI chips join two large dies and several memory stacks on a shared base using <em>advanced packaging</em> (such as TSMC's CoWoS). Packaging capacity was one of the tightest AI bottlenecks of 2023–25.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: who makes what</summary><div class="body">
       <p>One company (ASML) makes EUV scanners. One foundry (TSMC) makes roughly 90% of the most advanced logic chips (common estimate), mostly in Taiwan. Three companies (SK hynix, Samsung and Micron) make nearly all high-bandwidth memory. Chip designers such as NVIDIA, AMD and Google don't own fabs at all.</p>
@@ -1223,7 +1223,7 @@ h1 { margin-top: 18px; }
       <p>Numbers can be stored with 32, 16, 8 or even 4 bits. Fewer bits mean more operations per second and less memory traffic, at some cost in accuracy. As of 2026, training mostly uses 16- and 8-bit formats, and serving increasingly uses 8- or 4-bit. Much of the headline speed-up between chip generations comes from dropping precision, so compare like with like.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: fighting the memory wall</summary><div class="body">
-      <p>Over 20 years, a 3× versus 1.6× trend compounds to roughly 60,000× more compute but only about 100× more bandwidth. Engineers push back with high-bandwidth memory (HBM: 8–12 memory chips stacked beside the processor), bigger on-chip caches, batching many requests so each weight fetched is reused, fusing operations so data stays on the chip, and lower precision.</p>
+      <p>Over 20 years, a 3× versus 1.6× trend compounds to roughly 60,000× more compute but only about 100× more bandwidth. Engineers push back with high-bandwidth memory (HBM: 8–16 memory chips stacked beside the processor), bigger on-chip caches, batching many requests so each weight fetched is reused, fusing operations so data stays on the chip, and lower precision.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: TPUs and custom chips</summary><div class="body">
       <p>Google has run its own TPUs since 2015; Amazon (Trainium), Meta and Microsoft build custom accelerators too. They lay out grids of multiply-add units that pass numbers to their neighbors like a bucket brigade. As of 2026 NVIDIA still sold the large majority of AI accelerators, with AMD the main alternative GPU maker.</p>
@@ -1368,7 +1368,7 @@ h1 { margin-top: 18px; }
     <figure class="fig" id="fig-nn">
       <figcaption class="fig-head"><h3>Tune a network by hand</h3><p>Each line is a weight, a number its input gets multiplied by. Drag a line up or down (or select it and use the slider) and watch the output map change. Then let it learn.</p></figcaption>
       <div class="mount" data-mount="nn"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> two inputs, one hidden layer of up to six neurons, one output. Large models have thousands of neurons per layer and hundreds of layers' worth of weights.</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> two inputs, one hidden layer of up to six neurons, one output. Large models have tens of thousands of neurons per layer and around a hundred layers.</p>
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="1" data-show="nn:xor1">
@@ -1482,7 +1482,7 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
-  <aside class="analogy"><p><b>Analogy</b> Gradient descent is like walking downhill in thick fog, feeling the slope under your feet and stepping the steepest way down.</p><p class="breaks"><b>Where it breaks</b> The real landscape has billions of dimensions, not two, and it shifts with every batch of data. And the walker takes millions of steps without ever seeing the valley.</p></aside>
+  <aside class="analogy"><p><b>Analogy</b> Gradient descent is like walking downhill in thick fog, feeling the slope under your feet and stepping the steepest way down.</p><p class="breaks"><b>Where it breaks</b> The real landscape has billions of dimensions, not two, and it shifts with every batch of data. And the walker takes hundreds of thousands of steps without ever seeing the valley.</p></aside>
 
   <div class="deepers">
     <details class="deeper"><summary>Go deeper: loss, in numbers</summary><div class="body">
@@ -1508,7 +1508,7 @@ h1 { margin-top: 18px; }
     <p class="summary">To answer, the model scores every possible next token, picks one, adds it to the text, and repeats.</p>
   </header>
   <div class="spec">
-    <div class="stat"><div class="stat-num"><span class="est">~</span>0.3 Wh</div><div class="stat-label">for a typical short text query (2025 estimates from Google, OpenAI and Epoch AI). Long "reasoning" answers can use 10–100× more.</div></div>
+    <div class="stat"><div class="stat-num"><span class="est">~</span>0.3 Wh</div><div class="stat-label">for a typical short text query (2025 estimates from Google, OpenAI and Epoch AI). Long "reasoning" answers can use 10–100× more (est.).</div></div>
     <div class="stat"><div class="stat-num"><span class="est">~</span>0.3 MB</div><div class="stat-label">of memory per token of context for a 70-billion-parameter model's KV cache, so ~40 GB for a 128,000-token conversation.</div></div>
   </div>
 
@@ -1516,7 +1516,7 @@ h1 { margin-top: 18px; }
     <figure class="fig" id="fig-gen">
       <figcaption class="fig-head"><h3>Pick the next word</h3><p>The model gives every possible next word a probability. You decide how to choose: sample at random, take the favorite, or tap a bar yourself.</p></figcaption>
       <div class="mount" data-mount="gen"></div>
-      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> a tiny "trigram" model that predicts from the previous two words, trained in your browser on 80 sentences written for this page. Real models read the whole context through a transformer and choose among ~100,000 tokens.</p>
+      <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> a tiny "trigram" model that predicts from the previous two words, trained in your browser on 76 sentences written for this page. Real models read the whole context through a transformer and choose among ~100,000 tokens.</p>
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="1" data-show="gen:greedy">
@@ -1568,7 +1568,7 @@ h1 { margin-top: 18px; }
       <p>Bytes per token = 2 (keys and values) × layers × key-value heads × head size × bytes per number. For Llama 3 70B: 2 × 80 × 8 × 128 × 2 ≈ 330 KB. At 128,000 tokens that's about 42 GB, for one conversation.</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: speed, latency and "thinking"</summary><div class="body">
-      <p>The first token typically arrives within a few hundred milliseconds to a few seconds; after that, tens to a few hundred tokens per second. "Reasoning" models write a long hidden chain of thought before answering, which helps on hard problems but can multiply the tokens, and the energy, by 10 to 100 times.</p>
+      <p>The first token typically arrives within a few hundred milliseconds to a few seconds; after that, tens to a few hundred tokens per second. "Reasoning" models write a long hidden chain of thought before answering, which helps on hard problems but can multiply the tokens, and the energy, by 10 to 100 times (est.).</p>
     </div></details>
     <details class="deeper"><summary>Go deeper: tricks that make serving cheaper</summary><div class="body">
       <p>Batching many users per chip; storing weights in 8 or 4 bits; caching the shared start of prompts; <b>speculative decoding</b>, where a small model drafts several tokens and the big model checks them in one pass; and distilling big models into smaller ones.</p>
@@ -1584,7 +1584,7 @@ h1 { margin-top: 18px; }
     <p class="summary">Apps wrap the model in instructions, tools and memory. An agent is the model running in a loop.</p>
   </header>
   <div class="spec">
-    <div class="stat"><div class="stat-num"><span class="est">~</span>800 million</div><div class="stat-label">weekly ChatGPT users, as reported by OpenAI in late 2025.</div></div>
+    <div class="stat"><div class="stat-num">900 million+</div><div class="stat-label">weekly ChatGPT users, as reported by OpenAI in early 2026.</div></div>
     <div class="stat"><div class="stat-num">36%</div><div class="stat-label">chance a 20-step task goes right if each step is 95% reliable (0.95<sup>20</sup>). That's why agents need checks.</div></div>
   </div>
 
@@ -1663,7 +1663,7 @@ h1 { margin-top: 18px; }
 
 <footer class="sources" id="sources">
   <h2>Sources and notes</h2>
-  <p>Figures are rounded and many are estimates; they reflect what was public by 2026 and will drift. Key sources: IEA, <i>Energy and AI</i> (2025); Lawrence Berkeley National Laboratory, US data center energy report (2024); Uptime Institute surveys; NVIDIA, ASML, TSMC and Zeiss product materials; Gholami et al., "AI and Memory Wall" (2024); Meta, "The Llama 3 Herd of Models" (2024); DeepSeek-V3 technical report (2024); Vaswani et al., "Attention Is All You Need" (2017); Hoffmann et al., "Training Compute-Optimal Large Language Models" (2022); Kaplan et al., "Scaling Laws for Neural Language Models" (2020); Bai et al., "Constitutional AI" (2022); Epoch AI analyses of training compute, data stocks and per-query energy; Google (2025) and OpenAI (2025) statements on per-prompt energy; OpenAI's reported user numbers (2025); US EIA household electricity data.</p>
+  <p>Figures are rounded and many are estimates; they reflect what was public by 2026 and will drift. Key sources: IEA, <i>Energy and AI</i> (2025); Lawrence Berkeley National Laboratory, US data center energy report (2024); Uptime Institute surveys; NVIDIA, ASML, TSMC and Zeiss product materials; Gholami et al., "AI and Memory Wall" (2024); Meta, "The Llama 3 Herd of Models" (2024); DeepSeek-V3 technical report (2024); Vaswani et al., "Attention Is All You Need" (2017); Hoffmann et al., "Training Compute-Optimal Large Language Models" (2022) and the Epoch AI re-fit by Besiroglu et al. (2024); Kaplan et al., "Scaling Laws for Neural Language Models" (2020); Bai et al., "Constitutional AI" (2022); Epoch AI analyses of training compute, data stocks and per-query energy; Google (2025) and OpenAI (2025) statements on per-prompt energy; OpenAI's reported user numbers (2025); US EIA household electricity data.</p>
   <p>Every interactive is a simplified model built for this page. The tokenizer is a real byte-pair encoder with a small vocabulary; the next-word model is a real trigram model trained on a tiny corpus; the neural networks really train in your browser. Attention weights, embeddings, agent transcripts and data-pipeline pages are hand-made to illustrate the idea.</p>
 </footer>
 </main>
@@ -2549,10 +2549,10 @@ defineMount("hero", (root) => {
    ===================================================================== */
 
 defineMount("power", (root) => {
-  const PER_GPU = 1500; // W per GPU, all-in: its share of CPUs, memory, network, fans
+  const PER_GPU = 1800; // W per GPU, all-in (Blackwell-class): its share of CPUs, memory, network, fans
   const HOME = 1200; // W, average US household draw over a year
   const MODES = {
-    air: { pue: 1.5, cool: 0.4, other: 0.1, perRack: 24, dT: 12, name: "Air" },
+    air: { pue: 1.5, cool: 0.4, other: 0.1, perRack: 16, dT: 12, name: "Air" },
     liquid: { pue: 1.15, cool: 0.1, other: 0.05, perRack: 72, dT: 10, name: "Liquid" },
   };
   const NAMED = [
@@ -2561,7 +2561,7 @@ defineMount("power", (root) => {
     { v: 72, name: "one liquid-cooled rack" },
     { v: 1000, name: "a row of racks" },
     { v: 10000, name: "a data hall" },
-    { v: 100000, name: "a frontier cluster" },
+    { v: 100000, name: "a 2024-scale frontier cluster" },
   ];
   let n = 8;
   let mode = "liquid";
@@ -2902,7 +2902,7 @@ defineMount("power", (root) => {
       tween(prevFac, fac, 450, (v) => { const [a, u] = siParts(v, "W"); roFac.set(a, u); }, true),
     ];
     prevIT = it; prevFac = fac;
-    roIT.set(...siParts(it, "W"), `${fmtInt(n)} × ~1.5 kW`);
+    roIT.set(...siParts(it, "W"), `${fmtInt(n)} × ~${fmtNum(PER_GPU / 1000, 2)} kW`);
     roFac.set(...siParts(fac, "W"), `+${Math.round((m.pue - 1) * 100)}% for cooling and power conversion`);
     const heatW = it; // essentially all IT power becomes heat
     if (mode === "liquid") {
@@ -2930,10 +2930,10 @@ defineMount("power", (root) => {
     const homes = homesTarget();
     const facTxt = fmtSI(facW(), "W", 2);
     if (n === 1) return `<b>One GPU with its share of the server: about a space heater.</b> Run it all year and it uses about as much electricity as ${fmtNum(homes, 2)} average US homes.`;
-    if (n === 8) return `<b>One server of eight GPUs: ~12 kW,</b> about what ${fmtInt(Math.round(homes))} homes draw on average.`;
-    if (n === 72 && mode === "liquid") return `<b>One rack: ~110 kW packed into less than a square meter.</b> Switch to air cooling and see how many racks the same 72 GPUs need.`;
-    if (n === 72 && mode === "air") return `<b>Air can't carry ~110 kW out of one rack.</b> The same 72 GPUs have to be spread over ${racks()} racks, with fans pushing ${fmtNum((itW() / (1.2 * 1005 * 12)), 2)} m³ of air per second.`;
-    if (n === 100000) return `<b>A frontier cluster: ${facTxt} for the whole site,</b> as much as ~${fmtInt(roundSig(homes, 2))} homes. Every one of those watts leaves as heat.`;
+    if (n === 8) return `<b>One server of eight GPUs: ~${fmtSI(8 * PER_GPU, "W", 2)},</b> about what ${fmtInt(Math.round(homes))} homes draw on average.`;
+    if (n === 72 && mode === "liquid") return `<b>One rack: ~${fmtSI(72 * PER_GPU, "W", 2)} packed into less than a square meter.</b> Switch to air cooling and see how many racks the same 72 GPUs need.`;
+    if (n === 72 && mode === "air") return `<b>Air can't carry ~${fmtSI(72 * PER_GPU, "W", 2)} out of one rack.</b> The same 72 GPUs have to be spread over ${racks()} racks, with fans pushing ${fmtNum(itW() / (1.2 * 1005 * 12), 2)} m³ of air per second.`;
+    if (n === 100000) return `<b>A 2024-scale frontier cluster: ${facTxt} for the whole site,</b> as much as ~${fmtInt(roundSig(homes, 2))} homes. Every one of those watts leaves as heat.`;
     if (named) return `<b>${named.name[0].toUpperCase() + named.name.slice(1)}: ${facTxt}</b>, as much as ~${fmtInt(roundSig(homes, 2))} homes.`;
     return `<b>${fmtInt(n)} GPUs: ${facTxt}</b> for the whole building, as much as ~${fmtHomes(roundSig(homes, 2))} homes.`;
   }
@@ -3335,7 +3335,7 @@ defineMount("node", (root) => {
     { name: "NVIDIA V100", year: 2017, t: 21.1e9, area: 815, node: "12 nm" },
     { name: "NVIDIA A100", year: 2020, t: 54.2e9, area: 826, node: "7 nm" },
     { name: "NVIDIA H100", year: 2022, t: 80e9, area: 814, node: "4N (5 nm class)" },
-    { name: "NVIDIA B200", year: 2024, t: 208e9, area: 1600, node: "4NP, two dies" },
+    { name: "NVIDIA B200", year: 2024, t: 208e9, area: 1600, est: true, node: "4NP, two dies" },
   ];
   // side of the average square each transistor occupies, in µm
   const cellUm = (ch) => Math.sqrt(ch.area / ch.t) * 1000;
@@ -3502,8 +3502,8 @@ defineMount("node", (root) => {
     const ty0 = dy + Math.max(rs, side) + 34;
     c.fillText(L.wide ? `${ch.name} · ${ch.year}` : ch.name, D.x, ty0);
     c.fillStyle = C.muted; c.font = `500 ${L.wide ? 13 : 12}px ${Theme.body}`;
-    if (L.wide) c.fillText(`${fmtNum(ch.area, 3)} mm² · process "${ch.node}"`, D.x, ty0 + 19);
-    else { c.fillText(`${ch.year} · ${fmtNum(ch.area, 3)} mm²`, D.x, ty0 + 17); c.fillText(`"${ch.node.split(",")[0]}"`, D.x, ty0 + 33); }
+    if (L.wide) c.fillText(`${ch.est ? "~" : ""}${fmtNum(ch.area, 3)} mm²${ch.est ? " (est.)" : ""} · process "${ch.node}"`, D.x, ty0 + 19);
+    else { c.fillText(`${ch.year} · ${ch.est ? "~" : ""}${fmtNum(ch.area, 3)} mm²`, D.x, ty0 + 17); c.fillText(`"${ch.node.split(",")[0]}"`, D.x, ty0 + 33); }
 
     drawChart(c, C, mono);
   }
@@ -3588,7 +3588,7 @@ defineMount("node", (root) => {
     else cmp = "a little smaller than a flu virus";
     let extra = "";
     if (idx >= 8) extra = ` Process names like "7 nm" and "4N" are labels; no feature on the chip measures that. Transistor gates sit roughly 50–60 nm apart.`;
-    if (idx === 10) extra = " No single piece of silicon can be bigger than about 858 mm², so the B200 joins two.";
+    if (idx === 10) extra = " One exposure prints at most ~858 mm², so the B200 joins two dies of roughly that size (areas est.).";
     status.innerHTML = `<b>${ch.name} (${ch.year}): ${fmtWords(ch.t, 3)} transistors.</b> Each one, with its share of wiring, takes up a square ${fmtUm(cell)} across, ${cmp}.${extra}`;
     Loop.wake();
   }
@@ -4163,8 +4163,8 @@ defineMount("zoom", (root) => {
       text: "One compute unit (NVIDIA calls it a streaming multiprocessor): four blocks of tensor cores for matrix math, plus registers and cache. Each die has dozens." },
     { key: "die", name: "Die", w: 0.026, h: 0.031, view: 0.05, gpus: 0.5, t: 104e9, watts: 500,
       text: "One die: the largest piece of silicon a scanner can print in one exposure, holding ~104 billion transistors." },
-    { key: "package", name: "GPU", w: 0.09, h: 0.075, view: 0.15, gpus: 1, t: 208e9, watts: 1000,
-      text: "One GPU: two dies joined side by side, surrounded by eight stacks of high-bandwidth memory. About 1,000 W." },
+    { key: "package", name: "GPU", w: 0.09, h: 0.075, view: 0.15, gpus: 1, t: 208e9, watts: 1100,
+      text: "One GPU: two dies joined side by side, surrounded by eight stacks of high-bandwidth memory. About 1,000–1,200 W." },
     { key: "tray", name: "Compute tray", w: 0.44, h: 0.86, view: 1.2, gpus: 4, t: 4 * 208e9, watts: 6000,
       text: "One compute tray: four GPUs and two CPUs on cold plates, with coolant pipes. It slides into a rack like a drawer." },
     { key: "rack", name: "Rack", w: 0.6, h: 1.07, view: 3.2, gpus: 72, t: 72 * 208e9, watts: 130e3,
