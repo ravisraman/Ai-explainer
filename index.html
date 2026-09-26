@@ -19,6 +19,8 @@
   --l6:#e495f0; --l7:#c3a1ff; --l8:#a2acff; --l9:#79b8ff; --l10:#2bc7ff;
   --accent: var(--l1);
   --on-accent: #0d0c12;
+  --sky1:#12101f; --sky2:#271f32; --hill:#1e1a29; --ground:#17151f; --ink:#8e88a3; --struct:#2c2839;
+  --steam:#e6e1f0; --smoke:#5a5462; --water:#4d9fe0; --panel:#35558a; --coal:#08070b;
   --glow-mix: 17%;
   --shadow: 0 1px 0 rgba(255,255,255,.035) inset, 0 24px 48px -28px rgba(0,0,0,.7);
   --font-display: "Bricolage Grotesque", "Avenir Next Condensed", "Arial Narrow", system-ui, sans-serif;
@@ -33,6 +35,8 @@
     --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
     --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#00679f;
     --on-accent:#ffffff; --glow-mix: 11%;
+    --sky1:#c7d7f0; --sky2:#f6eee4; --hill:#d8d1c4; --ground:#e7e1d7; --ink:#4c465b; --struct:#faf8fb;
+    --steam:#ffffff; --smoke:#6e6874; --water:#2a78bd; --panel:#3f6fb6; --coal:#2a262e;
     --shadow: 0 1px 2px rgba(23,18,40,.05), 0 18px 36px -24px rgba(23,18,40,.28);
   }
 }
@@ -43,6 +47,8 @@
   --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
   --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#00679f;
   --on-accent:#ffffff; --glow-mix: 11%;
+  --sky1:#c7d7f0; --sky2:#f6eee4; --hill:#d8d1c4; --ground:#e7e1d7; --ink:#4c465b; --struct:#faf8fb;
+  --steam:#ffffff; --smoke:#6e6874; --water:#2a78bd; --panel:#3f6fb6; --coal:#2a262e;
   --shadow: 0 1px 2px rgba(23,18,40,.05), 0 18px 36px -24px rgba(23,18,40,.28);
 }
 :root[data-theme="dark"]{ color-scheme: dark; }
@@ -432,6 +438,107 @@ details[open] > .body{animation:fadeUp .35s ease both}
 .sample-sentence{margin-top:6px;color:var(--text-2)}
 .sample-sentence b{color:var(--accent)}
 
+/* energy scene */
+.scene-scroll{overflow-x:auto;border-radius:14px;border:1px solid var(--line);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.scene-svg{display:block;width:100%;min-width:680px;height:auto}
+.scene-svg .src-name{font:600 12.5px var(--font-mono);fill:var(--text-2);transition:fill .3s}
+.scene-svg .dc-name{font:600 12.5px var(--font-mono);fill:var(--text-2)}
+.src{cursor:pointer;transition:opacity .35s}
+.src:focus{outline:none}
+.src-hit{fill:transparent;stroke:transparent;stroke-width:2}
+.src:hover .src-hit{fill:color-mix(in srgb, var(--text) 4%, transparent)}
+.src:focus-visible .src-hit{stroke:var(--accent)}
+#gridScene[data-sel] .src:not(.on){opacity:.32}
+.src.on .src-name{fill:var(--accent)}
+.struct{fill:var(--struct);stroke:var(--ink);stroke-width:1.2}
+.pylon,.wire{fill:none;stroke:var(--ink);stroke-width:1.1;opacity:.85}
+.flow{fill:none;stroke:var(--l1);stroke-width:2.4;stroke-dasharray:3 13;stroke-linecap:round;animation:flow16 1.1s linear infinite}
+@keyframes flow16{to{stroke-dashoffset:-32}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rotor{animation:spin 3.2s linear infinite}
+.sun-rays{animation:spin 50s linear infinite}
+.sun-rays line{stroke:var(--l1);stroke-width:2;stroke-linecap:round;opacity:.7}
+.pv{fill:var(--panel);stroke:var(--ink);stroke-width:.6;animation:shine 4s ease-in-out infinite}
+@keyframes shine{0%,100%{fill-opacity:.65}50%{fill-opacity:1}}
+.water{fill:var(--water);fill-opacity:.55}
+.fall{fill:none;stroke:var(--water);stroke-width:2.2;stroke-dasharray:6 5;animation:flow11 .55s linear infinite}
+.river{fill:none;stroke:var(--water);stroke-width:5;stroke-linecap:round;opacity:.5}
+.river-flow{fill:none;stroke:var(--steam);stroke-width:1.4;stroke-dasharray:4 7;opacity:.6;animation:flow11 1.4s linear infinite}
+@keyframes flow11{to{stroke-dashoffset:-22}}
+.steam,.smoke{transform-box:fill-box;transform-origin:center;opacity:0;animation:puff 5s ease-out infinite}
+.steam{fill:var(--steam)}
+.smoke{fill:var(--smoke);animation-name:puffDark;animation-duration:4.2s}
+@keyframes puff{0%{transform:translate(0,0) scale(.5);opacity:0}15%{opacity:.6}100%{transform:translate(16px,-50px) scale(2.6);opacity:0}}
+@keyframes puffDark{0%{transform:translate(0,0) scale(.5);opacity:0}12%{opacity:.85}100%{transform:translate(22px,-56px) scale(2.8);opacity:0}}
+.shimmer{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linecap:round;animation:shim 2.2s ease-in-out infinite;opacity:0}
+@keyframes shim{0%{transform:translateY(4px);opacity:0}50%{opacity:.55}100%{transform:translateY(-10px);opacity:0}}
+.coal-pile{fill:var(--coal);stroke:var(--ink);stroke-width:.8}
+.led{fill:var(--l10);animation:blink 1.7s steps(2,jump-none) infinite}
+@keyframes blink{50%{fill-opacity:.2}}
+.dc-fan{animation:spin 1.1s linear infinite}
+.dc-fan path{fill:var(--ink)}
+.paused,.paused *{animation-play-state:paused!important}
+.scene-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:10px}
+.scene-hint{font-size:.8rem;color:var(--muted)}
+@media (min-width:760px){ .scene-hint{visibility:hidden} }
+.btn.sm{min-height:36px;padding:6px 14px;font-size:13.5px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.mix{margin-top:18px}
+.mix-bar{display:flex;gap:2px;height:30px;border-radius:6px;overflow:hidden;margin-top:6px}
+.mix-seg{transition:opacity .35s}
+.mix-bar.has-sel .mix-seg:not(.on){opacity:.25}
+.src-panel{margin-top:16px;padding:18px;border-radius:14px;background:var(--surface-2);display:grid;gap:12px}
+.src-panel h4{font-size:1.4rem;font-variation-settings:"wdth" 85}
+.src-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.src-stats span{display:block;font:500 11.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.src-stats b{font:700 1.2rem/1.3 var(--font-display);color:var(--accent)}
+.src-panel p{color:var(--text-2)}
+.src-panel p b{color:var(--text)}
+/* EUV */
+.euv-wrap{overflow-x:auto}
+.euv-svg{display:block;width:100%;min-width:600px;height:auto}
+.euv-svg .svg-label{font-size:11.5px}
+.vessel{fill:var(--surface-2);stroke:var(--line-strong);stroke-width:1.5}
+.drop{fill:var(--text-2);animation:drop 1.6s linear infinite}
+@keyframes drop{0%{transform:translateY(0);opacity:1}43%{transform:translateY(60px);opacity:1}44%,100%{transform:translateY(60px);opacity:0}}
+.laser{stroke:var(--l3);stroke-width:3;animation:laser 1.6s linear infinite}
+@keyframes laser{0%,38%{opacity:.14}41%,45%{opacity:1}52%,100%{opacity:.14}}
+.plasma{fill:var(--l6);transform-box:fill-box;transform-origin:center;animation:plasma 1.6s ease-out infinite;opacity:0}
+@keyframes plasma{0%,42%{opacity:0;transform:scale(.2)}46%{opacity:1;transform:scale(1.3)}75%,100%{opacity:0;transform:scale(2)}}
+.cone{fill:var(--l6);animation:cone 1.6s ease-out infinite;opacity:.06}
+@keyframes cone{0%,42%{opacity:.05}48%{opacity:.32}85%,100%{opacity:.05}}
+.beam-base{fill:none;stroke:var(--l6);stroke-width:7;opacity:.13;stroke-linejoin:round}
+.beam{fill:none;stroke:var(--l6);stroke-width:2.5;stroke-dasharray:5 9;stroke-linejoin:round;animation:flow14 .9s linear infinite}
+@keyframes flow14{to{stroke-dashoffset:-28}}
+.mirror{stroke:var(--text-2);stroke-width:4.5;stroke-linecap:round;fill:none}
+.mask-g{animation:scanM 3s ease-in-out infinite alternate}
+@keyframes scanM{from{transform:translateX(-16px)}to{transform:translateX(16px)}}
+.wafer-g{animation:scanW 3s ease-in-out infinite alternate}
+@keyframes scanW{from{transform:translateX(4px)}to{transform:translateX(-4px)}}
+.expo{fill:var(--l6);animation:laser 1.6s linear infinite}
+/* CPU vs GPU */
+.race-grid{display:grid;gap:16px}
+@media (min-width:700px){ .race-grid{grid-template-columns:1fr 1fr} }
+.race-panel{padding:14px;border-radius:14px;background:var(--surface-2);display:grid;gap:10px;align-content:start}
+.race-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.race-head h4{font-size:1.2rem}
+.race-head small{font-size:.82rem;color:var(--muted)}
+.cells{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;width:100%;max-width:300px;aspect-ratio:1}
+.cells i{border-radius:2px;background:var(--line);transition:background .15s}
+.cells i.done{background:var(--accent)}
+.mem-pipe{position:relative;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.mem-pipe span{position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--l10) 0 6px,transparent 6px 14px);opacity:.3}
+.mem-pipe.run span{opacity:.9;animation:pipe .7s linear infinite}
+.mem-pipe.fast.run span{animation-duration:.18s}
+@keyframes pipe{to{background-position:14px 0}}
+.race-meta{display:flex;flex-wrap:wrap;gap:4px 16px;font:13.5px var(--font-mono);color:var(--text-2);font-variant-numeric:tabular-nums}
+.race-meta b{color:var(--text)}
+.race-msg{margin-top:14px;min-height:3em;color:var(--text)}
+/* funnel */
+.funnel-canvas{width:100%;height:330px;display:block;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.funnel-count{margin-top:12px;font:14px var(--font-mono);color:var(--text-2);font-variant-numeric:tabular-nums}
+.funnel-count b{color:var(--text)}
+
 /* ================= NAVIGATION ================= */
 .rail{display:none}
 .stack-list{list-style:none;margin:0;padding:0;display:grid;gap:3px}
@@ -557,6 +664,11 @@ details[open] > .body{animation:fadeUp .35s ease both}
     </aside>
   </div>
 
+  <figure class="figure wide" id="gridFig">
+    <figcaption class="fig-cap"><b>What powers AI today.</b> Every power station feeds the same grid, and the data center draws from all of them. Tap a source to see how much of data centers' electricity it supplies and what it trades off.</figcaption>
+    <div id="gridScene"></div>
+  </figure>
+
   <figure class="figure wide" id="coolingFig">
     <figcaption class="fig-cap"><b>Where 100 watts go.</b> Choose a cooling design to see how much power reaches the computers versus the building's overhead.</figcaption>
     <div id="cooling"></div>
@@ -671,6 +783,11 @@ details[open] > .body{animation:fadeUp .35s ease both}
     </aside>
   </div>
 
+  <figure class="figure wide" id="euvFig">
+    <figcaption class="fig-cap"><b>Inside an EUV scanner.</b> A laser blasts falling droplets of tin into a glowing plasma. Mirrors carry that light to a patterned mask and shrink the pattern onto the wafer, while mask and wafer sweep past in sync. Simplified: real machines use around a dozen mirrors, all inside a vacuum.</figcaption>
+    <div id="euv"></div>
+  </figure>
+
   <figure class="figure wide" id="fabFig">
     <figcaption class="fig-cap"><b>From sand to chip, and who controls each step.</b> Chokepoint shares are rounded, approximate, and shift year to year.</figcaption>
     <div id="fab"></div>
@@ -727,6 +844,11 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p class="breaks"><b>Where it breaks</b> the line cooks aren't independent. Groups of GPU cores must execute the same instruction at the same moment, so a GPU is only fast when the work is uniform. Matrix math happens to be perfectly uniform.</p>
     </aside>
   </div>
+
+  <figure class="figure wide" id="raceFig">
+    <figcaption class="fig-cap"><b>CPU versus GPU.</b> Both chips compute the same 256 numbers of a matrix multiplication. The speeds are illustrative; the shape of the result is real.</figcaption>
+    <div id="race"></div>
+  </figure>
 
   <figure class="figure wide" id="wallFig">
     <figcaption class="fig-cap"><b>The memory wall.</b> Peak compute has grown about 3× every two years; memory bandwidth about 1.6× (trend estimates from a 2024 analysis by Gholami et al.). Both are indexed to 1 at year 0. Hover or tap for values.</figcaption>
@@ -847,6 +969,11 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p class="breaks"><b>Where it breaks</b> token boundaries follow statistics of the training text, not sound or meaning. "dog", " dog" (with a space) and "Dog" can be three different tokens.</p>
     </aside>
   </div>
+
+  <figure class="figure wide" id="funnelFig">
+    <figcaption class="fig-cap"><b>From web crawl to training data.</b> Each dot is a document. Most never make it through. The proportions at each stage are illustrative; overall, published pipelines often discard around 90% of raw web text.</figcaption>
+    <div id="funnel"></div>
+  </figure>
 
   <figure class="figure wide" id="tokFig">
     <figcaption class="fig-cap"><b>Tokenizer.</b> Type anything. This is an <em>approximate</em> tokenizer written for this page: it imitates how real byte-pair tokenizers behave, but its splits and IDs are illustrative, not those of any real model.</figcaption>
@@ -2177,6 +2304,279 @@ function segmented(options, value, onChange, label) {
       ...[0, 1, 2, 3].flatMap(i => { const y = 4 + i * 16, on = i === 1 || i === 2; return [sv("path", { d: `M23 34 L96 ${y + 6}`, stroke: on ? A : M, "stroke-width": on ? 1.6 : 1, "stroke-dasharray": on ? "" : "3 3", fill: "none" }), box(98, y, 60, 12, on ? { stroke: A, fill: "color-mix(in srgb, var(--accent) 20%, transparent)" } : {}), sv("text", { x: 166, y: y + 10, class: "svg-label small" }, "expert " + (i + 1))]; })],
   ];
   cards.forEach((c, i) => c.prepend(sv("svg", { viewBox: "0 0 200 72", class: "par-svg", "aria-hidden": "true" }, ...D[i]())));
+})();
+
+/* ---------- 13. Energy scene: what powers AI ---------- */
+(function energyScene() {
+  const root = $("#gridScene"); if (!root) return;
+  const INFO = {
+    solar: { name: "Solar", group: "ren", share: "Part of ~27% renewables", co2: "~40–50 g", avail: "Daytime only",
+      text: "The cheapest new electricity in much of the world, and quick to build. It stops at night, so a round-the-clock data center pairs it with batteries or other sources. Tech companies sign huge solar contracts." },
+    wind: { name: "Wind", group: "ren", share: "Part of ~27% renewables", co2: "~11 g", avail: "Varies with the weather",
+      text: "Cheap and very low-carbon; big tech firms are among the largest corporate buyers of wind and solar power through long-term contracts. Output rises and falls with the wind, so it's balanced by other sources." },
+    hydro: { name: "Hydro", group: "ren", share: "Part of ~27% renewables", co2: "~24 g", avail: "Steady and adjustable",
+      text: "Reliable, low-carbon and quick to ramp up or down. Few good new sites remain, which is why data centers cluster near existing dams in places like the US Pacific Northwest, Quebec and the Nordic countries." },
+    nuclear: { name: "Nuclear", group: "nuc", share: "~15%", co2: "~12 g", avail: "Round the clock",
+      text: "Steady, carbon-free power that matches a data center's 24/7 demand. New reactors are slow and expensive, so tech firms have signed deals to restart retired plants and to buy from small modular reactors, most of which won't arrive until the 2030s." },
+    gas: { name: "Natural gas", group: "gas", share: "~26%", co2: "~490 g", avail: "On demand",
+      text: "The fastest large source to add, and many new US AI campuses lean on it, sometimes with turbines built on site. It emits roughly half as much CO₂ per kWh as coal. As of 2026, orders for new gas turbines are backlogged for years." },
+    coal: { name: "Coal", group: "coal", share: "~30%", co2: "~820 g", avail: "On demand",
+      text: "Still the largest single source for data centers worldwide, mainly because many sit on coal-heavy grids such as China's. It is the most carbon-intensive option, and rising demand has delayed some plant retirements." },
+  };
+  const OVERVIEW = "In 2024, data centers' electricity came roughly 30% from coal, 26% from gas, 27% from renewables and 15% from nuclear (IEA estimates). In the IEA's base case, renewables supply roughly half of the growth to 2030, gas and coal much of the rest, with nuclear adding more toward the end of the decade.";
+  const MIX = [
+    { k: "coal", p: 30, label: "Coal", c: "var(--muted)" },
+    { k: "gas", p: 26, label: "Gas", c: "var(--l2)" },
+    { k: "ren", p: 27, label: "Renewables", c: "var(--l10)" },
+    { k: "nuc", p: 15, label: "Nuclear", c: "var(--l7)" },
+    { k: "other", p: 2, label: "Other", c: "var(--line-strong)" },
+  ];
+  const G = 236, WY = 148, SAG = 12;
+  const wx = [150, 175, 325, 470, 610, 725, 840, 872];
+  const wireY = x => { for (let i = 1; i < wx.length; i++) if (x <= wx[i]) { const t = (x - wx[i - 1]) / (wx[i] - wx[i - 1]); return WY + 2 * t * (1 - t) * SAG; } return WY; };
+  let wd = `M${wx[0]} ${WY}`; for (let i = 1; i < wx.length; i++) wd += ` Q${(wx[i - 1] + wx[i]) / 2} ${WY + SAG} ${wx[i]} ${WY}`;
+  const feeder = (x, y) => `<path class="wire" d="M${x} ${y} V${wireY(x).toFixed(1)}"/><path class="flow" d="M${x} ${y} V${wireY(x).toFixed(1)}"/>`;
+  const pylon = x => `<path class="pylon" d="M${x - 8} ${G} L${x - 2} ${WY} L${x + 2} ${WY} L${x + 8} ${G} M${x - 11} ${WY + 5} H${x + 11} M${x - 6} ${WY + 30} H${x + 6} M${x - 5} ${WY + 30} L${x + 4} ${WY + 62} M${x + 5} ${WY + 30} L${x - 4} ${WY + 62}"/>`;
+  const blade = L => `M0 0 C3 -6 2.6 ${-L * .6} 0 ${-L} C-1.3 ${-L * .6} -1.6 -6 0 0 Z`;
+  const turbine = (x, top, L, dur) => `<path class="struct" d="M${x - 2.2} ${G} L${x - .8} ${top} L${x + .8} ${top} L${x + 2.2} ${G} Z"/>
+    <g transform="translate(${x} ${top})"><g class="rotor" style="animation-duration:${dur}s">${[0, 120, 240].map(a => `<path class="struct" transform="rotate(${a})" d="${blade(L)}"/>`).join("")}</g><circle r="2.6" class="struct"/></g>`;
+  const tower = (cx, h, wb) => { const t = G - h; return `<path class="struct" d="M${cx - wb} ${G} C${cx - wb * .45} ${G - h * .5} ${cx - wb * .5} ${G - h * .75} ${cx - wb * .7} ${t} L${cx + wb * .7} ${t} C${cx + wb * .5} ${G - h * .75} ${cx + wb * .45} ${G - h * .5} ${cx + wb} ${G} Z"/>`; };
+  const puffs = (cx, cy, cls, n, dur) => Array.from({ length: n }, (_, i) => `<circle class="${cls}" cx="${cx}" cy="${cy}" r="${5 + (i % 2) * 2}" style="animation-delay:${(-i * dur / n).toFixed(2)}s"/>`).join("");
+  const src = (id, x0, x1, lx, body) => `<g class="src" data-src="${id}" tabindex="0" role="button" aria-label="${INFO[id].name}: show details">
+    <rect class="src-hit" x="${x0}" y="36" width="${x1 - x0}" height="246" rx="10"/>${body}<text class="src-name" x="${lx}" y="264" text-anchor="middle">${INFO[id].name}</text></g>`;
+
+  let pv = "";
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = 26 + c * 30 + r * 7, y = 198 + r * 13; pv += `<polygon class="pv" style="animation-delay:${(c * .35 + r * .2).toFixed(2)}s" points="${x},${y + 10} ${x + 22},${y + 10} ${x + 26},${y} ${x + 4},${y}"/>`; }
+  let leds = "";
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) leds += `<rect class="led" x="${884 + c * 17}" y="${166 + r * 15}" width="9" height="3" rx="1" style="animation-delay:${(((c * 7 + r * 3) % 11) * .15).toFixed(2)}s"/>`;
+  const fan = x => `<g transform="translate(${x} 140)"><circle r="8" class="struct"/><g class="dc-fan">${[0, 90, 180, 270].map(a => `<path transform="rotate(${a})" d="M0 0 L6 -2 L6 2 Z"/>`).join("")}</g></g>`;
+
+  const svg = `<svg class="scene-svg" viewBox="0 0 1000 285" role="group" aria-label="Animated landscape of power sources feeding an AI data center over the grid">
+    <defs><linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient>
+    <radialGradient id="sunG"><stop offset="0" style="stop-color:var(--l1);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--l1);stop-opacity:0"/></radialGradient></defs>
+    <rect width="1000" height="285" fill="url(#skyG)"/>
+    <path d="M0 228 C120 194 220 212 320 224 S520 198 640 220 S860 204 1000 222 V285 H0Z" fill="var(--hill)"/>
+    <rect y="${G}" width="1000" height="49" fill="var(--ground)"/>
+    <path class="wire" d="${wd}"/><path class="flow" d="${wd}"/>
+    ${[175, 325, 470, 610, 725, 840].map(pylon).join("")}
+    ${src("solar", 14, 172, 92, `<g transform="translate(62 58)"><circle r="44" fill="url(#sunG)"/><g class="sun-rays">${Array.from({ length: 12 }, (_, i) => `<line transform="rotate(${i * 30})" x1="0" y1="-22" x2="0" y2="-30"/>`).join("")}</g><circle r="15" fill="var(--l1)"/></g>${pv}<path class="wire" d="M160 210 H150"/>${feeder(150, 210)}`)}
+    ${src("wind", 190, 314, 255, `${turbine(212, 150, 28, 3.6)}${turbine(255, 128, 34, 4.2)}${turbine(296, 160, 24, 3)}${feeder(276, G)}`)}
+    ${src("hydro", 330, 464, 400, `<polygon class="water" points="336,198 392,198 392,${G} 336,${G}"/><polygon class="struct" points="390,184 402,184 418,${G} 384,${G}"/>
+      ${[0, 1, 2].map(i => `<path class="fall" style="animation-delay:${-i * .18}s" d="M${403 + i * 2} 197 Q${412 + i * 2} 206 ${416 + i * 3} ${G}"/>`).join("")}
+      <rect class="struct" x="416" y="220" width="18" height="16"/><path class="river" d="M432 ${G + 5} C450 ${G + 1} 470 ${G + 11} 505 ${G + 6}"/><path class="river-flow" d="M432 ${G + 5} C450 ${G + 1} 470 ${G + 11} 505 ${G + 6}"/>${feeder(425, 220)}`)}
+    ${src("nuclear", 478, 602, 540, `${tower(505, 72, 22)}${tower(548, 62, 19)}<rect class="struct" x="568" y="212" width="26" height="24"/><path class="struct" d="M568 212 A13 13 0 0 1 594 212 Z"/>
+      ${puffs(505, 162, "steam", 4, 5)}${puffs(548, 172, "steam", 4, 5.6)}${feeder(581, 199)}`)}
+    ${src("gas", 616, 692, 652, `<rect class="struct" x="628" y="206" width="46" height="30"/><rect class="struct" x="641" y="180" width="7" height="26"/><rect class="struct" x="657" y="186" width="7" height="20"/>
+      ${[0, 1, 2].map(i => `<path class="shimmer" style="animation-delay:${-i * .7}s" d="M${642 + i * 9} 174 q3 -5 0 -10 q-3 -5 0 -10"/>`).join("")}${feeder(651, 206)}`)}
+    ${src("coal", 732, 832, 785, `<path class="coal-pile" d="M737 ${G} Q754 212 772 ${G} Z"/><rect class="struct" x="772" y="200" width="40" height="36"/><rect class="struct" x="817" y="130" width="9" height="106"/>
+      <rect x="817" y="136" width="9" height="5" fill="var(--l3)"/><rect x="817" y="148" width="9" height="5" fill="var(--l3)"/>${puffs(821, 124, "smoke", 5, 4.2)}${feeder(792, 200)}`)}
+    <g aria-label="AI data center"><rect class="struct" x="872" y="146" width="118" height="90" rx="2"/>${leds}${fan(895)}${fan(931)}${fan(967)}
+      ${[0, 1, 2].map(i => `<path class="shimmer" style="animation-delay:${-i * .6}s" d="M${905 + i * 26} 128 q3 -5 0 -10 q-3 -5 0 -10"/>`).join("")}
+      <text class="dc-name" x="931" y="264" text-anchor="middle">AI data center</text></g>
+  </svg>`;
+
+  const scene = el("div", { class: "scene-scroll", html: svg });
+  const chips = el("div", { class: "chips", role: "group", "aria-label": "Choose a power source" },
+    el("button", { type: "button", class: "chip", "data-k": "", "aria-pressed": "true" }, "All sources"),
+    Object.entries(INFO).map(([k, v]) => el("button", { type: "button", class: "chip", "data-k": k, "aria-pressed": "false" }, v.name)));
+  const bar = el("div", { class: "mix-bar", role: "img", "aria-label": MIX.map(m => `${m.label} ${m.p}%`).join(", ") },
+    MIX.map(m => el("span", { class: "mix-seg", "data-k": m.k, style: `flex:${m.p} 1 0;background:${m.c}` })));
+  const legend = el("ul", { class: "legend" }, MIX.map(m => el("li", {}, el("i", { style: `background:${m.c}` }), el("span", { class: "lg-name" }, m.label), el("b", { class: "lg-val" }, `~${m.p}%`))));
+  const panel = el("div", { class: "src-panel", "aria-live": "polite" });
+  const pauseBtn = el("button", { type: "button", class: "btn sm" }, "Pause motion");
+  pauseBtn.addEventListener("click", () => { const p = root.classList.toggle("paused"); pauseBtn.textContent = p ? "Play motion" : "Pause motion"; });
+
+  function select(k) {
+    if (k) root.dataset.sel = k; else delete root.dataset.sel;
+    $$(".src", root).forEach(g => g.classList.toggle("on", g.dataset.src === k));
+    $$(".chip", chips).forEach(c => c.setAttribute("aria-pressed", String(c.dataset.k === (k || ""))));
+    const grp = k ? INFO[k].group : null;
+    bar.classList.toggle("has-sel", !!grp);
+    $$(".mix-seg", bar).forEach(s => s.classList.toggle("on", s.dataset.k === grp));
+    if (!k) {
+      panel.replaceChildren(el("h4", {}, "Where data centers' electricity comes from"), el("p", {}, OVERVIEW), el("p", { class: "muted small" }, "Tap a power station in the scene, or a button above, to see its trade-offs."));
+      return;
+    }
+    const d = INFO[k];
+    panel.replaceChildren(el("h4", {}, d.name),
+      el("div", { class: "src-stats" },
+        el("div", {}, el("span", {}, "Share for data centers (2024)"), el("b", {}, d.share)),
+        el("div", {}, el("span", {}, "Lifecycle CO₂ per kWh"), el("b", {}, d.co2)),
+        el("div", {}, el("span", {}, "Availability"), el("b", {}, d.avail))),
+      el("p", {}, d.text));
+  }
+  root.addEventListener("click", e => { const g = e.target.closest(".src"); if (g) select(root.dataset.sel === g.dataset.src ? "" : g.dataset.src); });
+  root.addEventListener("keydown", e => { const g = e.target.closest(".src"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(g.dataset.src); } });
+  chips.addEventListener("click", e => { const c = e.target.closest(".chip"); if (c) select(c.dataset.k); });
+  root.append(scene, el("div", { class: "scene-bar" }, el("span", { class: "scene-hint" }, "Swipe the scene sideways to see it all."), pauseBtn), chips,
+    el("div", { class: "mix" }, el("p", { class: "ctl-label" }, "Data centers' electricity by source, worldwide, 2024 (IEA est.)"), bar, legend), panel,
+    el("p", { class: "note" }, "Shares are IEA estimates for data centers worldwide in 2024; the mix varies hugely by country and even by hour. CO₂ figures are rounded lifecycle medians from the IPCC (2014). “100% renewable” claims usually rest on contracts and certificates matched over a year, not on the electricity flowing at every hour."));
+  select("");
+})();
+
+/* ---------- 14. EUV scanner ---------- */
+(function euv() {
+  const root = $("#euv"); if (!root) return;
+  const svg = `<svg class="euv-svg" viewBox="-78 0 758 270" role="img" aria-label="Animated diagram: tin droplets fall, a laser pulse turns one into plasma that emits EUV light, a collector mirror focuses it, mirrors relay it to a scanning mask, and more mirrors project the pattern onto a scanning wafer.">
+    <rect class="vessel" x="34" y="44" width="200" height="176" rx="22"/>
+    <text class="svg-label" x="134" y="236" text-anchor="middle">light source, in vacuum</text>
+    <rect x="122" y="48" width="12" height="14" rx="2" fill="var(--ink)"/>
+    <text class="svg-label" x="128" y="34" text-anchor="middle">tin droplets, ~50,000 a second</text>
+    <circle class="drop" cx="128" cy="70" r="3.6"/>
+    <line class="laser" x1="-78" y1="130" x2="124" y2="130"/>
+    <text class="svg-label" x="-74" y="118">CO₂ laser</text>
+    <polygon class="cone" points="74,78 74,182 262,130"/>
+    <path class="mirror" d="M76 76 Q56 100 53 123 M53 137 Q56 160 76 184"/>
+    <text class="svg-label" x="46" y="208">collector mirror</text>
+    <circle class="plasma" cx="128" cy="130" r="10"/>
+    <text class="svg-label" x="134" y="182">plasma glows at 13.5 nm</text>
+    <polyline class="beam-base" points="262,130 322,66 420,40 500,112 420,172 560,222"/>
+    <polyline class="beam" points="262,130 322,66 420,40 500,112 420,172 560,222"/>
+    <path class="mirror" d="M309 56 L336 74"/><path class="mirror" d="M492 98 L509 124"/><path class="mirror" d="M407 180 L432 162"/>
+    <text class="svg-label" x="330" y="96">mirror</text><text class="svg-label" x="512" y="110">mirrors</text>
+    <g class="mask-g"><rect x="378" y="22" width="84" height="12" rx="2" fill="var(--struct)" stroke="var(--ink)"/>${Array.from({ length: 9 }, (_, i) => `<rect x="${384 + i * 8.6}" y="25" width="4" height="6" fill="var(--ink)"/>`).join("")}</g>
+    <text class="svg-label" x="472" y="32">mask (pattern, 4× larger)</text>
+    <g class="wafer-g"><rect x="498" y="238" width="124" height="10" rx="3" fill="var(--line-strong)"/>
+      <ellipse cx="560" cy="229" rx="54" ry="10" fill="var(--struct)" stroke="var(--ink)"/>
+      ${[-36, -18, 0, 18, 36].map(dx => `<line x1="${560 + dx}" y1="221" x2="${560 + dx}" y2="237" stroke="var(--ink)" stroke-width=".6" opacity=".6"/>`).join("")}
+      <ellipse class="expo" cx="560" cy="226" rx="10" ry="3"/></g>
+    <text class="svg-label" x="620" y="216">wafer</text>
+  </svg>`;
+  const pauseBtn = el("button", { type: "button", class: "btn sm" }, "Pause motion");
+  pauseBtn.addEventListener("click", () => { const p = root.classList.toggle("paused"); pauseBtn.textContent = p ? "Play motion" : "Pause motion"; });
+  root.append(el("div", { class: "euv-wrap", html: svg }), el("div", { class: "scene-bar" }, el("span", { class: "scene-hint" }, "Swipe sideways on small screens."), pauseBtn),
+    el("p", { class: "note" }, "Shown slowed down enormously. EUV light is invisible and is absorbed by air and glass, which is why everything happens in a vacuum and only mirrors are used."));
+})();
+
+/* ---------- 15. CPU versus GPU race ---------- */
+(function race() {
+  const root = $("#race"); if (!root) return;
+  const N = 256, CPU_RATE = 4, GPU_LANES = 128, MEM_RATE = 32;
+  let fast = false, timer = null, ran = false;
+  const mkPanel = (title, sub, extra) => {
+    const cells = el("div", { class: "cells", "aria-hidden": "true" }, Array.from({ length: N }, () => el("i")));
+    const meta = el("div", { class: "race-meta" });
+    return { cells, meta, node: el("div", { class: "race-panel" }, el("div", { class: "race-head" }, el("h4", {}, title), el("small", {}, sub)), extra || null, cells, meta) };
+  };
+  const pipe = el("div", { class: "mem-pipe", title: "Data arriving from memory" }, el("span"));
+  const cpuPipe = el("div", { class: "mem-pipe fast", title: "Data arriving from memory" }, el("span"));
+  const cpu = mkPanel("CPU", "a few powerful cores: 4 results per tick", el("div", {}, el("p", { class: "ctl-label" }, "Memory keeps up easily"), cpuPipe));
+  const gpu = mkPanel("GPU", "thousands of simple cores: up to 128 per tick", el("div", {}, el("p", { class: "ctl-label" }, "Data arriving from memory"), pipe));
+  const msg = el("p", { class: "race-msg", "aria-live": "polite" }, "Press Race to start.");
+  const raceBtn = el("button", { type: "button", class: "btn primary" }, "▶ Race");
+  const seg = segmented([{ label: "Realistic memory", value: false }, { label: "Imaginary unlimited memory", value: true }], false, v => { fast = v; pipe.classList.toggle("fast", v); reset(); }, "GPU memory speed");
+  function paint(p, n) { const cs = p.cells.children; for (let i = 0; i < N; i++) cs[i].classList.toggle("done", i < n); }
+  function reset() { clearInterval(timer); timer = null; pipe.classList.remove("run"); cpuPipe.classList.remove("run"); paint(cpu, 0); paint(gpu, 0); cpu.meta.innerHTML = "Time: <b>0</b> ticks"; gpu.meta.innerHTML = "Time: <b>0</b> ticks"; msg.textContent = "Press Race to start."; raceBtn.textContent = "▶ Race"; }
+  function finishMsg(ct, gt) {
+    const busy = fast ? 100 : Math.round(MEM_RATE / GPU_LANES * 100);
+    msg.textContent = fast
+      ? `With imaginary unlimited memory, the GPU finishes ${ct / gt}× sooner. No real chip can feed its cores that fast, which is why memory bandwidth matters so much.`
+      : `The GPU finished ${ct / gt}× sooner, yet its cores were busy only ${busy}% of the time; the rest they waited for numbers from memory. That's the memory wall. For big matrix math, real GPUs are tens of times faster than CPUs.`;
+  }
+  function run() {
+    reset();
+    const rate = fast ? GPU_LANES : MEM_RATE;
+    const ct = Math.ceil(N / CPU_RATE), gt = Math.ceil(N / rate);
+    if (reduceMotion.matches) {
+      paint(cpu, N); paint(gpu, N);
+      cpu.meta.innerHTML = `Time: <b>${ct}</b> ticks`; gpu.meta.innerHTML = `Time: <b>${gt}</b> ticks · cores busy: <b>${fast ? 100 : 25}%</b>`;
+      finishMsg(ct, gt); return;
+    }
+    let t = 0; pipe.classList.add("run"); cpuPipe.classList.add("run"); raceBtn.textContent = "Racing…"; msg.textContent = "Racing…";
+    timer = setInterval(() => {
+      t++;
+      const c = Math.min(N, t * CPU_RATE), g = Math.min(N, t * rate);
+      paint(cpu, c); paint(gpu, g);
+      cpu.meta.innerHTML = `Time: <b>${Math.min(t, ct)}</b> ticks${c >= N ? " · done" : ""}`;
+      gpu.meta.innerHTML = `Time: <b>${Math.min(t, gt)}</b> ticks · cores busy: <b>${fast ? 100 : 25}%</b>${g >= N ? " · done" : ""}`;
+      if (g >= N) pipe.classList.remove("run");
+      if (c >= N) { clearInterval(timer); timer = null; cpuPipe.classList.remove("run"); raceBtn.textContent = "▶ Race again"; finishMsg(ct, gt); }
+    }, 75);
+  }
+  raceBtn.addEventListener("click", run);
+  root.append(el("div", { class: "att-top" }, el("span", { class: "ctl-label" }, "GPU memory:"), seg),
+    el("div", { class: "race-grid", style: "margin-top:14px" }, cpu.node, gpu.node), msg, el("div", { class: "btn-row" }, raceBtn));
+  reset();
+  new IntersectionObserver((es, o) => { if (es[0].isIntersecting && !ran) { ran = true; o.disconnect(); run(); } }, { threshold: .5 }).observe(root);
+})();
+
+/* ---------- 16. Data filtering funnel ---------- */
+(function funnel() {
+  const root = $("#funnel"); if (!root) return;
+  const ST = [
+    { n: "Raw web crawl", w: 1 }, { n: "Extract text", w: .84, keep: .8 }, { n: "Remove duplicates", w: .68, keep: .5 },
+    { n: "Quality filter", w: .52, keep: .35 }, { n: "Safety & privacy", w: .42, keep: .9 }, { n: "Training data", w: .36 },
+  ];
+  const expected = ST.slice(1, 5).reduce((a, s) => a * s.keep, 1);
+  const canvas = el("canvas", { class: "funnel-canvas", role: "img", "aria-label": "Animated funnel: documents fall through five filtering stages; most are rejected along the way." });
+  const count = el("p", { class: "funnel-count" });
+  root.append(canvas, count);
+  let ctx, W = 0, H = 0, parts = [], spawned = 0, kept = 0, last = 0, acc = 0, visible = false, C = {};
+  const colors = () => { C = { line: cssVar("--line-strong"), text: cssVar("--text-2"), muted: cssVar("--muted"), acc: cssVar("--l6"), font: cssVar("--font-mono") }; };
+  function size() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = canvas.clientWidth; H = canvas.clientHeight; if (!W) return;
+    canvas.width = W * dpr; canvas.height = H * dpr; ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  const geo = () => { const narrow = W < 520; const fw = W * (narrow ? .5 : .56), fx = 12; return { fw, cx: fx + fw / 2, lx: fx + fw + (narrow ? 12 : 22), y0: 26, gap: (H - 52) / (ST.length - 1), narrow }; };
+  function spawn() {
+    let fate = 5; for (let i = 1; i <= 4; i++) if (Math.random() > ST[i].keep) { fate = i; break; }
+    parts.push({ off: Math.random() - .5, y: 16, v: 55 + Math.random() * 35, fate, st: 0, x: 0, vx: 0, a: 1 });
+    spawned++;
+  }
+  function step(dt) {
+    const g = geo();
+    acc += dt * 16; while (acc >= 1) { acc--; if (parts.length < 220) spawn(); }
+    for (const p of parts) {
+      if (p.st === 0) {
+        p.y += p.v * dt;
+        const k = clamp(Math.floor((p.y - g.y0) / g.gap), 0, ST.length - 2), f = clamp((p.y - g.y0 - k * g.gap) / g.gap, 0, 1);
+        const w = ST[k].w + (ST[k + 1].w - ST[k].w) * f;
+        p.x = g.cx + p.off * w * g.fw * .92;
+        const reached = Math.floor((p.y - g.y0) / g.gap + 1e-6);
+        if (p.fate < 5 && reached >= p.fate) { p.st = 1; p.vx = (p.off >= 0 ? 1 : -1) * (50 + Math.random() * 50); }
+        else if (reached >= ST.length - 1) { p.st = 2; kept++; }
+      } else if (p.st === 1) { p.x += p.vx * dt; p.y += 30 * dt; p.a -= dt * 1.1; }
+    }
+    parts = parts.filter(p => p.st !== 2 && p.a > 0);
+  }
+  function draw() {
+    if (!ctx) return;
+    const g = geo();
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = `${g.narrow ? 11 : 12.5}px ${C.font}`; ctx.textBaseline = "middle";
+    ST.forEach((s, i) => {
+      const y = g.y0 + i * g.gap, w = s.w * g.fw;
+      ctx.fillStyle = i === ST.length - 1 ? C.acc : C.line; ctx.globalAlpha = i === ST.length - 1 ? .5 : 1;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(g.cx - w / 2, y - 2.5, w, 5, 2.5) : ctx.rect(g.cx - w / 2, y - 2.5, w, 5); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = C.text; ctx.fillText(s.n, g.lx, y);
+    });
+    for (const p of parts) {
+      ctx.globalAlpha = Math.max(0, p.a); ctx.fillStyle = p.st === 1 ? C.muted : C.acc;
+      ctx.fillRect(p.x - 2.5, p.y - 3, 5, 6);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function render() {
+    const finished = spawned - parts.length;
+    count.innerHTML = finished >= 150
+      ? `Documents in: <b>${fmtInt(finished)}</b> · kept: <b>${fmtInt(kept)}</b> (${Math.round(kept / finished * 100)}%; about ${Math.round(expected * 100)}% expected)`
+      : `In this illustration, about <b>${Math.round(expected * 100)}%</b> of documents survive all four filters.`;
+  }
+  function tick(now) {
+    if (!visible) return;
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    step(dt); draw();
+    if (Math.floor(now / 500) !== Math.floor((now - dt * 1000) / 500)) render();
+    requestAnimationFrame(tick);
+  }
+  colors(); render();
+  new ResizeObserver(size).observe(canvas);
+  if (!reduceMotion.matches) new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) { last = performance.now(); requestAnimationFrame(tick); } }).observe(canvas);
+  const recolor = () => { colors(); draw(); };
+  document.addEventListener("themechange", recolor);
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", recolor);
 })();
 
 /* ---------- decorations: neighbor colors, go-deeper tags ---------- */
