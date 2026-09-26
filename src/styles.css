@@ -23,7 +23,7 @@
   --line-2: #3d394c;
   --text: #ecebf2;
   --muted: #a4a0b4;
-  --faint: #716c84;
+  --faint: #8a859c;
   --on-accent: #0d0c12;
   --good: #5ed39a;
   --bad: #ff5f73;
@@ -67,7 +67,7 @@
     --line-2: #c7c4d2;
     --text: #15131c;
     --muted: #5d5870;
-    --faint: #8a8599;
+    --faint: #67627a;
     --on-accent: #ffffff;
     --good: #16895a;
     --bad: #d42a45;
@@ -97,7 +97,7 @@
   --line-2: #c7c4d2;
   --text: #15131c;
   --muted: #5d5870;
-  --faint: #8a8599;
+  --faint: #67627a;
   --on-accent: #ffffff;
   --good: #16895a;
   --bad: #d42a45;
@@ -567,8 +567,7 @@ h1 { margin-top: 18px; }
   position: fixed; z-index: 30; left: 0; right: 0; bottom: 0;
   display: flex; align-items: stretch; gap: 6px;
   padding: 8px max(10px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-right, 0px));
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
   border-top: 1px solid var(--line);
 }
 @media (min-width: 1180px) { .elevator { display: none; } }
@@ -819,7 +818,7 @@ h1 { margin-top: 18px; }
 .ag-edge.on { stroke: var(--c); stroke-width: 3.5; }
 .ag-arrowhead { fill: var(--muted); }
 .ag-node circle { fill: var(--panel); stroke: var(--line-2); stroke-width: 2; transition: fill 0.2s, stroke 0.2s; }
-.ag-node text { fill: var(--muted); font: 600 12px var(--font-body); }
+.ag-node text { fill: var(--muted); font: 600 15px var(--font-body); }
 .ag-node .ag-icon { fill: var(--text); font: 700 18px var(--font-mono); }
 .ag-node.on circle { fill: var(--c); stroke: var(--c); }
 .ag-node.on .ag-icon { fill: var(--on-accent); }
@@ -949,3 +948,8 @@ h1 { margin-top: 18px; }
 @media (hover: none) {
   .jr-dots { gap: 8px; }
 }
+.filter-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 0.82rem; color: var(--muted); }
+.fl-item { display: inline-flex; align-items: center; gap: 6px; }
+.fl-item i { width: 10px; height: 10px; border-radius: 2px; }
+.fl-item b { color: var(--text); font: 600 0.78rem var(--font-mono); }
+.fl-item.gone { opacity: 0.5; text-decoration: line-through; }

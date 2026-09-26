@@ -444,10 +444,10 @@ defineMount("scaling", (root) => {
   const EFF = 1e15 * 0.4; // FLOP/s per H100-class GPU at 40% utilization
   const USD = 2, KW = 1.5, PUE = 1.2;
   const REFS = [
-    { name: "GPT-3", N: 175e9, D: 300e9 },
-    { name: "Chinchilla", N: 70e9, D: 1.4e12 },
-    { name: "Llama 3 8B", N: 8e9, D: 15e12 },
-    { name: "Llama 3.1 405B", N: 405e9, D: 15.6e12 },
+    { name: "GPT-3", N: 175e9, D: 300e9, dy: -6 },
+    { name: "Chinchilla", N: 70e9, D: 1.4e12, dy: -6 },
+    { name: "Llama 3 8B", short: "Llama 3 8B", N: 8e9, D: 15e12, dy: -6 },
+    { name: "Llama 3.1 405B", short: "405B", N: 405e9, D: 15.6e12, dy: 15 },
   ];
   const NMIN = 1e7, NMAX = 1e13, DMIN = 1e9, DMAX = 1e15;
   const DATA_STOCK = 3e14; // Epoch AI est. of public human text, tokens
@@ -514,7 +514,8 @@ defineMount("scaling", (root) => {
       const nn = Math.sqrt(Cv / 6 / 20);
       const px = lx(clamp(nn * 0.3, NMIN, NMAX), P), py = ly(Cv / (6 * clamp(nn * 0.3, NMIN, NMAX)), P);
       c.fillStyle = rgba(Cc.text, 0.75); c.textAlign = "left";
-      if (py > P.y1 + 22 && py < P.y0 - 4) c.fillText(`10${sup(e)} FLOP`, px + 4, py - 4);
+      const lab = `10${sup(e)} FLOP`;
+      if (py > P.y1 + 22 && py < P.y0 - 4 && px + 4 + c.measureText(lab).width < P.x1 - 4) c.fillText(lab, px + 4, py - 4);
     }
     c.setLineDash([]);
     // data stock line
@@ -527,14 +528,16 @@ defineMount("scaling", (root) => {
     c.stroke();
     const labN = Nopt(1e21);
     c.fillStyle = Cc.l10; c.textAlign = "left"; c.font = `700 10px ${mono}`;
-    c.fillText("BEST SPLIT (~20 TOKENS/PARAM)", lx(labN, P) + 8, ly(1e21 / (6 * labN), P) + 12);
+    const bl = L.w < 520 ? "BEST SPLIT" : "BEST SPLIT (~20 TOKENS/PARAM)";
+    c.fillText(bl, Math.min(lx(labN, P) + 8, P.x1 - c.measureText(bl).width - 4), ly(1e21 / (6 * labN), P) + 12);
     // refs
     c.font = `600 10px ${mono}`;
     for (const r of REFS) {
       const X = lx(r.N, P), Y = ly(r.D, P);
       c.fillStyle = Cc.text; c.beginPath(); c.arc(X, Y, 3.5, 0, Math.PI * 2); c.fill();
-      c.textAlign = X > P.x1 - 90 ? "right" : "left";
-      c.fillText(r.name, X + (c.textAlign === "left" ? 6 : -6), Y - 5);
+      const nm = L.w < 520 && r.short ? r.short : r.name;
+      c.textAlign = X + c.measureText(nm).width + 8 > P.x1 ? "right" : "left";
+      c.fillText(nm, X + (c.textAlign === "left" ? 6 : -6), Y + r.dy);
     }
     // current
     const X = lx(N, P), Y = ly(D, P);

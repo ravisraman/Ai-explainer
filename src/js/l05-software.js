@@ -97,14 +97,14 @@ defineMount("parallel", (root) => {
     const rows = N > 8 ? 2 : 1, perRow = Math.min(N, 8);
     const gap = 8;
     const gw = Math.min(88, (L.w - gap * (perRow - 1)) / perRow);
-    const gh = (L.topH - 26 - (rows - 1) * gap) / rows;
+    const gh = (L.topH - 26 - (rows - 1) * (gap + 12) - 12) / rows;
     const x0 = (L.w - (gw * perRow + gap * (perRow - 1))) / 2;
     const tNow = play * m.step;
     c.font = `600 10px ${mono}`; c.textAlign = "left"; c.fillStyle = C.muted;
     c.fillText(`${N} GPUS · WHAT EACH ONE HOLDS`, x0, 12);
 
     for (let i = 0; i < N; i++) {
-      const gx = x0 + (i % perRow) * (gw + gap), gy = 20 + Math.floor(i / perRow) * (gh + gap);
+      const gx = x0 + (i % perRow) * (gw + gap), gy = 20 + Math.floor(i / perRow) * (gh + gap + 12);
       const segs = segmentsFor(i, m);
       const cur = segs.find((s) => tNow >= s.t0 && tNow < s.t1);
       const state = play > 1 ? "done" : cur ? cur.k : "idle";
@@ -137,12 +137,21 @@ defineMount("parallel", (root) => {
       const fh = Math.min(1, frac) * mh;
       c.fillRect(mx, my + mh - fh, memW, fh);
       if (frac > 1) { c.fillStyle = C.bad; c.fillRect(mx - 2, my - 4, memW + 4, 3); }
+      // what this GPU holds
+      const M = MODELS[msize];
+      let cap;
+      if (strat === "data") cap = gw > 60 ? "whole model" : "all";
+      else if (strat === "tensor") cap = gw > 60 ? `1/${N} of every layer` : `1/${N} each`;
+      else { const per = M.L / N, a = Math.floor(i * per) + 1, b = Math.floor((i + 1) * per); cap = gw > 60 ? `layers ${a}–${b}` : `L${a}–${b}`; }
+      c.fillStyle = C.muted; c.font = `600 ${gw > 60 ? 10 : 9}px ${mono}`; c.textAlign = "center";
+      c.fillText(cap, gx + gw / 2, gy + gh + 11);
+      c.textAlign = "left"; c.font = `600 10px ${mono}`;
     }
     // links (for comm animation)
     if (N > 1) {
       const anyComm = segmentsFor(0, m).some((s) => s.k === "comm" && tNow >= s.t0 && tNow < s.t1);
       c.strokeStyle = anyComm ? net : rgba(net, 0.25); c.lineWidth = anyComm ? 2.5 : 1.5;
-      const yl = 20 + rows * (gh + gap) - gap + 5;
+      const yl = 20 + rows * (gh + gap + 12) - gap + 3;
       c.beginPath(); c.moveTo(x0, yl); c.lineTo(x0 + perRow * (gw + gap) - gap, yl); c.stroke();
       c.fillStyle = C.faint; c.textAlign = "right";
       c.fillText(link === "fast" ? "FAST LINKS" : "SLOW LINKS", x0 + perRow * (gw + gap) - gap, yl + 12);

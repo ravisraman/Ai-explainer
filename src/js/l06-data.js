@@ -258,6 +258,17 @@ defineMount("filter", (root) => {
     { key: "pii", name: "Scrub personal info", color: "l10", on: false, why: "" },
   ];
   let threshold = 0.5, sel = -1;
+  /* each kind wears the color of the stage that targets it */
+  const KINDS = [
+    { k: "good", name: "Useful English", color: "text" },
+    { k: "informal", name: "Informal English", color: "l6" },
+    { k: "other", name: "Other languages", color: "l8" },
+    { k: "dup", name: "Duplicates", color: "l7" },
+    { k: "boiler", name: "Menus & boilerplate", color: "l5" },
+    { k: "spam", name: "Spam", color: "l3" },
+    { k: "toxic", name: "Abusive", color: "l1" },
+  ];
+  const kindColor = (k) => KINDS.find((x) => x.k === k).color;
 
   function fate(d) {
     for (const st of STAGES) {
@@ -302,11 +313,16 @@ defineMount("filter", (root) => {
     for (const d of docs) {
       const x = x0 + (d.i % cols) * cell, y = y0 + Math.floor(d.i / cols) * cell;
       const f = fate(d);
-      const col = f ? C[f.color] : d.kind === "informal" ? C.l6 : C.text;
+      const col = C[kindColor(d.kind)];
       const sz = (cell - 2) * d.s;
-      c.globalAlpha = f ? d.a + 0.2 : 0.35 + 0.55 * d.a * (d.q != null ? 0.5 + d.q / 2 : 1);
+      c.globalAlpha = f ? 0.14 + 0.2 * d.a : 0.9;
       c.fillStyle = col;
       c.fillRect(x + (cell - sz) / 2, y + (cell - sz) / 2, sz, sz);
+      if (f && cell > 7) {
+        c.globalAlpha = 0.5; c.strokeStyle = C[f.color]; c.lineWidth = 1;
+        const m = cell * 0.3;
+        c.beginPath(); c.moveTo(x + m, y + m); c.lineTo(x + cell - m, y + cell - m); c.moveTo(x + cell - m, y + m); c.lineTo(x + m, y + cell - m); c.stroke();
+      }
       if (d.pii && STAGES[5].on && !f) { c.globalAlpha = 1; c.fillStyle = C[STAGES[5].color]; c.fillRect(x + cell - 4, y + 1, 3, 3); }
       if (d.i === sel) { c.globalAlpha = 1; c.strokeStyle = C.text; c.lineWidth = 2; c.strokeRect(x - 1, y - 1, cell + 1, cell + 1); }
     }
@@ -348,6 +364,8 @@ defineMount("filter", (root) => {
   });
   const btnAll = button("All stages on", () => { STAGES.forEach((s) => (s.on = true)); update(); }, { small: true });
   const btnNone = button("All off", () => { STAGES.forEach((s) => (s.on = false)); update(); }, { small: true });
+  const legend = h("div", { class: "filter-legend" });
+  root.insertBefore(legend, stage.wrap.nextSibling);
   const roKept = readout("Pages kept"), roTok = readout("Tokens kept"), roInf = readout("Informal voices kept"), roOther = readout("Other languages kept");
   root.append(h("div", { class: "filter-grid" }, h("div", null, rows, h("div", { class: "btn-row", style: "margin-top:10px" }, btnAll, btnNone)), docBox),
     h("div", { class: "readouts" }, roKept.el, roTok.el, roInf.el, roOther.el));
@@ -376,6 +394,11 @@ defineMount("filter", (root) => {
       r.n.textContent = r.st.key === "pii" ? (r.st.on ? `${docs.filter((d) => d.pii && !fate(d)).length} scrubbed` : "—") : String(n);
     }
     qSlider.el.classList.toggle("is-off", !STAGES[3].on);
+    legend.replaceChildren(...KINDS.map((K) => {
+      const all = docs.filter((d) => d.kind === K.k).length;
+      const kept = docs.filter((d) => d.kind === K.k && !fate(d)).length;
+      return h("span", { class: "fl-item" + (kept === 0 ? " gone" : "") }, h("i", { style: `background: var(--${K.color})` }), `${K.name} `, h("b", null, kept === all ? String(all) : `${kept}/${all}`));
+    }));
     const kept = docs.filter((d) => !fate(d));
     const totTok = docs.reduce((a, d) => a + d.tokens, 0);
     const keptTok = kept.reduce((a, d) => a + d.tokens, 0);

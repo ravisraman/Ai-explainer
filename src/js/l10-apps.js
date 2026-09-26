@@ -71,13 +71,13 @@ defineMount("agent", (root) => {
   const tokCount = (st) => Math.round(((st.text || st.code || "").split(/\s+/).length) * 1.4 + (st.code ? 8 : 4));
 
   /* ---------- loop diagram ---------- */
-  const svg = sv("svg", { class: "agent-svg", viewBox: "0 0 520 200", role: "img", "aria-label": "The agent loop: model thinks, app runs a tool, result is pasted back, repeat, then answer." });
+  const svg = sv("svg", { class: "agent-svg", viewBox: "0 0 440 212", role: "img", "aria-label": "The agent loop: model thinks, app runs a tool, result is pasted back, repeat, then answer." });
   const NODES = {
-    user: { x: 50, y: 60, label: "You ask" },
-    think: { x: 230, y: 50, label: "Model thinks" },
-    act: { x: 380, y: 150, label: "App runs a tool" },
-    observe: { x: 150, y: 150, label: "Result pasted in" },
-    answer: { x: 460, y: 50, label: "Model answers" },
+    user: { x: 42, y: 42, label: "You ask" },
+    think: { x: 205, y: 42, label: "Model thinks" },
+    act: { x: 300, y: 150, label: "App runs tool" },
+    observe: { x: 110, y: 150, label: "Result pasted in" },
+    answer: { x: 392, y: 42, label: "Answer" },
   };
   const EDGES = [["user", "think"], ["think", "act"], ["act", "observe"], ["observe", "think"], ["think", "answer"]];
   const edgeEls = {};
@@ -93,7 +93,7 @@ defineMount("agent", (root) => {
   const nodeEls = {};
   for (const k in NODES) {
     const n = NODES[k];
-    const g = sv("g", { class: "ag-node" }, sv("circle", { cx: n.x, cy: n.y, r: 26 }), sv("text", { x: n.x, y: n.y + 44, "text-anchor": "middle", text: n.label }));
+    const g = sv("g", { class: "ag-node" }, sv("circle", { cx: n.x, cy: n.y, r: 26 }), sv("text", { x: n.x, y: n.y + 48, "text-anchor": "middle", text: n.label }));
     g.append(sv("text", { x: n.x, y: n.y + 5, "text-anchor": "middle", class: "ag-icon", text: { user: "?", think: "✳", act: "⚙", observe: "⇣", answer: "✓" }[k] }));
     nodeEls[k] = g;
     svg.append(g);

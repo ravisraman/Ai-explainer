@@ -35,7 +35,7 @@
   --line-2: #3d394c;
   --text: #ecebf2;
   --muted: #a4a0b4;
-  --faint: #716c84;
+  --faint: #8a859c;
   --on-accent: #0d0c12;
   --good: #5ed39a;
   --bad: #ff5f73;
@@ -79,7 +79,7 @@
     --line-2: #c7c4d2;
     --text: #15131c;
     --muted: #5d5870;
-    --faint: #8a8599;
+    --faint: #67627a;
     --on-accent: #ffffff;
     --good: #16895a;
     --bad: #d42a45;
@@ -109,7 +109,7 @@
   --line-2: #c7c4d2;
   --text: #15131c;
   --muted: #5d5870;
-  --faint: #8a8599;
+  --faint: #67627a;
   --on-accent: #ffffff;
   --good: #16895a;
   --bad: #d42a45;
@@ -579,8 +579,7 @@ h1 { margin-top: 18px; }
   position: fixed; z-index: 30; left: 0; right: 0; bottom: 0;
   display: flex; align-items: stretch; gap: 6px;
   padding: 8px max(10px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-right, 0px));
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
   border-top: 1px solid var(--line);
 }
 @media (min-width: 1180px) { .elevator { display: none; } }
@@ -831,7 +830,7 @@ h1 { margin-top: 18px; }
 .ag-edge.on { stroke: var(--c); stroke-width: 3.5; }
 .ag-arrowhead { fill: var(--muted); }
 .ag-node circle { fill: var(--panel); stroke: var(--line-2); stroke-width: 2; transition: fill 0.2s, stroke 0.2s; }
-.ag-node text { fill: var(--muted); font: 600 12px var(--font-body); }
+.ag-node text { fill: var(--muted); font: 600 15px var(--font-body); }
 .ag-node .ag-icon { fill: var(--text); font: 700 18px var(--font-mono); }
 .ag-node.on circle { fill: var(--c); stroke: var(--c); }
 .ag-node.on .ag-icon { fill: var(--on-accent); }
@@ -961,6 +960,11 @@ h1 { margin-top: 18px; }
 @media (hover: none) {
   .jr-dots { gap: 8px; }
 }
+.filter-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 0.82rem; color: var(--muted); }
+.fl-item { display: inline-flex; align-items: center; gap: 6px; }
+.fl-item i { width: 10px; height: 10px; border-radius: 2px; }
+.fl-item b { color: var(--text); font: 600 0.78rem var(--font-mono); }
+.fl-item.gone { opacity: 0.5; text-decoration: line-through; }
 
 </style>
 </head>
@@ -1323,7 +1327,7 @@ h1 { margin-top: 18px; }
 
   <div class="bench">
     <figure class="fig" id="fig-filter">
-      <figcaption class="fig-head"><h3>Filter the web</h3><p>Start with a raw crawl of 400 web pages. Switch on each stage of a typical cleaning pipeline and watch what survives. Tap a page to read it.</p></figcaption>
+      <figcaption class="fig-head"><h3>Filter the web</h3><p>Each square is one page from a raw crawl of 400, colored by what it really is. Switch on each stage of a typical cleaning pipeline and watch what survives. Tap a page to read it.</p></figcaption>
       <div class="mount" data-mount="filter"></div>
       <p class="simplified"><span class="simp-glyph">◇</span> <b>Simplified:</b> 400 made-up pages in rough, typical proportions of duplicates, spam, boilerplate and other languages. Real pipelines process billions of pages, and every lab's recipe differs.</p>
     </figure>
@@ -2317,7 +2321,7 @@ function initNav() {
   railList.parentElement.append(marker);
   const moveMarker = () => {
     const a = railItems.find((x) => x.classList.contains("is-current"));
-    if (!a || !railList.offsetParent) { marker.style.opacity = "0"; return; }
+    if (!a || !window.matchMedia("(min-width: 1180px)").matches) { marker.style.opacity = "0"; return; }
     const r = a.getBoundingClientRect(), pr = railList.parentElement.getBoundingClientRect();
     marker.style.opacity = "1";
     marker.style.transform = `translateY(${r.top - pr.top + r.height / 2 - 6}px)`;
@@ -4681,14 +4685,14 @@ defineMount("parallel", (root) => {
     const rows = N > 8 ? 2 : 1, perRow = Math.min(N, 8);
     const gap = 8;
     const gw = Math.min(88, (L.w - gap * (perRow - 1)) / perRow);
-    const gh = (L.topH - 26 - (rows - 1) * gap) / rows;
+    const gh = (L.topH - 26 - (rows - 1) * (gap + 12) - 12) / rows;
     const x0 = (L.w - (gw * perRow + gap * (perRow - 1))) / 2;
     const tNow = play * m.step;
     c.font = `600 10px ${mono}`; c.textAlign = "left"; c.fillStyle = C.muted;
     c.fillText(`${N} GPUS · WHAT EACH ONE HOLDS`, x0, 12);
 
     for (let i = 0; i < N; i++) {
-      const gx = x0 + (i % perRow) * (gw + gap), gy = 20 + Math.floor(i / perRow) * (gh + gap);
+      const gx = x0 + (i % perRow) * (gw + gap), gy = 20 + Math.floor(i / perRow) * (gh + gap + 12);
       const segs = segmentsFor(i, m);
       const cur = segs.find((s) => tNow >= s.t0 && tNow < s.t1);
       const state = play > 1 ? "done" : cur ? cur.k : "idle";
@@ -4721,12 +4725,21 @@ defineMount("parallel", (root) => {
       const fh = Math.min(1, frac) * mh;
       c.fillRect(mx, my + mh - fh, memW, fh);
       if (frac > 1) { c.fillStyle = C.bad; c.fillRect(mx - 2, my - 4, memW + 4, 3); }
+      // what this GPU holds
+      const M = MODELS[msize];
+      let cap;
+      if (strat === "data") cap = gw > 60 ? "whole model" : "all";
+      else if (strat === "tensor") cap = gw > 60 ? `1/${N} of every layer` : `1/${N} each`;
+      else { const per = M.L / N, a = Math.floor(i * per) + 1, b = Math.floor((i + 1) * per); cap = gw > 60 ? `layers ${a}–${b}` : `L${a}–${b}`; }
+      c.fillStyle = C.muted; c.font = `600 ${gw > 60 ? 10 : 9}px ${mono}`; c.textAlign = "center";
+      c.fillText(cap, gx + gw / 2, gy + gh + 11);
+      c.textAlign = "left"; c.font = `600 10px ${mono}`;
     }
     // links (for comm animation)
     if (N > 1) {
       const anyComm = segmentsFor(0, m).some((s) => s.k === "comm" && tNow >= s.t0 && tNow < s.t1);
       c.strokeStyle = anyComm ? net : rgba(net, 0.25); c.lineWidth = anyComm ? 2.5 : 1.5;
-      const yl = 20 + rows * (gh + gap) - gap + 5;
+      const yl = 20 + rows * (gh + gap + 12) - gap + 3;
       c.beginPath(); c.moveTo(x0, yl); c.lineTo(x0 + perRow * (gw + gap) - gap, yl); c.stroke();
       c.fillStyle = C.faint; c.textAlign = "right";
       c.fillText(link === "fast" ? "FAST LINKS" : "SLOW LINKS", x0 + perRow * (gw + gap) - gap, yl + 12);
@@ -5114,6 +5127,17 @@ defineMount("filter", (root) => {
     { key: "pii", name: "Scrub personal info", color: "l10", on: false, why: "" },
   ];
   let threshold = 0.5, sel = -1;
+  /* each kind wears the color of the stage that targets it */
+  const KINDS = [
+    { k: "good", name: "Useful English", color: "text" },
+    { k: "informal", name: "Informal English", color: "l6" },
+    { k: "other", name: "Other languages", color: "l8" },
+    { k: "dup", name: "Duplicates", color: "l7" },
+    { k: "boiler", name: "Menus & boilerplate", color: "l5" },
+    { k: "spam", name: "Spam", color: "l3" },
+    { k: "toxic", name: "Abusive", color: "l1" },
+  ];
+  const kindColor = (k) => KINDS.find((x) => x.k === k).color;
 
   function fate(d) {
     for (const st of STAGES) {
@@ -5158,11 +5182,16 @@ defineMount("filter", (root) => {
     for (const d of docs) {
       const x = x0 + (d.i % cols) * cell, y = y0 + Math.floor(d.i / cols) * cell;
       const f = fate(d);
-      const col = f ? C[f.color] : d.kind === "informal" ? C.l6 : C.text;
+      const col = C[kindColor(d.kind)];
       const sz = (cell - 2) * d.s;
-      c.globalAlpha = f ? d.a + 0.2 : 0.35 + 0.55 * d.a * (d.q != null ? 0.5 + d.q / 2 : 1);
+      c.globalAlpha = f ? 0.14 + 0.2 * d.a : 0.9;
       c.fillStyle = col;
       c.fillRect(x + (cell - sz) / 2, y + (cell - sz) / 2, sz, sz);
+      if (f && cell > 7) {
+        c.globalAlpha = 0.5; c.strokeStyle = C[f.color]; c.lineWidth = 1;
+        const m = cell * 0.3;
+        c.beginPath(); c.moveTo(x + m, y + m); c.lineTo(x + cell - m, y + cell - m); c.moveTo(x + cell - m, y + m); c.lineTo(x + m, y + cell - m); c.stroke();
+      }
       if (d.pii && STAGES[5].on && !f) { c.globalAlpha = 1; c.fillStyle = C[STAGES[5].color]; c.fillRect(x + cell - 4, y + 1, 3, 3); }
       if (d.i === sel) { c.globalAlpha = 1; c.strokeStyle = C.text; c.lineWidth = 2; c.strokeRect(x - 1, y - 1, cell + 1, cell + 1); }
     }
@@ -5204,6 +5233,8 @@ defineMount("filter", (root) => {
   });
   const btnAll = button("All stages on", () => { STAGES.forEach((s) => (s.on = true)); update(); }, { small: true });
   const btnNone = button("All off", () => { STAGES.forEach((s) => (s.on = false)); update(); }, { small: true });
+  const legend = h("div", { class: "filter-legend" });
+  root.insertBefore(legend, stage.wrap.nextSibling);
   const roKept = readout("Pages kept"), roTok = readout("Tokens kept"), roInf = readout("Informal voices kept"), roOther = readout("Other languages kept");
   root.append(h("div", { class: "filter-grid" }, h("div", null, rows, h("div", { class: "btn-row", style: "margin-top:10px" }, btnAll, btnNone)), docBox),
     h("div", { class: "readouts" }, roKept.el, roTok.el, roInf.el, roOther.el));
@@ -5232,6 +5263,11 @@ defineMount("filter", (root) => {
       r.n.textContent = r.st.key === "pii" ? (r.st.on ? `${docs.filter((d) => d.pii && !fate(d)).length} scrubbed` : "—") : String(n);
     }
     qSlider.el.classList.toggle("is-off", !STAGES[3].on);
+    legend.replaceChildren(...KINDS.map((K) => {
+      const all = docs.filter((d) => d.kind === K.k).length;
+      const kept = docs.filter((d) => d.kind === K.k && !fate(d)).length;
+      return h("span", { class: "fl-item" + (kept === 0 ? " gone" : "") }, h("i", { style: `background: var(--${K.color})` }), `${K.name} `, h("b", null, kept === all ? String(all) : `${kept}/${all}`));
+    }));
     const kept = docs.filter((d) => !fate(d));
     const totTok = docs.reduce((a, d) => a + d.tokens, 0);
     const keptTok = kept.reduce((a, d) => a + d.tokens, 0);
@@ -5776,7 +5812,7 @@ defineMount("embed", (root) => {
 /* ---------- (c) Attention ---------- */
 defineMount("attn", (root) => {
   const BASE = ["The", "animal", "didn't", "cross", "the", "street", "because", "it", "was", "too", "tired", "."];
-  let variant = "tired", head = 1, focus = 10, sharp = 1, view = "arcs";
+  let variant = "tired", head = 1, focus = 10, sharp = 1, view = window.innerWidth < 600 ? "grid" : "arcs";
   const toks = () => BASE.map((t, i) => (i === 10 ? variant : t));
   /* hand-set scores s[i][j] for j <= i; softmax per row */
   function scores(hd, i, j) {
@@ -5874,6 +5910,12 @@ defineMount("attn", (root) => {
         svg.append(g);
       });
       svg.append(sv("text", { x: 14, y: 16, class: "attn-cap", text: "LOOKS BACK AT ↑ (ONLY EARLIER WORDS)" }));
+      // keep the focused word visible when the sentence is wider than the screen
+      requestAnimationFrame(() => {
+        if (wrap.scrollWidth <= wrap.clientWidth) return;
+        const k = svg.clientWidth / W;
+        wrap.scrollLeft = clamp(xs[focus] * k - wrap.clientWidth / 2, 0, wrap.scrollWidth - wrap.clientWidth);
+      });
     } else {
       const cell = 30, lab = 78, top = 70;
       const W = lab + n * cell + 10, Hh = top + n * cell + 10;
@@ -5909,7 +5951,7 @@ defineMount("attn", (root) => {
     status.innerHTML = msg;
   }
   Actions.attn = (arg) => {
-    if (arg === "it") { segH.set(1, false); head = 1; segView.set("arcs", false); view = "arcs"; focus = 7; render(); setTimeout(() => { focus = 10; render(); }, 1500); }
+    if (arg === "it") { segH.set(1, false); head = 1; focus = 7; render(); setTimeout(() => { focus = 10; render(); }, 1500); }
   };
   Theme.on(render);
   render();
@@ -6362,10 +6404,10 @@ defineMount("scaling", (root) => {
   const EFF = 1e15 * 0.4; // FLOP/s per H100-class GPU at 40% utilization
   const USD = 2, KW = 1.5, PUE = 1.2;
   const REFS = [
-    { name: "GPT-3", N: 175e9, D: 300e9 },
-    { name: "Chinchilla", N: 70e9, D: 1.4e12 },
-    { name: "Llama 3 8B", N: 8e9, D: 15e12 },
-    { name: "Llama 3.1 405B", N: 405e9, D: 15.6e12 },
+    { name: "GPT-3", N: 175e9, D: 300e9, dy: -6 },
+    { name: "Chinchilla", N: 70e9, D: 1.4e12, dy: -6 },
+    { name: "Llama 3 8B", short: "Llama 3 8B", N: 8e9, D: 15e12, dy: -6 },
+    { name: "Llama 3.1 405B", short: "405B", N: 405e9, D: 15.6e12, dy: 15 },
   ];
   const NMIN = 1e7, NMAX = 1e13, DMIN = 1e9, DMAX = 1e15;
   const DATA_STOCK = 3e14; // Epoch AI est. of public human text, tokens
@@ -6432,7 +6474,8 @@ defineMount("scaling", (root) => {
       const nn = Math.sqrt(Cv / 6 / 20);
       const px = lx(clamp(nn * 0.3, NMIN, NMAX), P), py = ly(Cv / (6 * clamp(nn * 0.3, NMIN, NMAX)), P);
       c.fillStyle = rgba(Cc.text, 0.75); c.textAlign = "left";
-      if (py > P.y1 + 22 && py < P.y0 - 4) c.fillText(`10${sup(e)} FLOP`, px + 4, py - 4);
+      const lab = `10${sup(e)} FLOP`;
+      if (py > P.y1 + 22 && py < P.y0 - 4 && px + 4 + c.measureText(lab).width < P.x1 - 4) c.fillText(lab, px + 4, py - 4);
     }
     c.setLineDash([]);
     // data stock line
@@ -6445,14 +6488,16 @@ defineMount("scaling", (root) => {
     c.stroke();
     const labN = Nopt(1e21);
     c.fillStyle = Cc.l10; c.textAlign = "left"; c.font = `700 10px ${mono}`;
-    c.fillText("BEST SPLIT (~20 TOKENS/PARAM)", lx(labN, P) + 8, ly(1e21 / (6 * labN), P) + 12);
+    const bl = L.w < 520 ? "BEST SPLIT" : "BEST SPLIT (~20 TOKENS/PARAM)";
+    c.fillText(bl, Math.min(lx(labN, P) + 8, P.x1 - c.measureText(bl).width - 4), ly(1e21 / (6 * labN), P) + 12);
     // refs
     c.font = `600 10px ${mono}`;
     for (const r of REFS) {
       const X = lx(r.N, P), Y = ly(r.D, P);
       c.fillStyle = Cc.text; c.beginPath(); c.arc(X, Y, 3.5, 0, Math.PI * 2); c.fill();
-      c.textAlign = X > P.x1 - 90 ? "right" : "left";
-      c.fillText(r.name, X + (c.textAlign === "left" ? 6 : -6), Y - 5);
+      const nm = L.w < 520 && r.short ? r.short : r.name;
+      c.textAlign = X + c.measureText(nm).width + 8 > P.x1 ? "right" : "left";
+      c.fillText(nm, X + (c.textAlign === "left" ? 6 : -6), Y + r.dy);
     }
     // current
     const X = lx(N, P), Y = ly(D, P);
@@ -7006,13 +7051,13 @@ defineMount("agent", (root) => {
   const tokCount = (st) => Math.round(((st.text || st.code || "").split(/\s+/).length) * 1.4 + (st.code ? 8 : 4));
 
   /* ---------- loop diagram ---------- */
-  const svg = sv("svg", { class: "agent-svg", viewBox: "0 0 520 200", role: "img", "aria-label": "The agent loop: model thinks, app runs a tool, result is pasted back, repeat, then answer." });
+  const svg = sv("svg", { class: "agent-svg", viewBox: "0 0 440 212", role: "img", "aria-label": "The agent loop: model thinks, app runs a tool, result is pasted back, repeat, then answer." });
   const NODES = {
-    user: { x: 50, y: 60, label: "You ask" },
-    think: { x: 230, y: 50, label: "Model thinks" },
-    act: { x: 380, y: 150, label: "App runs a tool" },
-    observe: { x: 150, y: 150, label: "Result pasted in" },
-    answer: { x: 460, y: 50, label: "Model answers" },
+    user: { x: 42, y: 42, label: "You ask" },
+    think: { x: 205, y: 42, label: "Model thinks" },
+    act: { x: 300, y: 150, label: "App runs tool" },
+    observe: { x: 110, y: 150, label: "Result pasted in" },
+    answer: { x: 392, y: 42, label: "Answer" },
   };
   const EDGES = [["user", "think"], ["think", "act"], ["act", "observe"], ["observe", "think"], ["think", "answer"]];
   const edgeEls = {};
@@ -7028,7 +7073,7 @@ defineMount("agent", (root) => {
   const nodeEls = {};
   for (const k in NODES) {
     const n = NODES[k];
-    const g = sv("g", { class: "ag-node" }, sv("circle", { cx: n.x, cy: n.y, r: 26 }), sv("text", { x: n.x, y: n.y + 44, "text-anchor": "middle", text: n.label }));
+    const g = sv("g", { class: "ag-node" }, sv("circle", { cx: n.x, cy: n.y, r: 26 }), sv("text", { x: n.x, y: n.y + 48, "text-anchor": "middle", text: n.label }));
     g.append(sv("text", { x: n.x, y: n.y + 5, "text-anchor": "middle", class: "ag-icon", text: { user: "?", think: "✳", act: "⚙", observe: "⇣", answer: "✓" }[k] }));
     nodeEls[k] = g;
     svg.append(g);

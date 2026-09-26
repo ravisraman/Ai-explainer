@@ -67,7 +67,7 @@ function initNav() {
   railList.parentElement.append(marker);
   const moveMarker = () => {
     const a = railItems.find((x) => x.classList.contains("is-current"));
-    if (!a || !railList.offsetParent) { marker.style.opacity = "0"; return; }
+    if (!a || !window.matchMedia("(min-width: 1180px)").matches) { marker.style.opacity = "0"; return; }
     const r = a.getBoundingClientRect(), pr = railList.parentElement.getBoundingClientRect();
     marker.style.opacity = "1";
     marker.style.transform = `translateY(${r.top - pr.top + r.height / 2 - 6}px)`;

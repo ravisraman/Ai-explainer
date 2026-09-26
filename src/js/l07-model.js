@@ -510,7 +510,7 @@ defineMount("embed", (root) => {
 /* ---------- (c) Attention ---------- */
 defineMount("attn", (root) => {
   const BASE = ["The", "animal", "didn't", "cross", "the", "street", "because", "it", "was", "too", "tired", "."];
-  let variant = "tired", head = 1, focus = 10, sharp = 1, view = "arcs";
+  let variant = "tired", head = 1, focus = 10, sharp = 1, view = window.innerWidth < 600 ? "grid" : "arcs";
   const toks = () => BASE.map((t, i) => (i === 10 ? variant : t));
   /* hand-set scores s[i][j] for j <= i; softmax per row */
   function scores(hd, i, j) {
@@ -608,6 +608,12 @@ defineMount("attn", (root) => {
         svg.append(g);
       });
       svg.append(sv("text", { x: 14, y: 16, class: "attn-cap", text: "LOOKS BACK AT ↑ (ONLY EARLIER WORDS)" }));
+      // keep the focused word visible when the sentence is wider than the screen
+      requestAnimationFrame(() => {
+        if (wrap.scrollWidth <= wrap.clientWidth) return;
+        const k = svg.clientWidth / W;
+        wrap.scrollLeft = clamp(xs[focus] * k - wrap.clientWidth / 2, 0, wrap.scrollWidth - wrap.clientWidth);
+      });
     } else {
       const cell = 30, lab = 78, top = 70;
       const W = lab + n * cell + 10, Hh = top + n * cell + 10;
@@ -643,7 +649,7 @@ defineMount("attn", (root) => {
     status.innerHTML = msg;
   }
   Actions.attn = (arg) => {
-    if (arg === "it") { segH.set(1, false); head = 1; segView.set("arcs", false); view = "arcs"; focus = 7; render(); setTimeout(() => { focus = 10; render(); }, 1500); }
+    if (arg === "it") { segH.set(1, false); head = 1; focus = 7; render(); setTimeout(() => { focus = 10; render(); }, 1500); }
   };
   Theme.on(render);
   render();
