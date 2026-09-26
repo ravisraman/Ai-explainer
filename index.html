@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The AI Stack</title>
+<meta name="description" content="How modern AI works end to end, from the power plant to the chatbot reply: an interactive tour of ten layers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* ---------- tokens (dark-first) ---------- */
+:root{
+  color-scheme: dark;
+  --bg:#0d0c12; --surface:#16141d; --surface-2:#1d1a26; --line:#2b2735; --line-strong:#3d384a;
+  --text:#ece8f3; --text-2:#c9c3d6; --muted:#a39db2;
+  --l1:#f4a437; --l2:#ff9858; --l3:#ff9173; --l4:#ff8c98; --l5:#fe8dc5;
+  --l6:#e495f0; --l7:#c3a1ff; --l8:#a2acff; --l9:#79b8ff; --l10:#2bc7ff;
+  --accent: var(--l1);
+  --font-display: "Bricolage Grotesque", "Avenir Next Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --bg:#f3f2f7; --surface:#ffffff; --surface-2:#ebe9f1; --line:#dcd8e5; --line-strong:#c4bfd1;
+    --text:#17151e; --text-2:#35313f; --muted:#625c70;
+    --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
+    --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#0075b8;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --bg:#f3f2f7; --surface:#ffffff; --surface-2:#ebe9f1; --line:#dcd8e5; --line-strong:#c4bfd1;
+  --text:#17151e; --text-2:#35313f; --muted:#625c70;
+  --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
+  --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#0075b8;
+}
+
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 var(--font-body)}
+a{color:inherit}
+h1,h2,h3{font-family:var(--font-display);line-height:1.1;text-wrap:balance;margin:0}
+p{margin:0}
+main{padding-inline:16px;padding-block:0 120px}
+.wrap{max-width:680px;margin-inline:auto}
+.wide{max-width:940px;margin-inline:auto}
+section{padding-block:72px}
+.layer-head{display:grid;gap:12px}
+.kicker{font:500 13px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.summary{font-size:1.3rem;line-height:1.45}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-block:28px}
+.stat-num{font:600 1.8rem/1.1 var(--font-mono)}
+.stat-label{font-size:.9rem;color:var(--muted)}
+.qgrid{display:grid;gap:24px}
+.q h3{font-size:1.1rem;margin-bottom:6px}
+.q p + p{margin-top:10px}
+.analogy{margin-block:28px;padding:16px;border:1px solid var(--line)}
+.breaks{display:block;margin-top:8px;color:var(--muted)}
+details.deeper{border-top:1px solid var(--line);padding-block:12px}
+details.deeper summary{cursor:pointer;font-weight:600}
+details.deeper .body{padding-top:10px;display:grid;gap:10px}
+.figure{margin-block:32px;padding:16px;border:1px solid var(--line)}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:16px;top:16px;z-index:100;background:var(--surface);padding:8px}
+.rail{display:none}
+.stack-list{list-style:none;margin:0;padding:0}
+.stack-list a{display:flex;gap:8px;text-decoration:none;padding:4px}
+.stack-list a.active{color:var(--c)}
+.sl-t{display:flex;flex-direction:column}
+.sl-tag{font-size:.75rem;color:var(--muted)}
+.elevator{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px))}
+.elev-btn{display:flex;gap:10px;align-items:center;width:100%;background:none;border:0;color:inherit;font:inherit}
+.gauge{display:grid;gap:1px;width:10px}.gauge i{height:3px;background:var(--line-strong)}.gauge i.active,.gauge i.passed{background:var(--c)}
+.sheet{max-height:70vh;overflow:auto;padding-bottom:12px}
+@media (min-width:1000px){
+  .rail{display:flex;flex-direction:column;gap:8px;position:fixed;left:0;top:0;bottom:0;width:240px;padding:24px 16px;border-right:1px solid var(--line);overflow:auto}
+  .elevator{display:none}
+  main{margin-left:240px}
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Persistent stack navigation (filled by script) -->
+<nav class="rail" id="rail" aria-label="Layers of the AI stack"></nav>
+<div class="elevator" id="elevator"></div>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="hero-text">
+    <p class="eyebrow">An interactive field guide · figures as of 2026</p>
+    <h1>The AI Stack: <span>From Electrons to Answers</span></h1>
+    <p class="lede">When you ask a chatbot a question, the answer comes from ten layers of technology stacked on top of each other, from the power plant to the text on your screen. This page climbs the stack from the bottom up.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#energy">Start at the bottom</a>
+      <a class="btn" href="#walkthrough">Follow one prompt</a>
+    </div>
+  </div>
+  <figure class="hero-stack" aria-hidden="true">
+    <svg id="heroSvg" viewBox="0 0 420 460"></svg>
+  </figure>
+</header>
+
+<section class="intro wrap" aria-label="How to read this page">
+  <h2 class="sr-only">How to read this page</h2>
+  <div class="howto">
+    <p><strong>Skimming?</strong> Read the large sentence at the top of each layer and the two numbers under it. That's the whole story in about five minutes.</p>
+    <p><strong>Want the details?</strong> Open the <em>Go deeper</em> panels and play with the interactive figures. Every layer answers the same questions: what it is, why it matters, and how it connects to its neighbors.</p>
+    <p><strong>About the numbers.</strong> They are rounded on purpose. A <span class="est">~</span> means approximate; "est." means an outside estimate rather than a published figure. AI moves fast, so anything dated will drift.</p>
+  </div>
+</section>
+
+<!-- ================= LAYER 1: ENERGY ================= -->
+<section class="layer" id="energy" data-layer="1" style="--accent:var(--l1)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 1 of 10 · Foundation</p>
+      <h2>Energy</h2>
+      <p class="summary">Every answer an AI gives starts as electricity, and almost all of that electricity ends up as heat.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~1.5%</div><div class="stat-label">of the world's electricity went to data centers in 2024 (IEA estimate). AI is the fastest-growing part.</div></div>
+      <div class="stat"><div class="stat-num">~2×</div><div class="stat-label">projected growth in data-center electricity use by 2030, to roughly 950 TWh (IEA base case)</div></div>
+      <div class="stat"><div class="stat-num">~120 kW</div><div class="stat-label">for one modern AI server rack, versus roughly 5–15 kW for a traditional rack</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>Power plants (gas, nuclear, hydro, wind, solar and coal) feed a high-voltage grid. Substations step the voltage down, and inside the data center, backup batteries and power distribution units feed the racks. The chips turn that electricity into computation. Then the cooling system removes the heat, which is where nearly every joule ends up.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>Power has become one of AI's main bottlenecks. As of 2026, the largest new AI campuses are planned at around a gigawatt, the output of a large nuclear reactor. In many regions a new grid connection of that size takes years, and big transformers and gas turbines have long waiting lists. Where the power comes from also decides most of AI's carbon footprint.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Nothing but physics: fuel, falling water, wind, sunlight and fission.</p>
+        <p><b class="dir">↑ Above</b> Data centers are designed around power and cooling first. Sites are increasingly chosen by where electricity is available, not where users are.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> A data center is a giant electric heater that happens to compute.</p>
+      <p class="breaks"><b>Where it breaks:</b> a heater's goal is heat; a data center tries to make as little as possible, and its useful output (the computation) is real. The energy accounting is close to exact, though: almost every watt that goes in comes out as warm air or warm water.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="coolingFig">
+    <figcaption class="fig-cap"><b>Where 100 watts go.</b> Choose a cooling design to see how much power reaches the computers versus the building's overhead.</figcaption>
+    <div id="cooling"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: air versus liquid cooling</summary><div class="body">
+      <p><b>Air cooling</b> pushes chilled air through racks with fans. It is simple and familiar, but air carries heat poorly, so it becomes impractical somewhere around 30–50 kW per rack.</p>
+      <p><b>Direct-to-chip liquid cooling</b> bolts cold plates onto the hottest chips and pumps coolant through them. Water holds roughly 3,500 times more heat than the same volume of air, which is why today's 100+ kW AI racks are almost all liquid-cooled. <b>Immersion cooling</b> goes further by dunking whole servers in non-conductive fluid.</p>
+      <p><b>Water use</b> is a separate question. Many sites reject heat through evaporative cooling towers, which consume water. Closed-loop and dry coolers save water but use more electricity, so operators trade one resource against the other depending on climate.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: what "PUE" means</summary><div class="body">
+      <p><b>Power usage effectiveness</b> is total facility power divided by the power that reaches the IT equipment. A PUE of 1.0 would mean zero overhead. The largest cloud operators report about 1.1–1.2; the industry-wide average is closer to 1.5 (surveys, approximate).</p>
+      <p>PUE says nothing about how useful the computing is. A perfectly efficient building full of idle chips still has a great PUE.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: how big is a gigawatt?</summary><div class="body">
+      <p>One gigawatt, running continuously, is about 8.8 terawatt-hours a year. The average US home draws about 1.2 kW averaged over the year, so a 1 GW campus uses roughly as much power as 800,000 homes (rough comparison).</p>
+      <p>Operators are signing deals for nuclear power, restarting retired plants, and building on-site gas generation. Much of the new nuclear capacity (such as small modular reactors) is still years away as of 2026.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 2: DATA CENTERS ================= -->
+<section class="layer" id="datacenters" data-layer="2" style="--accent:var(--l2)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 2 of 10 · Infrastructure</p>
+      <h2>Data centers</h2>
+      <p class="summary">A data center turns electricity, cooling and networking into one enormous computer.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">100,000+</div><div class="stat-label">accelerators in the largest training clusters (as of 2026; several are planned at hundreds of thousands)</div></div>
+      <div class="stat"><div class="stat-num">~2 miles</div><div class="stat-label">of copper cable, about 5,000 cables, inside one 72-GPU NVIDIA NVL72 rack (vendor figure)</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>Rows of racks in a secured building. Each rack holds servers; each AI server holds 4 to 8 accelerator chips. Switches link the racks into a <em>network fabric</em>, and the building's power and cooling plant keeps the whole thing running around the clock.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>Training a frontier model means tens of thousands of chips working on one job in lock-step, swapping results many times a second. How fast and how reliably they can talk to each other decides how much of the expensive hardware actually gets used.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Power and cooling set how densely chips can be packed.</p>
+        <p><b class="dir">↑ Above</b> Silicon chips are the payload. The building exists to feed them electricity, remove their heat, and wire them together.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> An orchestra: thousands of players who must stay in time. One slow player, such as a lagging chip or a flaky cable, holds up everyone.</p>
+      <p class="breaks"><b>Where it breaks:</b> orchestra players play different parts. In the most common training setup, thousands of chips run the <em>same</em> computation on different slices of data, then average what they learned.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="scaleFig">
+    <figcaption class="fig-cap"><b>Scale explorer.</b> Drag from a single transistor out to a whole campus. Counts use an NVIDIA GB200-class system as the example; other designs differ.</figcaption>
+    <div id="scale"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: two networks, two speeds</summary><div class="body">
+      <p><b>Scale-up</b> links connect GPUs inside a server or rack. NVIDIA's NVLink gives each current-generation GPU about 1.8 terabytes per second to its neighbors.</p>
+      <p><b>Scale-out</b> links connect racks to each other over InfiniBand or Ethernet, at about 400–800 gigabits per second per GPU, which is roughly 50–100 gigabytes per second. That's 10–20 times slower, so engineers place the chattiest parts of a computation inside a rack and the least chatty parts across racks.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: the fabric</summary><div class="body">
+      <p>Big clusters use layered "fat-tree" (Clos) networks: tiers of switches arranged so any GPU can reach any other at close to full speed. Long runs use optical transceivers that turn electrical signals into light. The biggest clusters contain hundreds of thousands of them (est.), and each one is a part that can fail.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: training sites versus inference sites</summary><div class="body">
+      <p>Training wants one giant, tightly connected cluster in one place, because every chip talks to every other chip constantly. Serving answers (inference) splits into independent requests, so it can be spread across many smaller data centers closer to users.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 3: SILICON ================= -->
+<section class="layer" id="silicon" data-layer="3" style="--accent:var(--l3)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 3 of 10 · Manufacturing</p>
+      <h2>Silicon</h2>
+      <p class="summary">Chips are made by printing tens of billions of tiny switches onto ultra-pure silicon, using machines so complex that only one company builds the most important one.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">13.5 nm</div><div class="stat-label">wavelength of the extreme-ultraviolet (EUV) light used to print the finest features; visible light is 400–700 nm</div></div>
+      <div class="stat"><div class="stat-num">~$200M</div><div class="stat-label">for one ASML EUV scanner; the newest "High-NA" version costs roughly $350M+ (reported prices)</div></div>
+      <div class="stat"><div class="stat-num">~90%</div><div class="stat-label">of the world's most advanced logic chips are made by TSMC, mostly in Taiwan (common estimate)</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>Quartz sand is reduced to silicon, then purified to about 99.9999999% ("nine nines"). A single crystal is pulled from the melt and sliced into 300 mm wafers. Each wafer then goes through many hundreds of steps: deposit a thin film, coat it with light-sensitive resist, print a pattern with light, etch, implant, polish, and repeat for dozens of layers. The trip takes around three months. Finally the wafer is tested and cut into individual chips (dies).</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>Smaller, better transistors mean more computation per watt and per dollar, and a large share of AI's hardware progress traces back to this layer. It is also the most concentrated part of the stack: a handful of companies in a handful of places make the parts nobody else can.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Fabs themselves need vast, uninterruptible power and ultra-pure water, and they're housed in some of the most controlled buildings on Earth.</p>
+        <p><b class="dir">↑ Above</b> The dies cut from these wafers become GPUs, TPUs and the stacked memory chips beside them.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> Lithography is like a slide projector run in reverse: a master pattern (the mask) is shrunk four times and projected onto a wafer coated with light-sensitive chemical, like exposing photographic paper.</p>
+      <p class="breaks"><b>Where it breaks:</b> EUV light is absorbed by glass and even by air, so there are no lenses. The light bounces off a chain of ultra-smooth mirrors inside a vacuum. And each chip needs dozens of patterned layers stacked with alignment errors of just a few nanometers.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="fabFig">
+    <figcaption class="fig-cap"><b>From sand to chip, and who controls each step.</b> Chokepoint shares are rounded, approximate, and shift year to year.</figcaption>
+    <div id="fab"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: how an EUV machine makes light</summary><div class="body">
+      <p>Tiny droplets of molten tin fall through a chamber about 50,000 times a second. A powerful CO₂ laser hits each one, turning it into a plasma hotter than the surface of the Sun, which glows at 13.5 nm. Mirrors from Zeiss collect and steer that light. Zeiss says that if one of these mirrors were scaled up to the size of Germany, its largest bump would be about 0.1 mm high.</p>
+      <p>A scanner is roughly the size of a bus and ships in dozens of containers. ASML in the Netherlands is the only supplier.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: what "3 nm" actually means</summary><div class="body">
+      <p>Node names like "3 nm" and "2 nm" are marketing labels. No feature on a "3 nm" chip is 3 nm wide; transistor gates sit roughly 45–50 nm apart. The names keep counting down because density and efficiency keep improving, now mostly by changing the transistor's 3-D shape: from FinFETs to "gate-all-around" nanosheets at the 2 nm-class nodes arriving in 2025–26.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: why the biggest chips are two chips glued together</summary><div class="body">
+      <p>A scanner can print an area of at most about 26 × 33 mm (roughly 850 mm²) in one exposure, so no single die can be larger. Bigger dies also catch more defects. About 60 H100-sized dies fit on a 300 mm wafer before accounting for defects.</p>
+      <p>So the newest GPUs join two large dies and several memory stacks on a shared base using <em>advanced packaging</em> (such as TSMC's CoWoS). Packaging capacity, not chipmaking, was one of the tightest AI bottlenecks in 2023–25.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 4: CHIPS ================= -->
+<section class="layer" id="chips" data-layer="4" style="--accent:var(--l4)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 4 of 10 · Hardware</p>
+      <h2>Chips</h2>
+      <p class="summary">AI runs on chips built to do enormous numbers of simple multiplications at once, and they spend much of their time waiting on memory, not math.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~10<sup>15</sup></div><div class="stat-label">16-bit operations per second (a quadrillion) for an H100-class GPU from 2023; newer chips do several times more at lower precision</div></div>
+      <div class="stat"><div class="stat-num">~300</div><div class="stat-label">math operations an H100 must do per byte it reads from memory to stay fully busy (≈ 1,000 TFLOPS ÷ 3.35 TB/s)</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p><b>CPUs</b> have a few dozen to about two hundred powerful cores, great at branching, step-by-step logic. <b>GPUs</b> have thousands of simpler cores plus <em>tensor cores</em> that each multiply small blocks of numbers in a single step. <b>TPUs and other custom accelerators</b> go further, laying out a grid of multiply-add units that pass numbers to their neighbors like a bucket brigade (a "systolic array").</p>
+        <p>Beside the processor sit stacks of <b>high-bandwidth memory (HBM)</b>: 8 to 12 memory dies piled up and wired with thousands of connections, holding roughly 80–200+ GB per chip.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>The vast majority of a neural network's work is matrix multiplication, and every element of a matrix product can be computed independently. Chips that do this in massive parallel set the ceiling on how big and fast AI can be. The catch is feeding them: numbers have to come from memory, and memory has not kept pace.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Made from silicon wafers. Each top-end chip draws about 700–1,200 W, which drives the rack and cooling design.</p>
+        <p><b class="dir">↑ Above</b> Software has to arrange every computation so these units stay fed. Idle tensor cores are wasted money.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> A CPU is a few brilliant chefs who can cook anything. A GPU is thousands of line cooks, all chopping at once.</p>
+      <p class="breaks"><b>Where it breaks:</b> the line cooks aren't independent. Groups of GPU cores must execute the same instruction at the same moment, so a GPU is only fast when the work is uniform. Matrix math happens to be perfectly uniform.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="wallFig">
+    <figcaption class="fig-cap"><b>The memory wall.</b> Peak compute has grown about 3× every two years; memory bandwidth about 1.6× (trend estimates from a 2024 analysis by Gholami et al.). Both are indexed to 1 at year 0. Hover or tap for values.</figcaption>
+    <div id="wall"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: why matrix math, specifically</summary><div class="body">
+      <p>A layer of a neural network takes a list of numbers (a vector) and multiplies it by a grid of learned weights (a matrix). Process many tokens at once and the vector becomes a matrix too. Multiplying a 16,000 × 16,000 matrix by one vector is about 256 million multiply-adds, and none of them depends on another, so they can all run in parallel.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: precision, or why fewer bits helps</summary><div class="body">
+      <p>Numbers can be stored with 32, 16, 8 or even 4 bits. Fewer bits mean more operations per second and less memory traffic, at some cost in accuracy. As of 2026, training mostly uses 16- and 8-bit formats, and serving increasingly uses 8- or 4-bit. Much of the headline speedup between chip generations comes from dropping precision, so compare like with like.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: fighting the memory wall</summary><div class="body">
+      <p>Over 20 years, a 3× versus 1.6× trend compounds to roughly 60,000× more compute but only about 100× more bandwidth. Engineers push back with bigger on-chip caches, stacked HBM, processing many requests together (batching) so each weight fetched is reused, fusing operations so data stays on-chip, and lower precision.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: TPUs and custom chips</summary><div class="body">
+      <p>Google has run its own TPUs since 2015. Amazon (Trainium), Meta (MTIA) and Microsoft (Maia) build custom accelerators too, and startups try wafer-sized chips (Cerebras) or designs that keep the model in fast on-chip memory (Groq). They trade flexibility for efficiency on a narrower set of tasks. NVIDIA GPUs still did most AI training as of 2026, with AMD as the main GPU alternative.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 5: SYSTEMS SOFTWARE ================= -->
+<section class="layer" id="software" data-layer="5" style="--accent:var(--l5)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 5 of 10 · Software</p>
+      <h2>Systems software</h2>
+      <p class="summary">Layers of software turn a few lines of Python into billions of precisely scheduled operations spread across thousands of chips.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~40%</div><div class="stat-label">of the chips' theoretical peak was actually used when training Llama 3 405B (Meta reported 38–43%); that's considered good</div></div>
+      <div class="stat"><div class="stat-num">~3 hours</div><div class="stat-label">between unexpected interruptions on 16,000 GPUs (Meta: 419 in 54 days of Llama 3 training)</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>From the bottom: a <b>driver</b> lets the operating system talk to the chip. A <b>programming platform</b> such as NVIDIA's CUDA (since 2007) or AMD's ROCm lets programmers write <em>kernels</em>, small programs that run on thousands of cores at once. <b>Libraries</b> supply tuned kernels for matrix math and for chip-to-chip communication. <b>Compilers</b> (XLA, Triton, torch.compile) fuse and generate kernels automatically. <b>Frameworks</b> such as PyTorch and JAX let researchers write models as math and compute gradients for them automatically.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>The same hardware can run two or three times faster or slower depending on the software. CUDA's head start, with nearly two decades of tools, libraries and trained programmers, is a big reason NVIDIA leads. And distributed-training software is what makes 16,000 separate chips behave like one computer.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Exposes the chips' tensor cores, memory and interconnect.</p>
+        <p><b class="dir">↑ Above</b> Lets researchers describe the model and its training in a few hundred lines of code instead of hardware instructions.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> A logistics company: the framework is the order desk, the compiler plans routes, kernels are the trucks, and the communication library is the highway between warehouses.</p>
+      <p class="breaks"><b>Where it breaks:</b> a late truck delays one package. In synchronized training, one slow GPU delays every other GPU at every step, so the whole job moves at the pace of its slowest part.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="swFig">
+    <figcaption class="fig-cap"><b>Four ways to split one model across many chips.</b> Real training runs combine three or four of them.</figcaption>
+    <div id="parallel" class="par-grid">
+      <div class="par"><h4>Data parallel</h4><p>Every group of chips holds a full copy of the model and trains on different data. They average their gradients after each step.</p></div>
+      <div class="par"><h4>Tensor parallel</h4><p>Each big matrix is sliced across the GPUs in one rack. They exchange partial results many times per layer, so they need the fastest links.</p></div>
+      <div class="par"><h4>Pipeline parallel</h4><p>Different layers live on different chips, like stations on an assembly line. Batches flow through in waves.</p></div>
+      <div class="par"><h4>Expert parallel</h4><p>In mixture-of-experts models, different "expert" sub-networks live on different chips and tokens are routed to them.</p></div>
+    </div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: what a kernel is, and why fusing them helps</summary><div class="body">
+      <p>A kernel is one GPU program, such as "multiply these two matrices." Every time a kernel finishes, its results go back to memory, and the next kernel reads them again. Fusing several steps into one kernel keeps data on-chip. FlashAttention (2022) is the famous example: the same math as standard attention, reorganized to avoid memory round-trips, and several times faster.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: automatic differentiation</summary><div class="body">
+      <p>Frameworks record every operation in the model's forward pass. To train, they replay that record backward to compute how the error depends on every weight. That's backpropagation (Layer 8), reduced to a single line of code such as <code>loss.backward()</code>.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: alternatives to CUDA</summary><div class="body">
+      <p>AMD's ROCm, Google's XLA (which drives TPUs through JAX and PyTorch), OpenAI's Triton kernel language (which targets multiple vendors), Apple's MLX and Intel's oneAPI. Switching frameworks is fairly easy; matching years of hand-tuned kernels is the hard part.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: keeping a giant job alive</summary><div class="body">
+      <p>With tens of thousands of parts, something is always failing: a GPU, a memory chip, a cable, a power supply. Training jobs save checkpoints regularly and restart automatically. A nastier problem is "silent data corruption," where a faulty chip returns wrong numbers without crashing.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 6: DATA ================= -->
+<section class="layer" id="data" data-layer="6" style="--accent:var(--l6)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 6 of 10 · Raw material</p>
+      <h2>Data</h2>
+      <p class="summary">A language model learns from trillions of words of text, which are heavily filtered and then chopped into numbered pieces called tokens.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~15 trillion</div><div class="stat-label">tokens used to train Meta's Llama 3 (2024). Frontier labs rarely disclose their totals.</div></div>
+      <div class="stat"><div class="stat-num">~250,000 years</div><div class="stat-label">for one person to read that much, at 8 hours a day (rough estimate)</div></div>
+      <div class="stat"><div class="stat-num">~¾ word</div><div class="stat-label">per token in typical English text; other languages often need more tokens</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>Sources include web crawls (the nonprofit Common Crawl has collected hundreds of billions of pages since 2008), code, books, scientific papers, encyclopedias, licensed data, transcripts, and synthetic text generated by other models. A pipeline extracts the text, identifies the language, removes duplicates, filters for quality, strips unsafe content and personal information, and mixes sources in chosen proportions. Finally a <b>tokenizer</b> turns the text into a sequence of integers.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>A model can only reflect what's in its data. Cleaning often matters as much as quantity, and the mix shapes skills: more code makes better coders. High-quality public human text is also finite; researchers at Epoch AI have estimated it could be fully used by frontier training sometime between roughly 2026 and 2032.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Collected, stored and processed on the same infrastructure. Tokenizer choices get baked into the model permanently.</p>
+        <p><b class="dir">↑ Above</b> Tokens become the model's inputs (Layer 7), and each next token is the answer key during training (Layer 8).</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> Tokens are like syllables for a machine: common words are one piece, rare words get broken into chunks.</p>
+      <p class="breaks"><b>Where it breaks:</b> token boundaries follow statistics of the training text, not sound or meaning. "dog", " dog" (with a space) and "Dog" can be three different tokens.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="tokFig">
+    <figcaption class="fig-cap"><b>Tokenizer.</b> Type anything. This is an <em>approximate</em> tokenizer written for this page: it imitates how real byte-pair tokenizers behave, but its splits and IDs are illustrative, not those of any real model.</figcaption>
+    <div id="tokenizer"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: how filtering works</summary><div class="body">
+      <p>Exact and near-duplicate pages are removed (the web repeats itself enormously). Simple rules drop pages that are too short, mostly symbols, or boilerplate. Classifiers trained to recognize "educational" or well-written text score the rest. In typical published pipelines, most of the raw crawl is thrown away, often around 90% (varies widely).</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: how a tokenizer learns its vocabulary</summary><div class="body">
+      <p>Byte-pair encoding (BPE) starts with the 256 possible byte values, then repeatedly merges the most frequent neighboring pair into a new token, until it reaches a target vocabulary size, commonly 32,000 to 256,000 (Llama 3 uses about 128,000). Frequent words end up as single tokens; rare words stay in pieces.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: why tokens cause odd mistakes</summary><div class="body">
+      <p>Ask a model how many r's are in "strawberry" and it may struggle, because it sees a couple of tokens, not ten letters. Long numbers are split into awkward chunks, which complicates arithmetic. Many non-English languages need more tokens for the same meaning, so they cost more and fit less into the model's memory.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 7: THE MODEL ================= -->
+<section class="layer" id="model" data-layer="7" style="--accent:var(--l7)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 7 of 10 · Architecture</p>
+      <h2>The model</h2>
+      <p class="summary">A model is a huge stack of simple arithmetic, mostly weighted sums, and its billions of weights were learned rather than written by anyone.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">405 billion</div><div class="stat-label">parameters in Llama 3.1 405B, about 810 GB at 16 bits each. Most frontier labs don't disclose sizes.</div></div>
+      <div class="stat"><div class="stat-num">37 of 671B</div><div class="stat-label">parameters used per token by DeepSeek-V3, a "mixture-of-experts" model that activates only part of itself at a time</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p>An artificial <b>neuron</b> multiplies each input by a weight, adds the results, and passes the total through a simple bend (a nonlinearity). An <b>embedding</b> turns each token ID into a list of thousands of numbers, a position in a kind of "meaning space." The <b>transformer</b> (2017) then applies the same kind of block again and again, about 30 to 130 times: an <b>attention</b> step, where each token gathers information from earlier tokens, and a <b>feed-forward</b> step, where each token is processed by wide layers of neurons. At the end, the final vector is turned into a score for every token in the vocabulary.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>The architecture decides what the model can learn efficiently. Attention lets any word draw directly on any earlier word, however far back, and it's built from matrix math that GPUs run well. That combination is why transformers took over.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Every block is matrix multiplication, exactly what the chips and software are built for.</p>
+        <p><b class="dir">↑ Above</b> Training sets the weights (Layer 8). Inference runs them (Layer 9).</p>
+      </div>
+    </div>
+
+    <figure class="neuron" aria-label="Diagram: a neuron computes a weighted sum">
+      <svg viewBox="0 0 560 170" role="img" aria-labelledby="neuronTitle">
+        <title id="neuronTitle">Three inputs multiplied by weights and summed: 2×0.5 + 1×(−0.3) + 3×0.4 = 1.9</title>
+        <g class="nin"><circle cx="40" cy="30" r="20"/><text x="40" y="35">2</text></g>
+        <g class="nin"><circle cx="40" cy="85" r="20"/><text x="40" y="90">1</text></g>
+        <g class="nin"><circle cx="40" cy="140" r="20"/><text x="40" y="145">3</text></g>
+        <path class="nw" d="M60 30 L250 85"/><path class="nw" d="M60 85 L250 85"/><path class="nw" d="M60 140 L250 85"/>
+        <text class="nwl" x="150" y="46">× 0.5</text><text class="nwl" x="150" y="79">× −0.3</text><text class="nwl" x="150" y="132">× 0.4</text>
+        <g class="nsum"><circle cx="280" cy="85" r="30"/><text x="280" y="92">Σ</text></g>
+        <path class="nw" d="M310 85 L380 85"/>
+        <text class="nout" x="390" y="80">1.9</text>
+        <text class="ncap" x="390" y="104">then a simple bend,</text>
+        <text class="ncap" x="390" y="122">e.g. negatives → 0</text>
+      </svg>
+      <figcaption>One neuron: 2×0.5 + 1×(−0.3) + 3×0.4 = 1.9. A large model has billions of these weights, all learned.</figcaption>
+    </figure>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> "Neuron" is borrowed from biology, and attention is like a reader glancing back to work out what "it" refers to.</p>
+      <p class="breaks"><b>Where it breaks:</b> a brain cell is a living cell with complex chemistry and timing; an artificial neuron is one line of arithmetic. And attention runs for every word at once, in dozens of parallel "heads" per layer, most of which do things far less tidy than resolving a pronoun.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="attnFig">
+    <figcaption class="fig-cap"><b>Attention.</b> Hover over, tap, or tab to a word to see which earlier words it draws on. Weights are hand-set to illustrate one idealized attention head, not taken from a real model.</figcaption>
+    <div id="attention"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: attention in one paragraph</summary><div class="body">
+      <p>Each token produces three vectors: a <em>query</em> ("what am I looking for?"), a <em>key</em> ("what do I contain?") and a <em>value</em> ("what will I pass along?"). A token scores every earlier token by multiplying its query with their keys, turns the scores into weights that add up to 1 (a "softmax"), and takes the weighted average of their values. Standard attention compares every token with every other, so its cost grows with the square of the text length, one reason long contexts are expensive.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: embeddings</summary><div class="body">
+      <p>Llama 3.1 405B represents each token as 16,384 numbers. Directions in this space loosely capture relationships. The famous "king − man + woman ≈ queen" comes from older word-embedding models and works only approximately, on well-chosen examples. Inside a transformer, each token's vector is rewritten layer by layer as it absorbs context.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: where the parameters live</summary><div class="body">
+      <p>In a typical dense transformer, roughly two-thirds of the parameters sit in the feed-forward blocks and one-third in attention. In <b>mixture-of-experts</b> models, the feed-forward part is split into many "experts" and a small router sends each token to just a few, so total size and per-token cost come apart.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: can we read the weights?</summary><div class="body">
+      <p>Individual weights are almost never meaningful on their own. Interpretability research finds "features" (concepts such as a specific city, or code with a bug) spread across many neurons, and is beginning to trace how some behaviors are computed. Most of what a large model does is still not understood in detail.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 8: TRAINING ================= -->
+<section class="layer" id="training" data-layer="8" style="--accent:var(--l8)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 8 of 10 · Learning</p>
+      <h2>Training</h2>
+      <p class="summary">Training shows the model trillions of examples, measures how wrong each next-word guess was, and nudges every weight slightly to be less wrong.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~4 × 10<sup>25</sup></div><div class="stat-label">operations to train Llama 3.1 405B (Meta: 3.8 × 10<sup>25</sup>). The largest runs as of 2026 are estimated at 10<sup>26</sup> or more.</div></div>
+      <div class="stat"><div class="stat-num">~31 million</div><div class="stat-label">H100 GPU-hours for that run; roughly 30 GWh including cooling and overhead, about what 3,000 US homes use in a year (est.)</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p><b>Pretraining:</b> take a chunk of text; at every position, the model predicts a probability for every possible next token. The <b>loss</b> measures how little probability it gave to the token that actually came next. <b>Backpropagation</b> works out how each weight contributed to that error, and <b>gradient descent</b> nudges every weight a tiny step in the direction that reduces it. Repeat for millions of steps, each on a batch of millions of tokens.</p>
+        <p><b>Post-training</b> turns a text predictor into an assistant: fine-tuning on example conversations; learning from human preferences (<b>RLHF</b>: people compare answers, a reward model learns their taste, and the model is optimized against it); <b>constitutional</b> approaches, where the model critiques and revises its own answers against a written set of principles and AI feedback replaces some human labels; and reinforcement learning on tasks with checkable answers, such as math and code.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>This is where capabilities come from. <b>Scaling laws</b>, smooth and predictable improvements in loss as compute, data and size grow, are what gave labs the confidence to spend hundreds of millions of dollars on single runs.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Consumes data (Layer 6) through the model's architecture (Layer 7), running on distributed software and hardware.</p>
+        <p><b class="dir">↑ Above</b> Produces a fixed set of weights. Inference uses them unchanged: the model doesn't learn from your chat as it happens.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> Gradient descent is like walking downhill in thick fog, feeling the slope under your feet and stepping the steepest way down.</p>
+      <p class="breaks"><b>Where it breaks:</b> the real landscape has billions of dimensions, not two, and it shifts slightly with every batch of data. The toy below shows the step-size problem honestly but its hills are far simpler than the real thing.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="gdFig">
+    <figcaption class="fig-cap"><b>Gradient descent.</b> The ball follows the slope downhill. Change the learning rate (step size), then press Run. Tap the curve to move the starting point.</figcaption>
+    <div id="gd"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: loss, in numbers</summary><div class="body">
+      <p>The loss for one prediction is −log(probability given to the right token). Give it 50% and the loss is 0.69; give it 90% and the loss is 0.11; give it 1% and the loss is 4.6. Training pushes the average down across trillions of predictions.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: backpropagation and the "6ND" rule</summary><div class="body">
+      <p>Backpropagation applies the chain rule of calculus backward from the loss through every layer. The backward pass costs about twice the forward pass, so training takes about 6 operations per parameter per token: 2 forward and 4 backward. For Llama 3.1 405B: 6 × 405 billion × ~15.6 trillion tokens ≈ 3.8 × 10<sup>25</sup>.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: scaling laws, and their limits</summary><div class="body">
+      <p>Loss falls as a smooth power law as compute grows (Kaplan et al., 2020). DeepMind's "Chinchilla" work (2022) found the compute-optimal recipe was about 20 training tokens per parameter. Many recent models are trained far past that (Llama 3 8B saw about 1,900 tokens per parameter) because smaller models are cheaper to run afterward.</p>
+      <p>Smooth loss does not mean smooth abilities: specific skills can seem to appear suddenly on benchmarks, though some of that is an artifact of how the benchmarks are scored. Whether scaling keeps paying off at the same rate is an open question.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: what training costs</summary><div class="body">
+      <p>31 million GPU-hours at a rental price of roughly $2 an hour is about $60 million in compute (est.). The largest frontier runs are estimated to cost hundreds of millions of dollars. Those figures exclude research, failed experiments, data and staff, which can cost as much again or more.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: the limits of post-training</summary><div class="body">
+      <p>Optimizing against a reward model can teach a model to please rather than to be right (sycophancy), or to find loopholes in the reward ("reward hacking"). Constitutional and AI-feedback methods scale better than pure human labeling but inherit the blind spots of the principles and the models doing the judging.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 9: INFERENCE ================= -->
+<section class="layer" id="inference" data-layer="9" style="--accent:var(--l9)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 9 of 10 · Running the model</p>
+      <h2>Inference</h2>
+      <p class="summary">When you send a prompt, the model reads it all at once, then writes its answer one token at a time, with a full pass through the network for each token.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~0.3 Wh</div><div class="stat-label">for a typical short text query (2025 estimates: Google 0.24 Wh median, OpenAI ~0.34 Wh, Epoch AI ~0.3 Wh). Long reasoning can use far more.</div></div>
+      <div class="stat"><div class="stat-num">~0.3 MB</div><div class="stat-label">of memory per token of context for a 70B-parameter model's "KV cache" (16-bit), so ~40 GB at 128,000 tokens</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p><b>Prefill:</b> all the prompt's tokens go through the network in parallel, and each layer's keys and values are saved in the <b>KV cache</b>. <b>Decode:</b> to produce each new token, only the newest token runs through the network, looking back at the cache instead of recomputing it. The model outputs a probability for every token in its vocabulary; a <b>sampler</b> picks one (the <b>temperature</b> setting controls how adventurous it is); the token is appended; repeat until done.</p>
+        <p>Context windows (how much text fits at once) ranged from about 128,000 to over a million tokens for leading models as of 2026.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>Training happens once; inference happens billions of times a day. For a popular model, the total compute spent answering questions can exceed what was spent training it. Its speed and cost decide which products are possible.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Each new token requires reading the model's active weights from memory, so memory bandwidth (Layer 4), more than raw math, sets the speed.</p>
+        <p><b class="dir">↑ Above</b> Every application is built from inference calls.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> Writing an essay one word at a time while keeping notes on everything so far. The KV cache is the notes: you never have to reread the whole thing.</p>
+      <p class="breaks"><b>Where it breaks:</b> the "notes" aren't words; they are intermediate numbers for every layer. They grow with every token, and eventually their size limits how long a context can be and how many users one chip can serve.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="tempFig">
+    <figcaption class="fig-cap"><b>Temperature.</b> The model's next-word probabilities (illustrative numbers). Low temperature sharpens them toward the top choice; high temperature flattens them.</figcaption>
+    <div id="temperature"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: why output tokens cost more than input tokens</summary><div class="body">
+      <p>Prefill handles thousands of tokens in parallel, so the chip's math units stay busy. Decode handles one token at a time per request, and each step must stream the active weights from memory. Serving many users together (batching) spreads that cost, but output is still the expensive part, so providers typically price output tokens several times higher than input.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: the math of temperature and top-p</summary><div class="body">
+      <p>The model outputs a score (logit) z for each token. Probabilities are proportional to e<sup>z/T</sup>, where T is the temperature. At T = 1 you get the model's own distribution; as T approaches 0 it always picks the top token ("greedy"); above 1 the distribution flattens. <b>Top-p</b> sampling adds a cutoff: sample only from the smallest set of tokens whose probabilities add up to p, for example 0.9.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: KV cache arithmetic</summary><div class="body">
+      <p>Bytes per token = 2 (keys and values) × layers × key-value heads × head size × bytes per number. For Llama 3 70B: 2 × 80 × 8 × 128 × 2 ≈ 330 KB. Multiply by 128,000 tokens and it's about 42 GB, for one conversation. Techniques such as grouped-query attention (already counted here), cache compression and paging keep this manageable.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: speed, latency and "thinking"</summary><div class="body">
+      <p>Time to first token is typically a few hundred milliseconds to a few seconds; after that, tens to a few hundred tokens per second per user. "Reasoning" models write a long hidden chain of thought before answering. That helps on hard problems but can multiply the tokens, and so the energy, by 10 to 100 times.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: tricks that make serving cheaper</summary><div class="body">
+      <p>Batching many users per chip; quantization (4- or 8-bit weights); caching the shared start of prompts; <b>speculative decoding</b>, where a small model drafts several tokens and the big model checks them in one pass; and distillation into smaller models. As of 2026, API prices ranged from well under $1 to tens of dollars per million output tokens, so a short answer costs a fraction of a cent to a few cents.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= LAYER 10: APPLICATIONS ================= -->
+<section class="layer" id="apps" data-layer="10" style="--accent:var(--l10)">
+  <div class="wrap">
+    <header class="layer-head">
+      <p class="kicker">Layer 10 of 10 · What you touch</p>
+      <h2>Applications</h2>
+      <p class="summary">Applications wrap the model in instructions, memory, tools and your own data, turning next-token prediction into something useful.</p>
+    </header>
+
+    <div class="spec">
+      <div class="stat"><div class="stat-num">~800 million</div><div class="stat-label">weekly ChatGPT users, as reported by OpenAI in late 2025</div></div>
+      <div class="stat"><div class="stat-num">36%</div><div class="stat-label">chance a 20-step task goes right if each step is 95% reliable (0.95<sup>20</sup>), why agents need checks</div></div>
+    </div>
+
+    <div class="qgrid">
+      <div class="q">
+        <h3>What it is</h3>
+        <p><b>Chat</b>: hidden instructions (a system prompt) plus the conversation so far, sent to the model each turn. <b>Coding assistants</b> read a codebase, propose edits and run tests. <b>Agents</b> loop: the model decides on an action, calls a tool (search, a calculator, code, an app), reads the result, and decides again until done. <b>Retrieval</b> (RAG) searches your documents and pastes the relevant passages into the prompt, so answers can rest on specific sources.</p>
+      </div>
+      <div class="q">
+        <h3>Why it matters</h3>
+        <p>This is where value, and risk, reaches people. Many model weaknesses (made-up facts, outdated knowledge, no access to your files) are reduced by good application design, or made worse by bad design.</p>
+      </div>
+      <div class="q conn">
+        <h3>How it connects</h3>
+        <p><b class="dir">↓ Below</b> Every step is one or more inference calls; an agentic coding task can take hundreds of calls and consume hundreds of thousands to millions of tokens (est.).</p>
+        <p><b class="dir">↑ Above</b> You.</p>
+      </div>
+    </div>
+
+    <aside class="analogy">
+      <p><b>Analogy.</b> The model is an engine; the application is the car built around it.</p>
+      <p class="breaks"><b>Where it breaks:</b> an engine does the same thing every time. A model's output varies with sampling and phrasing and can be confidently wrong, so good applications add checks, citations, retries and human review.</p>
+    </aside>
+  </div>
+
+  <figure class="figure wide" id="agentFig">
+    <figcaption class="fig-cap"><b>An agent is a loop.</b> The model never touches the outside world directly: it writes a structured request, the application runs it, and the result is pasted back in as more text.</figcaption>
+    <div id="agent"></div>
+  </figure>
+
+  <div class="wrap deepers">
+    <details class="deeper"><summary>Go deeper: how tool use actually works</summary><div class="body">
+      <p>The model is trained to emit a special structured message, such as <code>{"tool": "search", "query": "sky color physics"}</code>. The application, not the model, runs the search and appends the results to the conversation. The model continues from there. Open standards such as the Model Context Protocol (2024) give applications a common way to plug tools in.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: retrieval, step by step</summary><div class="body">
+      <p>Documents are split into passages, and each passage is turned into an embedding vector. At question time the question is embedded too, the closest passages are found, and they're placed in the prompt with an instruction to answer from them. It reduces made-up answers but doesn't eliminate them: the search can miss, and the model can misread a source.</p>
+    </div></details>
+    <details class="deeper"><summary>Go deeper: memory</summary><div class="body">
+      <p>Models don't remember past conversations on their own. "Memory" features are the application saving notes and pasting them back into later prompts.</p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ================= WALKTHROUGH ================= -->
+<section class="walk" id="walkthrough" aria-labelledby="walkTitle">
+  <div class="wrap">
+    <p class="kicker neutral">Putting it together</p>
+    <h2 id="walkTitle">Follow one prompt</h2>
+    <p class="summary">Trace one short question from your keyboard down through every layer and back up to the answer. Times and energy are rough, for a typical short exchange.</p>
+  </div>
+  <div class="figure wide walk-panel" id="walk"></div>
+</section>
+
+<!-- ================= CALCULATOR ================= -->
+<section class="calc" id="calculator" aria-labelledby="calcTitle">
+  <div class="wrap">
+    <p class="kicker neutral">Try it yourself</p>
+    <h2 id="calcTitle">The cost of one answer</h2>
+    <p class="summary">A back-of-envelope calculator: model size times tokens gives compute, and compute gives energy.</p>
+  </div>
+  <div class="figure wide" id="calcPanel"></div>
+</section>
+
+<!-- ================= LIMITS ================= -->
+<section class="limits" id="limits" aria-labelledby="limitsTitle">
+  <div class="wrap">
+    <p class="kicker neutral">Open questions and limits</p>
+    <h2 id="limitsTitle">What this stack still can't settle</h2>
+    <div class="limit-grid">
+      <div class="limit">
+        <h3>Energy demand</h3>
+        <p>Projections for AI's electricity use span a wide range because they depend on chip sales, efficiency gains and demand nobody can forecast well. Efficiency per query keeps improving, but cheaper AI tends to be used more. Local grids feel the strain first, and the carbon impact depends on whether new supply is gas, nuclear or renewables.</p>
+      </div>
+      <div class="limit">
+        <h3>Supply-chain concentration</h3>
+        <p>One company makes EUV scanners, one foundry makes most leading-edge chips, and three companies make nearly all high-bandwidth memory. A disruption to any of them, whether a disaster, a conflict or an export rule, would ripple through the whole stack.</p>
+      </div>
+      <div class="limit">
+        <h3>What models still get wrong</h3>
+        <p>They can state false things fluently ("hallucination"), stumble on tasks that look trivial (counting letters, some arithmetic) because of tokens, know nothing after their training cutoff unless given tools, tell people what they want to hear, and follow instructions hidden in documents they read ("prompt injection"). Errors compound over long agent tasks.</p>
+      </div>
+      <div class="limit">
+        <h3>What we don't understand</h3>
+        <p>We can train models far more easily than we can explain them. Whether scaling keeps delivering, how to measure real ability rather than benchmark memorization, what happens when high-quality human text runs short, and how copyright and consent apply to training data are all unresolved.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot wrap">
+  <h2>Sources and notes</h2>
+  <p>Figures are rounded and many are estimates; they are dated to what was public by 2026 and will drift. Key sources: IEA, <em>Energy and AI</em> (2025); Lawrence Berkeley National Laboratory, US data center energy report (2024); Uptime Institute data center surveys; NVIDIA and ASML product materials; Zeiss; Gholami et al., "AI and Memory Wall" (2024); Meta, "The Llama 3 Herd of Models" (2024); DeepSeek-V3 technical report (2024); Vaswani et al., "Attention Is All You Need" (2017); Kaplan et al. (2020) and Hoffmann et al. (2022) on scaling laws; Bai et al., "Constitutional AI" (2022); Epoch AI analyses of training compute, data stocks and per-query energy; Google (2025) and OpenAI (2025) statements on per-prompt energy; OpenAI's reported user counts (2025).</p>
+  <p>Interactive figures use simplified, illustrative models. The tokenizer, attention weights and probabilities are made up to teach the idea; the calculator's assumptions are listed beside it.</p>
+</footer>
+</main>
+
+<script>
+"use strict";
+/* ============ shared helpers ============ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null) n.append(k);
+  return n;
+};
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+const LAYERS = [
+  { n: 1, id: "energy", name: "Energy", tag: "Power & cooling" },
+  { n: 2, id: "datacenters", name: "Data centers", tag: "Racks & networks" },
+  { n: 3, id: "silicon", name: "Silicon", tag: "Fabs & lithography" },
+  { n: 4, id: "chips", name: "Chips", tag: "GPUs & memory" },
+  { n: 5, id: "software", name: "Systems software", tag: "CUDA & frameworks" },
+  { n: 6, id: "data", name: "Data", tag: "Text & tokens" },
+  { n: 7, id: "model", name: "The model", tag: "Transformers" },
+  { n: 8, id: "training", name: "Training", tag: "Loss & gradients" },
+  { n: 9, id: "inference", name: "Inference", tag: "Token by token" },
+  { n: 10, id: "apps", name: "Applications", tag: "Chat, code, agents" },
+];
+const EXTRAS = [
+  { id: "walkthrough", name: "Follow one prompt" },
+  { id: "calculator", name: "Cost of one answer" },
+  { id: "limits", name: "Open questions" },
+];
+
+/* ============ persistent stack navigation ============ */
+function buildStackList(cls) {
+  // Top of the list is the top of the stack (Layer 10); Layer 1 sits at the bottom.
+  return el("ol", { class: cls },
+    [...LAYERS].reverse().map(L =>
+      el("li", { style: `--c:var(--l${L.n})` },
+        el("a", { href: "#" + L.id, "data-layer": L.n },
+          el("span", { class: "sl-n" }, String(L.n)),
+          el("span", { class: "sl-t" }, el("span", { class: "sl-name" }, L.name), el("span", { class: "sl-tag" }, L.tag))
+        ))));
+}
+
+const rail = $("#rail");
+rail.append(
+  el("a", { class: "rail-brand", href: "#top" }, el("span", {}, "The AI Stack"), el("small", {}, "electrons → answers")),
+  el("p", { class: "rail-dir" }, "↑ toward you"),
+  buildStackList("stack-list"),
+  el("p", { class: "rail-dir" }, "↓ toward the power plant"),
+  el("div", { class: "rail-extra" }, EXTRAS.map(x => el("a", { href: "#" + x.id, "data-extra": x.id }, x.name))),
+  el("button", { class: "theme-btn", type: "button", id: "themeBtn", "aria-label": "Switch color theme" }, "◐ Theme")
+);
+
+const elevator = $("#elevator");
+const sheet = el("div", { class: "sheet", id: "sheet", hidden: true, role: "dialog", "aria-label": "Jump to a layer" },
+  el("p", { class: "rail-dir" }, "↑ toward you"),
+  buildStackList("stack-list"),
+  el("p", { class: "rail-dir" }, "↓ toward the power plant"),
+  el("div", { class: "rail-extra" }, EXTRAS.map(x => el("a", { href: "#" + x.id, "data-extra": x.id }, x.name)),
+    el("button", { class: "theme-btn", type: "button", "aria-label": "Switch color theme" }, "◐ Theme")));
+const gauge = el("span", { class: "gauge", "aria-hidden": "true" },
+  [...LAYERS].reverse().map(L => el("i", { style: `--c:var(--l${L.n})`, "data-layer": L.n })));
+const elevLabel = el("span", { class: "elev-label" }, el("b", {}, "Start"), el("small", {}, "Tap to jump between layers"));
+const elevBtn = el("button", { class: "elev-btn", type: "button", "aria-expanded": "false", "aria-controls": "sheet" },
+  gauge, elevLabel, el("span", { class: "elev-caret", "aria-hidden": "true" }, "▴"));
+elevator.append(sheet, elevBtn);
+const setSheet = open => {
+  sheet.hidden = !open;
+  elevBtn.setAttribute("aria-expanded", String(open));
+  elevator.classList.toggle("open", open);
+};
+elevBtn.addEventListener("click", () => setSheet(sheet.hidden));
+sheet.addEventListener("click", e => { if (e.target.closest("a")) setSheet(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !sheet.hidden) { setSheet(false); elevBtn.focus(); } });
+document.addEventListener("click", e => { if (!sheet.hidden && !elevator.contains(e.target)) setSheet(false); });
+
+/* theme toggle: explicit choice wins over the system setting; no storage used */
+function currentTheme() {
+  const t = document.documentElement.dataset.theme;
+  if (t === "light" || t === "dark") return t;
+  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+$$(".theme-btn").forEach(b => b.addEventListener("click", () => {
+  document.documentElement.dataset.theme = currentTheme() === "dark" ? "light" : "dark";
+  document.dispatchEvent(new CustomEvent("themechange"));
+}));
+
+/* active-layer tracking: whichever section crosses the reading line (40% down the viewport) */
+const tracked = [...LAYERS.map(L => ({ id: L.id, n: L.n, name: L.name })), ...EXTRAS.map(x => ({ id: x.id, n: 0, name: x.name }))]
+  .map(t => ({ ...t, node: document.getElementById(t.id) })).filter(t => t.node);
+let activeId = null;
+function updateActive() {
+  const line = window.innerHeight * 0.4;
+  let cur = null;
+  for (const t of tracked) {
+    const r = t.node.getBoundingClientRect();
+    if (r.top <= line && r.bottom > line) { cur = t; break; }
+  }
+  const id = cur ? cur.id : null;
+  if (id === activeId) return;
+  activeId = id;
+  $$("[data-layer]", rail).concat($$("[data-layer]", elevator)).forEach(a => {
+    const on = cur && cur.n && Number(a.dataset.layer) === cur.n;
+    a.classList.toggle("active", !!on);
+    const below = cur && cur.n && Number(a.dataset.layer) < cur.n;
+    a.classList.toggle("passed", !!below);
+    if (a.tagName === "A") on ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current");
+  });
+  $$("[data-extra]").forEach(a => a.classList.toggle("active", !!cur && a.dataset.extra === cur.id));
+  document.body.dataset.layer = cur && cur.n ? cur.n : 0;
+  document.body.style.setProperty("--glow", cur && cur.n ? `var(--l${cur.n})` : "var(--l1)");
+  elevLabel.firstChild.textContent = cur ? (cur.n ? `Layer ${cur.n} · ${cur.name}` : cur.name) : "The AI Stack";
+}
+let ticking = false;
+window.addEventListener("scroll", () => {
+  if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; updateActive(); }); }
+}, { passive: true });
+window.addEventListener("resize", updateActive);
+updateActive();
+</script>
+</body>
+</html>
