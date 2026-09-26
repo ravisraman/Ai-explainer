@@ -401,7 +401,7 @@ h1 { margin-top: 18px; }
 
 .seg {
   display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px;
-  background: var(--sunk); border: 1px solid var(--line); border-radius: 999px;
+  background: var(--sunk); border: 1px solid var(--line); border-radius: 22px;
   max-width: 100%;
 }
 .seg button {
@@ -642,6 +642,29 @@ h1 { margin-top: 18px; }
 .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 @media (min-width: 1180px) { .theme-btn-m { display: none; } }
 
+/* ---------- L1 power meter ---------- */
+.powerbar { margin-top: 14px; }
+.pb-title { font: 600 0.66rem/1.25 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.pb-track { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunk); gap: 2px; }
+.pb-seg { height: 100%; transition: width 0.5s ease; }
+.pb-it, i.pb-it { background: var(--l1); }
+.pb-cool, i.pb-cool { background: var(--l6); }
+.pb-other, i.pb-other { background: var(--faint); }
+.pb-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; font-size: 0.8rem; color: var(--muted); }
+.pb-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+/* stepper */
+.ctl-stp { flex: 0 0 auto; }
+.stp { display: inline-flex; align-items: center; background: var(--sunk); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.stp-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--raised); cursor: pointer;
+  display: grid; place-items: center; padding: 0; color: var(--text);
+}
+.stp-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.stp-btn:hover:not(:disabled) { background: var(--c); color: var(--on-accent); }
+.stp-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.stp-val { min-width: 2.6em; text-align: center; font: 600 1rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+
 </style>
 </head>
 <body>
@@ -725,7 +748,7 @@ h1 { margin-top: 18px; }
       <div class="predict" data-answer="2" data-show="power:100k">
         <p class="predict-q"><b>Predict</b> One GPU, with its share of the server around it, draws about as much as a space heater. How many homes' worth of power does a 100,000-GPU cluster draw?</p>
         <div class="predict-opts"><button type="button">About 1,000 homes</button><button type="button">About 10,000</button><button type="button">More than 100,000</button></div>
-        <div class="predict-a" hidden><p>Well over 100,000. The chips and servers alone draw ~150 MW, and cooling adds more. An average US home uses about 1.2 kW averaged over a year, so that's roughly 150,000 homes.</p></div>
+        <div class="predict-a" hidden><p>Well over 100,000: roughly 140,000–190,000 homes, depending on the cooling. The chips and servers alone draw ~150 MW, and cooling and power conversion add another 15–50%. An average US home uses about 1.2 kW averaged over a year.</p></div>
       </div>
       <div class="note"><h4>Watts in, heat out</h4><p>Chips turn electricity into computation, but physically nearly every joule ends up as heat. After computing, a data center's main job is carrying that heat outside.</p></div>
       <div class="note"><h4>Why liquid</h4><p>Water carries about 3,500 times more heat than the same volume of air. Air cooling runs out around 30–40 kW per rack. The densest AI racks draw ~130 kW, so water is piped to cold plates sitting on the chips.</p></div>
@@ -769,9 +792,9 @@ h1 { margin-top: 18px; }
     </figure>
     <aside class="notes">
       <div class="predict" data-answer="1" data-show="cluster:cut">
-        <p class="predict-q"><b>Predict</b> Rack 3 has four links to the switches. You cut one of them, one link out of 48 in the whole cluster. How much slower does training get?</p>
-        <div class="predict-opts"><button type="button">About 2% slower</button><button type="button">Much more than that</button></div>
-        <div class="predict-a" hidden><p>Much more. Every rack waits for the slowest one at every step, so the whole job drops to rack 3's pace. One weak link taxes all twelve racks.</p></div>
+        <p class="predict-q"><b>Predict</b> Rack 3 has four links to the switches. You cut one of them: one link out of 32 in the whole cluster. How much slower does training get?</p>
+        <div class="predict-opts"><button type="button">About 3% (1 in 32)</button><button type="button">Much more than that</button></div>
+        <div class="predict-a" hidden><p>Much more. Every rack waits for the slowest one at every step, so the whole job drops to rack 3's pace. Cut a second link on the same rack and it gets worse fast.</p></div>
       </div>
       <div class="note"><h4>Lock-step</h4><p>In the most common setup, every chip trains on different data and then they all average what they learned. Nobody can start the next step until the average is done, so the slowest link sets the pace for everyone.</p></div>
       <div class="note"><h4>Two networks</h4><p>Inside a rack, GPUs share a very fast private network. Between racks, traffic goes through switches at roughly a tenth of the speed. Engineers put the chattiest work inside racks.</p></div>
@@ -1446,6 +1469,9 @@ const Theme = {
     for (const k of keys) this.c[k] = cs.getPropertyValue("--" + k).trim();
     for (let i = 1; i <= 10; i++) this.c["l" + i] = cs.getPropertyValue("--l" + i).trim();
     this.dark = cs.getPropertyValue("--is-dark").trim() !== "0";
+    this.mono = cs.getPropertyValue("--font-mono").trim();
+    this.body = cs.getPropertyValue("--font-body").trim();
+    this.display = cs.getPropertyValue("--font-display").trim();
   },
   on(fn) { this.fns.add(fn); },
   changed() {
@@ -1524,9 +1550,10 @@ class Stage {
     this.w = 0;
     this.h = 0;
     this.dpr = 1;
+    /* The observer's first callback does the initial sizing, after the
+       figure's own setup code has finished running. */
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(this.wrap);
-    this.resize();
   }
   resize() {
     const w = Math.round(this.wrap.clientWidth);
@@ -1784,6 +1811,31 @@ function button(label, onClick, opts = {}) {
   return b;
 }
 
+/* stepper({ label, value, min, max, fmt, onChange }) -> compact − value + control */
+function stepper(o) {
+  let value = o.value;
+  const val = h("output", { class: "stp-val" });
+  const minus = h("button", { type: "button", class: "stp-btn", "aria-label": `Fewer ${o.label.toLowerCase()}`, html: ICONS.minus });
+  const plus = h("button", { type: "button", class: "stp-btn", "aria-label": `More ${o.label.toLowerCase()}`, html: ICONS.plus });
+  const el = h("div", { class: "ctl ctl-stp" }, h("span", { class: "ctl-label" }, o.label), h("div", { class: "stp" }, minus, val, plus));
+  const paint = () => {
+    val.textContent = o.fmt ? o.fmt(value) : String(value);
+    minus.disabled = value <= o.min;
+    plus.disabled = value >= o.max;
+  };
+  const change = (d) => {
+    const v = clamp(value + d, o.min, o.max);
+    if (v === value) return;
+    value = v;
+    paint();
+    if (o.onChange) o.onChange(v, d);
+  };
+  minus.addEventListener("click", () => change(-1));
+  plus.addEventListener("click", () => change(1));
+  paint();
+  return { el, get value() { return value; }, set(v) { value = v; paint(); } };
+}
+
 /* readout(label, { unit, sub, cls }) -> { el, set(text, unit?, sub?) } */
 function readout(label, opts = {}) {
   const val = h("span", { class: "ro-num" }, "–");
@@ -2027,7 +2079,1607 @@ function initNav() {
   syncThemeButtons();
 }
 
-/* ---- 99-boot.js ---- */
+/* ---- l01-energy.js ---- */
+/* =====================================================================
+   Layer 1 · Energy — cluster power meter with air/liquid cooling.
+   ===================================================================== */
+
+defineMount("power", (root) => {
+  const PER_GPU = 1500; // W per GPU, all-in: its share of CPUs, memory, network, fans
+  const HOME = 1200; // W, average US household draw over a year
+  const MODES = {
+    air: { pue: 1.5, cool: 0.4, other: 0.1, perRack: 24, dT: 12, name: "Air" },
+    liquid: { pue: 1.15, cool: 0.1, other: 0.05, perRack: 72, dT: 10, name: "Liquid" },
+  };
+  const NAMED = [
+    { v: 1, name: "one GPU" },
+    { v: 8, name: "one server" },
+    { v: 72, name: "one liquid-cooled rack" },
+    { v: 1000, name: "a row of racks" },
+    { v: 10000, name: "a data hall" },
+    { v: 100000, name: "a frontier cluster" },
+  ];
+  let n = 8;
+  let mode = "liquid";
+  let dispHomes = 1;
+  let dispRacks = 1;
+
+  /* ---------- layout + drawing ---------- */
+  let L = {};
+  const stage = new Stage(root, {
+    label: "A rack of GPUs with electricity flowing in and heat flowing out, next to a grid of houses using the same power.",
+    height: (w) => (w >= 560 ? clamp(w * 0.46, 290, 380) : clamp(w * 1.08, 360, 470)),
+    onResize: layout,
+    draw: () => draw(0),
+  });
+
+  function layout(w, hh) {
+    const wide = w >= 560;
+    const scene = wide ? { x: 0, y: 0, w: w * 0.6, h: hh } : { x: 0, y: 0, w, h: hh * 0.6 };
+    const homes = wide ? { x: w * 0.62, y: 0, w: w * 0.38, h: hh } : { x: 0, y: hh * 0.62, w, h: hh * 0.38 };
+    const rackW = clamp(scene.w * 0.26, 70, 120);
+    const rackH = scene.h * 0.78;
+    const rackX = scene.x + scene.w * 0.36;
+    const rackY = scene.y + scene.h * 0.14;
+    const src = { x: scene.x + 22, y: rackY + 10 };
+    const plant = { x: rackX + rackW + clamp(scene.w * 0.14, 34, 70), y: rackY + rackH * 0.3, w: clamp(scene.w * 0.15, 56, 72), h: rackH * 0.4 };
+    L = { wide, scene, homes, rackX, rackY, rackW, rackH, src, plant };
+    particles.length = 0;
+  }
+
+  /* particles travel along polylines */
+  const particles = [];
+  const R = rng(7);
+  function trayYs() {
+    const m = MODES[mode];
+    const rows = mode === "liquid" ? 9 : 3;
+    const ys = [];
+    const pad = 10, inner = L.rackH - pad * 2;
+    for (let i = 0; i < rows; i++) {
+      if (mode === "liquid") ys.push(L.rackY + pad + inner * ((i + 0.5) / rows));
+      else ys.push(L.rackY + pad + inner * ((i * 3 + 1.5) / 9));
+    }
+    void m;
+    return ys;
+  }
+  function litTrays() {
+    const perTray = 8;
+    const cap = MODES[mode].perRack;
+    return Math.max(1, Math.ceil(Math.min(n, cap) / perTray));
+  }
+  function makePath(kind) {
+    const ys = trayYs();
+    const k = Math.floor(R() * Math.min(litTrays(), ys.length));
+    const ty = ys[ys.length - 1 - k] + (R() - 0.5) * 6;
+    const { rackX: x, rackY: y, rackW: w, rackH: hh, src, plant } = L;
+    if (kind === "power") {
+      return [[src.x + 10, src.y], [x - 16, src.y], [x - 16, ty], [x + 8, ty]];
+    }
+    if (mode === "air") {
+      const jx = R() * 26;
+      return [[x - 70 - jx, ty], [x + w + 18, ty], [x + w + 34 + R() * 34, y - 6], [x + w + 40 + R() * 40, y - 40]];
+    }
+    const lx = x - 8, rx = x + w + 8;
+    return [
+      [plant.x, plant.y + plant.h - 6], [plant.x - 12, plant.y + plant.h - 6], [plant.x - 12, y + hh + 10],
+      [lx, y + hh + 10], [lx, ty], [rx, ty], [rx, y - 10], [plant.x - 12, y - 10], [plant.x - 12, plant.y + 6], [plant.x, plant.y + 6],
+    ];
+  }
+  function pathInfo(pts) {
+    const seg = [];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      seg.push(d);
+      total += d;
+    }
+    return { pts, seg, total };
+  }
+  function at(p, s) {
+    let d = s * p.total;
+    for (let i = 0; i < p.seg.length; i++) {
+      if (d <= p.seg[i] || i === p.seg.length - 1) {
+        const t = p.seg[i] ? clamp(d / p.seg[i], 0, 1) : 0;
+        return [lerp(p.pts[i][0], p.pts[i + 1][0], t), lerp(p.pts[i][1], p.pts[i + 1][1], t)];
+      }
+      d -= p.seg[i];
+    }
+    return p.pts[p.pts.length - 1];
+  }
+  /* distance fraction where the path crosses the rack (heat is picked up there) */
+  function hotAt(p) {
+    if (p.kind === "power") return 2;
+    const midX = L.rackX + L.rackW / 2;
+    let d = 0;
+    for (let i = 1; i < p.pts.length; i++) {
+      const a = p.pts[i - 1], b = p.pts[i];
+      if ((a[0] - midX) * (b[0] - midX) <= 0 && Math.abs(a[1] - b[1]) < 1) {
+        return (d + Math.abs(midX - a[0])) / p.total;
+      }
+      d += p.seg[i - 1];
+    }
+    return 0.5;
+  }
+  function spawn(kind, s0) {
+    const p = pathInfo(makePath(kind));
+    p.kind = kind;
+    p.s = s0 == null ? 0 : s0;
+    p.hot = hotAt(p);
+    p.speed = (kind === "power" ? 0.55 : mode === "air" ? 0.32 : 0.16) * (0.8 + R() * 0.4);
+    return p;
+  }
+
+  const itW = () => n * PER_GPU;
+  const facW = () => itW() * MODES[mode].pue;
+  const load = () => clamp(Math.log10(itW() / 1000 + 1) / Math.log10(150001), 0, 1);
+
+  function tick(dt) {
+    const want = Math.round(10 + 70 * load());
+    const wantP = Math.round(5 + 18 * load());
+    const coolant = particles.filter((p) => p.kind !== "power");
+    const power = particles.filter((p) => p.kind === "power");
+    if (!reducedMotion()) {
+      if (coolant.length < want && R() < 0.5) particles.push(spawn("cool"));
+      if (power.length < wantP && R() < 0.5) particles.push(spawn("power"));
+      const speedUp = 0.8 + load() * 0.9;
+      for (const p of particles) p.s += (p.speed * speedUp * dt * 120) / Math.max(120, p.total);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.s >= 1 || (p.kind !== "power" && coolant.length > want + 4 && R() < 0.02)) particles.splice(i, 1);
+      }
+    } else if (!particles.length) {
+      for (let i = 0; i < want; i++) particles.push(spawn("cool", R()));
+      for (let i = 0; i < wantP; i++) particles.push(spawn("power", R()));
+    }
+    dispHomes = Math.exp(approach(Math.log(dispHomes), Math.log(homesTarget()), 9, dt));
+    dispRacks = approach(dispRacks, racks(), 9, dt);
+    draw(dt);
+  }
+
+  let fanAngle = 0;
+  function draw(dt) {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !L.scene) return;
+    stage.clear();
+    const hot = C.l1, cold = C.l6, elec = C.l4;
+    const { rackX: x, rackY: y, rackW: w, rackH: hh, src, plant } = L;
+
+    // grid source
+    c.save();
+    c.strokeStyle = C.faint; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(src.x, src.y + 26); c.lineTo(src.x + 8, src.y - 10); c.lineTo(src.x + 16, src.y + 26);
+    c.moveTo(src.x + 2, src.y + 6); c.lineTo(src.x + 14, src.y + 6); c.moveTo(src.x + 4, src.y - 2); c.lineTo(src.x + 12, src.y - 2); c.stroke();
+    c.fillStyle = C.muted; c.font = "600 10px " + Theme.mono;
+    c.textAlign = "left"; c.fillText("GRID", src.x - 2, src.y + 40);
+    // power bus
+    c.strokeStyle = rgba(elec, 0.35); c.lineWidth = 2;
+    c.beginPath(); c.moveTo(src.x + 16, src.y); c.lineTo(x - 16, src.y); c.lineTo(x - 16, y + hh - 8); c.stroke();
+    c.restore();
+
+    // air: aisle labels; liquid: plant + pipes
+    const mono = Theme.mono;
+    c.font = `600 10px ${mono}`;
+    if (mode === "air") {
+      c.fillStyle = rgba(cold, 0.9); c.textAlign = "center";
+      c.fillText("COLD AISLE", x - 52, y + hh + 16);
+      c.fillStyle = rgba(hot, 0.95);
+      c.fillText("HOT AISLE", x + w + 40, y + hh + 16);
+      // warm plume above rack
+      const g = c.createRadialGradient(x + w + 30, y - 10, 4, x + w + 30, y - 10, 70 + 60 * load());
+      g.addColorStop(0, rgba(hot, 0.18 + 0.25 * load())); g.addColorStop(1, rgba(hot, 0));
+      c.fillStyle = g; c.beginPath(); c.arc(x + w + 30, y - 10, 70 + 60 * load(), 0, Math.PI * 2); c.fill();
+    } else {
+      c.fillStyle = C.sunk; c.strokeStyle = C["line-2"]; c.lineWidth = 1;
+      roundRect(c, plant.x, plant.y, plant.w, plant.h, 6); c.fill(); c.stroke();
+      c.fillStyle = C.muted; c.textAlign = "center"; c.font = `600 9px ${mono}`;
+      const lines = ["TO", "COOLING", "TOWER"];
+      lines.forEach((t, i) => c.fillText(t, plant.x + plant.w / 2, plant.y + plant.h / 2 - 10 + i * 12));
+      c.lineWidth = 5; c.lineCap = "round"; c.lineJoin = "round";
+      const lx = x - 8, rx = x + w + 8;
+      c.strokeStyle = rgba(cold, 0.22);
+      c.beginPath(); c.moveTo(plant.x, plant.y + plant.h - 6); c.lineTo(plant.x - 12, plant.y + plant.h - 6); c.lineTo(plant.x - 12, y + hh + 10); c.lineTo(lx, y + hh + 10); c.lineTo(lx, y + 8); c.stroke();
+      c.strokeStyle = rgba(hot, 0.22);
+      c.beginPath(); c.moveTo(rx, y + hh - 8); c.lineTo(rx, y - 10); c.lineTo(plant.x - 12, y - 10); c.lineTo(plant.x - 12, plant.y + 6); c.lineTo(plant.x, plant.y + 6); c.stroke();
+    }
+
+    // extra racks behind
+    const rk = racks();
+    const show = Math.min(rk - 1, 10);
+    for (let i = show; i >= 1; i--) {
+      const off = i * 7;
+      c.fillStyle = rgba(C.text, 0.03 + 0.012 * (show - i));
+      c.strokeStyle = rgba(C.text, 0.12);
+      c.lineWidth = 1;
+      roundRect(c, x + off, y - off * 0.6, w, hh, 5); c.fill(); c.stroke();
+    }
+
+    // rack
+    c.fillStyle = C.sunk; c.strokeStyle = C.muted; c.lineWidth = 1.5;
+    roundRect(c, x, y, w, hh, 5); c.fill(); c.stroke();
+    const ys = trayYs();
+    const cap = MODES[mode].perRack;
+    const lit = Math.min(n, cap);
+    const cellW = (w - 18) / 8;
+    let idx = 0;
+    for (let r = ys.length - 1; r >= 0; r--) {
+      const ty = ys[r];
+      const trayH = mode === "liquid" ? (hh - 20) / 9 - 4 : (hh - 20) / 9 * 2.2;
+      c.fillStyle = rgba(C.text, 0.05);
+      roundRect(c, x + 5, ty - trayH / 2, w - 10, trayH, 3); c.fill();
+      for (let k = 0; k < 8; k++) {
+        const on = idx < lit;
+        const cx = x + 9 + k * cellW;
+        const ch = Math.min(trayH - 4, mode === "liquid" ? trayH - 4 : cellW * 1.2);
+        c.fillStyle = on ? hot : rgba(C.text, 0.1);
+        if (on) { c.shadowColor = hot; c.shadowBlur = 8; }
+        roundRect(c, cx + 1, ty - ch / 2, cellW - 2, ch, 2); c.fill();
+        c.shadowBlur = 0;
+        idx++;
+      }
+    }
+    if (mode === "air") {
+      // fans on the exhaust side
+      fanAngle += dt * (4 + 18 * load());
+      c.strokeStyle = C.muted; c.lineWidth = 1.2;
+      for (const ty of ys) {
+        const fx = x + w + 1, r0 = 7;
+        c.beginPath(); c.arc(fx, ty, r0, 0, Math.PI * 2); c.stroke();
+        for (let b = 0; b < 3; b++) {
+          const a = fanAngle + (b * Math.PI * 2) / 3;
+          c.beginPath(); c.moveTo(fx, ty); c.lineTo(fx + Math.cos(a) * r0, ty + Math.sin(a) * r0); c.stroke();
+        }
+      }
+    }
+    // rack label
+    c.fillStyle = C.text; c.textAlign = "center"; c.font = `600 11px ${mono}`;
+    const rkTxt = rk > 1 ? `× ${fmtInt(Math.round(dispRacks))} RACKS` : n < cap ? `${n} OF ${cap} SLOTS` : "1 RACK";
+    c.fillText(rkTxt, x + w / 2, y - 10 - Math.min(show, 10) * 4);
+
+    // particles
+    for (const p of particles) {
+      const [px, py] = at(p, p.s);
+      let col;
+      if (p.kind === "power") col = elec;
+      else col = p.s < p.hot ? cold : hot;
+      const a = p.s < 0.06 ? p.s / 0.06 : p.s > 0.9 ? (1 - p.s) / 0.1 : 1;
+      c.fillStyle = rgba(col, 0.9 * a);
+      c.beginPath(); c.arc(px, py, p.kind === "power" ? 2 : 2.4, 0, Math.PI * 2); c.fill();
+    }
+
+    drawHomes(c, C, mono);
+  }
+
+  function drawHomes(c, C, mono) {
+    const H = L.homes;
+    const homes = dispHomes;
+    const unitExp = Math.max(0, Math.ceil(Math.log10(homesTarget() / 100)));
+    const unit = Math.pow(10, unitExp);
+    const icons = homes / unit;
+    const flat = H.w / H.h > 1.6;
+    const cols = flat ? 20 : 10, rows = flat ? 5 : 10;
+    const pad = 14;
+    const titleH = 44;
+    const cell = Math.min((H.w - pad * 2) / cols, (H.h - titleH - pad - 22) / rows);
+    const gx = H.x + (H.w - cell * cols) / 2;
+    const gy = H.y + titleH;
+    c.textAlign = "left";
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    c.fillText("SAME POWER AS", gx, H.y + 18);
+    c.fillStyle = C.text; c.font = `700 17px ${mono}`;
+    c.fillText(`≈ ${fmtHomes(homes)} US homes`, gx, H.y + 36);
+    for (let i = 0; i < cols * rows; i++) {
+      const cx = gx + (i % cols) * cell + cell / 2;
+      const cy = gy + Math.floor(i / cols) * cell + cell / 2;
+      const f = clamp(icons - i, 0, 1);
+      house(c, cx, cy, cell * 0.36, rgba(C.text, 0.08));
+      if (f > 0) {
+        c.save();
+        c.beginPath(); c.rect(cx - cell / 2, cy - cell / 2, cell * f, cell); c.clip();
+        house(c, cx, cy, cell * 0.36, C.l3);
+        c.restore();
+      }
+    }
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    c.fillText(`EACH ICON = ${fmtInt(unit)} HOME${unit > 1 ? "S" : ""}`, gx, gy + rows * cell + 14);
+  }
+  function house(c, x, y, r, col) {
+    c.fillStyle = col;
+    c.beginPath();
+    c.moveTo(x, y - r); c.lineTo(x + r, y - r * 0.1); c.lineTo(x + r * 0.75, y - r * 0.1); c.lineTo(x + r * 0.75, y + r);
+    c.lineTo(x - r * 0.75, y + r); c.lineTo(x - r * 0.75, y - r * 0.1); c.lineTo(x - r, y - r * 0.1); c.closePath(); c.fill();
+  }
+  const fmtHomes = (x) => (x < 10 ? fmtNum(x, 2) : fmtInt(roundSig(x, 2)));
+  const homesTarget = () => facW() / HOME;
+  const racks = () => Math.max(1, Math.ceil(n / MODES[mode].perRack));
+
+  /* ---------- controls ---------- */
+  const gpuSlider = slider({
+    label: "GPUs",
+    min: 1, max: 100000, value: n, log: true,
+    round: (v) => {
+      for (const s of NAMED) if (Math.abs(Math.log10(v / s.v)) < 0.06) return s.v;
+      return v < 20 ? Math.round(v) : roundSig(v, 2);
+    },
+    fmt: (v) => fmtInt(v),
+    ticks: [{ v: 1, label: "1" }, { v: 8, label: "8" }, { v: 72, label: "72" }, { v: 1000, label: "1k" }, { v: 10000, label: "10k" }, { v: 100000, label: "100k" }],
+    onInput: (v) => { n = v; update(); },
+  });
+  const coolSeg = segmented({
+    label: "Cooling",
+    options: [{ value: "air", label: "Air" }, { value: "liquid", label: "Liquid" }],
+    value: mode,
+    onChange: (v) => { mode = v; particles.length = 0; update(); },
+  });
+  root.append(h("div", { class: "ctl-row" }, gpuSlider.el, coolSeg.el));
+
+  const roIT = readout("Chips & servers", { sub: "" });
+  const roFac = readout("Whole building", { sub: "" });
+  const roHeat = readout("Coolant flow", { sub: "" });
+  const roRack = readout("Racks needed", { sub: "" });
+  root.append(h("div", { class: "readouts" }, roIT.el, roFac.el, roHeat.el, roRack.el));
+
+  const segIT = h("div", { class: "pb-seg pb-it" });
+  const segCool = h("div", { class: "pb-seg pb-cool" });
+  const segOther = h("div", { class: "pb-seg pb-other" });
+  const barLegend = h("div", { class: "pb-legend" });
+  root.append(h("div", { class: "powerbar" },
+    h("div", { class: "pb-title" }, "Where each watt goes"),
+    h("div", { class: "pb-track" }, segIT, segCool, segOther), barLegend));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  let prevIT = itW(), prevFac = facW(), cancels = [];
+  function update() {
+    const m = MODES[mode];
+    const it = itW(), fac = facW();
+    cancels.forEach((f) => f());
+    cancels = [
+      tween(prevIT, it, 450, (v) => { const [a, u] = siParts(v, "W"); roIT.set(a, u); }, true),
+      tween(prevFac, fac, 450, (v) => { const [a, u] = siParts(v, "W"); roFac.set(a, u); }, true),
+    ];
+    prevIT = it; prevFac = fac;
+    roIT.set(...siParts(it, "W"), `${fmtInt(n)} × ~1.5 kW`);
+    roFac.set(...siParts(fac, "W"), `+${Math.round((m.pue - 1) * 100)}% for cooling and power conversion`);
+    const heatW = it; // essentially all IT power becomes heat
+    if (mode === "liquid") {
+      const lpm = (heatW / (4186 * m.dT)) * 60;
+      roHeat.set(fmtNum(lpm, 2), "L/min", `water warming by ${m.dT} °C, circulating`);
+    } else {
+      const m3s = heatW / (1.2 * 1005 * m.dT);
+      roHeat.set(fmtNum(m3s, 2), "m³/s", `of air warming by ${m.dT} °C`);
+    }
+    const rk = racks();
+    roRack.set(fmtInt(rk), rk === 1 ? "rack" : "racks", `${m.perRack} GPUs per ${mode}-cooled rack`);
+    const tot = 1 + m.cool + m.other;
+    segIT.style.width = (100 / tot).toFixed(1) + "%";
+    segCool.style.width = ((100 * m.cool) / tot).toFixed(1) + "%";
+    segOther.style.width = ((100 * m.other) / tot).toFixed(1) + "%";
+    barLegend.innerHTML =
+      `<span><i class="pb-it"></i>Computing ${Math.round(100 / tot)}%</span>` +
+      `<span><i class="pb-cool"></i>Cooling ${Math.round((100 * m.cool) / tot)}%</span>` +
+      `<span><i class="pb-other"></i>Power conversion, lights ${Math.round((100 * m.other) / tot)}%</span>`;
+    status.innerHTML = describe();
+    Loop.wake();
+  }
+  function describe() {
+    const named = NAMED.find((s) => s.v === n);
+    const homes = homesTarget();
+    const facTxt = fmtSI(facW(), "W", 2);
+    if (n === 1) return `<b>One GPU with its share of the server: about a space heater.</b> Run it all year and it uses about as much electricity as ${fmtNum(homes, 2)} average US homes.`;
+    if (n === 8) return `<b>One server of eight GPUs: ~12 kW,</b> about what ${fmtInt(Math.round(homes))} homes draw on average.`;
+    if (n === 72 && mode === "liquid") return `<b>One rack: ~110 kW packed into less than a square meter.</b> Switch to air cooling and see how many racks the same 72 GPUs need.`;
+    if (n === 72 && mode === "air") return `<b>Air can't carry ~110 kW out of one rack.</b> The same 72 GPUs have to be spread over ${racks()} racks, with fans pushing ${fmtNum((itW() / (1.2 * 1005 * 12)), 2)} m³ of air per second.`;
+    if (n === 100000) return `<b>A frontier cluster: ${facTxt} for the whole site,</b> as much as ~${fmtInt(roundSig(homes, 2))} homes. Every one of those watts leaves as heat.`;
+    if (named) return `<b>${named.name[0].toUpperCase() + named.name.slice(1)}: ${facTxt}</b>, as much as ~${fmtInt(roundSig(homes, 2))} homes.`;
+    return `<b>${fmtInt(n)} GPUs: ${facTxt}</b> for the whole building, as much as ~${fmtHomes(roundSig(homes, 2))} homes.`;
+  }
+
+  Actions.power = (arg) => {
+    if (arg === "100k") gpuSlider.set(100000, true);
+  };
+  Theme.on(() => draw(0));
+  Loop.add(stage.canvas, tick);
+  update();
+});
+
+/* shared canvas helper */
+function roundRect(c, x, y, w, hh, r) {
+  r = Math.min(r, w / 2, hh / 2);
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + hh, r);
+  c.arcTo(x + w, y + hh, x, y + hh, r);
+  c.arcTo(x, y + hh, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+
+/* ---- l02-datacenters.js ---- */
+/* =====================================================================
+   Layer 2 · Data centers — build-a-cluster sandbox.
+   Each step: fixed compute, then a ring all-reduce whose speed is set by
+   the rack with the fewest working uplinks (the straggler).
+   ===================================================================== */
+
+defineMount("cluster", (root) => {
+  const TC = 1.0; // compute time per step (s)
+  const GB = 0.82; // gradient size / per-link bandwidth (s)
+  const ALPHA = 0.004; // per-hop latency (s)
+  const MAX_R = 12, MIN_R = 2, MAX_S = 4, MIN_S = 1;
+  const SW = "ABCD";
+
+  let S, racks, sel = 0, hover = -1, focused = false;
+  let phase = "compute", t = 0, playing = true, stallT = 0;
+  const history = [];
+  const rackNew = [];
+
+  function reset() {
+    S = 4;
+    racks = Array.from({ length: 8 }, () => ({ links: [true, true, true, true] }));
+    rackNew.length = 0;
+    phase = "compute"; t = 0; history.length = 0;
+  }
+  reset();
+
+  const nLinks = (r) => r.links.slice(0, S).filter(Boolean).length;
+  function model() {
+    const n = racks.length;
+    const counts = racks.map(nLinks);
+    const minL = Math.min(...counts), maxL = Math.max(...counts);
+    const slow = minL < maxL ? counts.indexOf(minL) : -1;
+    if (minL === 0) return { n, counts, stalled: true, slow, minL };
+    const bwTerm = (l) => (2 * (n - 1) / n) * GB / l;
+    const lat = 2 * (n - 1) * ALPHA;
+    const ts = bwTerm(minL) + lat;
+    const per = counts.map((l) => bwTerm(l) + lat);
+    const step = TC + ts;
+    const speed = (n * TC) / step; // relative to one rack computing alone
+    const wired = TC + bwTerm(S) + lat;
+    return { n, counts, ts, per, step, speed, slow, minL, eff: TC / step, slowdown: step / wired - 1 };
+  }
+
+  /* ---------- canvas ---------- */
+  let G = {};
+  const stage = new Stage(root, {
+    label: "A cluster of racks connected to network switches. Each training step, racks compute, then exchange results over the links.",
+    height: (w) => clamp(w * 0.62, 330, 440),
+    onResize: layout,
+    draw: () => draw(),
+  });
+  stage.canvas.tabIndex = 0;
+
+  function layout(w, hh) {
+    const chartH = 70;
+    const netH = hh - chartH - 14;
+    const n = racks.length;
+    const pad = 12;
+    const gap = w < 480 ? 5 : 10;
+    const rw = Math.min(48, (w - pad * 2 - gap * (n - 1)) / n);
+    const totalW = rw * n + gap * (n - 1);
+    const rx0 = (w - totalW) / 2;
+    const rackY = netH * 0.56, rackH = netH * 0.3;
+    const swW = Math.min(120, (w - pad * 2 - 12 * (S - 1)) / S);
+    const swTot = swW * S + 12 * (S - 1);
+    const sx0 = (w - swTot) / 2;
+    const swY = 22, swH = 24;
+    const rackList = racks.map((_, i) => ({ x: rx0 + i * (rw + gap), y: rackY, w: rw, h: rackH }));
+    const swList = Array.from({ length: S }, (_, s) => ({ x: sx0 + s * (swW + 12), y: swY, w: swW, h: swH }));
+    const links = [];
+    racks.forEach((r, i) => {
+      for (let s = 0; s < S; s++) {
+        const R = rackList[i], W = swList[s];
+        links.push({
+          r: i, s,
+          x1: R.x + (R.w * (s + 1)) / (S + 1), y1: R.y,
+          x2: W.x + (W.w * (i + 1)) / (n + 1), y2: W.y + W.h,
+        });
+      }
+    });
+    G = { w, hh, chartH, netH, rackList, swList, links };
+    sel = clamp(sel, 0, links.length - 1);
+  }
+  const relayout = () => { if (stage.w) layout(stage.w, stage.h); };
+
+  function segDist(px, py, L) {
+    const dx = L.x2 - L.x1, dy = L.y2 - L.y1;
+    const k = clamp(((px - L.x1) * dx + (py - L.y1) * dy) / (dx * dx + dy * dy), 0, 1);
+    return Math.hypot(px - (L.x1 + k * dx), py - (L.y1 + k * dy));
+  }
+  function pick(p, e) {
+    const tol = e && e.pointerType === "touch" ? 16 : 9;
+    let best = -1, bd = tol;
+    G.links.forEach((L, i) => {
+      if (p.y < L.y2 - 4 || p.y > L.y1 + 4) return;
+      const d = segDist(p.x, p.y, L);
+      if (d < bd) { bd = d; best = i; }
+    });
+    return best;
+  }
+  function toggle(i) {
+    const L = G.links[i];
+    if (!L) return;
+    racks[L.r].links[L.s] = !racks[L.r].links[L.s];
+    update();
+  }
+  stage.pointer({
+    down: (p, e) => { const i = pick(p, e); if (i >= 0) { sel = i; toggle(i); } },
+    move: (p, e) => {
+      const i = pick(p, e);
+      if (i !== hover) { hover = i; draw(); }
+      if (i >= 0 && e.pointerType !== "touch") {
+        const L = G.links[i];
+        const on = racks[L.r].links[L.s];
+        stage.tip(`Rack ${L.r + 1} ↔ switch ${SW[L.s]}: ${on ? "tap to cut" : "tap to connect"}`, p.x, p.y);
+        stage.canvas.style.cursor = "pointer";
+      } else { stage.tip(null); stage.canvas.style.cursor = ""; }
+    },
+    leave: () => { hover = -1; stage.tip(null); draw(); },
+  });
+  stage.canvas.addEventListener("focus", () => { focused = true; draw(); });
+  stage.canvas.addEventListener("blur", () => { focused = false; draw(); });
+  stage.canvas.addEventListener("keydown", (e) => {
+    const n = G.links.length;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { sel = (sel + 1) % n; e.preventDefault(); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { sel = (sel - 1 + n) % n; e.preventDefault(); }
+    else if (e.key === "Enter" || e.key === " ") { toggle(sel); e.preventDefault(); }
+    else return;
+    const L = G.links[sel];
+    Announcer(`Rack ${L.r + 1} to switch ${SW[L.s]}: ${racks[L.r].links[L.s] ? "connected" : "cut"}`);
+    draw();
+  });
+
+  function tick(dt) {
+    const m = model();
+    if (playing) {
+      t += dt;
+      if (phase === "compute" && t >= TC) { phase = "sync"; t = 0; }
+      else if (phase === "sync") {
+        if (m.stalled) {
+          stallT += dt;
+          if (stallT > 0.8) { history.push(0); stallT = 0; }
+        } else if (t >= m.ts) {
+          history.push(m.speed);
+          phase = "compute"; t = 0;
+        }
+      }
+      if (history.length > 40) history.splice(0, history.length - 40);
+    }
+    draw();
+  }
+
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !G.links) return;
+    stage.clear();
+    const m = model();
+    const acc = C.l2, net = C.l6;
+    const mono = Theme.mono;
+
+    // links
+    G.links.forEach((L, i) => {
+      const on = racks[L.r].links[L.s];
+      const isHover = i === hover, isSel = focused && i === sel;
+      c.lineWidth = isHover || isSel ? 3 : 1.4;
+      if (on) {
+        c.setLineDash([]);
+        const active = phase === "sync" && !m.stalled ? 0.55 : 0.28;
+        c.strokeStyle = isHover || isSel ? C.text : rgba(net, active);
+      } else {
+        c.setLineDash([3, 4]);
+        c.strokeStyle = isHover || isSel ? C.text : rgba(C.muted, 0.35);
+      }
+      c.beginPath(); c.moveTo(L.x1, L.y1); c.lineTo(L.x2, L.y2); c.stroke();
+      if (!on) {
+        const mx = lerp(L.x1, L.x2, 0.5), my = lerp(L.y1, L.y2, 0.5);
+        c.setLineDash([]);
+        c.strokeStyle = C.bad; c.lineWidth = 1.6;
+        c.beginPath(); c.moveTo(mx - 3, my - 3); c.lineTo(mx + 3, my + 3); c.moveTo(mx + 3, my - 3); c.lineTo(mx - 3, my + 3); c.stroke();
+      }
+    });
+    c.setLineDash([]);
+
+    // packets during sync: each rack's packets move at its own link speed
+    if (phase === "sync") {
+      G.links.forEach((L) => {
+        if (!racks[L.r].links[L.s]) return;
+        const per = m.stalled ? Infinity : m.per[L.r];
+        const done = t >= per;
+        if (done) return;
+        const speed = m.counts[L.r] / S;
+        for (let k = 0; k < 2; k++) {
+          const f = ((t * 1.6 * speed + k * 0.5) % 1);
+          const up = (k % 2) === 0;
+          const ff = up ? f : 1 - f;
+          c.fillStyle = net;
+          c.beginPath(); c.arc(lerp(L.x1, L.x2, ff), lerp(L.y1, L.y2, ff), 2.4, 0, Math.PI * 2); c.fill();
+        }
+      });
+    }
+
+    // switches
+    c.font = `600 10px ${mono}`;
+    c.textAlign = "center";
+    G.swList.forEach((W, s) => {
+      c.fillStyle = C.raised; c.strokeStyle = C.muted; c.lineWidth = 1.2;
+      roundRect(c, W.x, W.y, W.w, W.h, 5); c.fill(); c.stroke();
+      c.fillStyle = C.text;
+      c.fillText(W.w > 70 ? `SWITCH ${SW[s]}` : SW[s], W.x + W.w / 2, W.y + W.h / 2 + 3.5);
+    });
+    c.fillStyle = C.muted; c.textAlign = "left";
+    c.fillText("NETWORK SWITCHES", G.swList[0].x, 12);
+
+    // racks
+    G.rackList.forEach((R, i) => {
+      const isSlow = i === m.slow;
+      const cnt = m.counts[i];
+      let prog, col, state;
+      if (phase === "compute") { prog = t / TC; col = acc; state = "compute"; }
+      else if (m.stalled) { prog = cnt === 0 ? 0 : 1; col = cnt === 0 ? C.bad : C.faint; state = cnt === 0 ? "cut off" : "waiting"; }
+      else {
+        const per = m.per[i];
+        prog = clamp(t / per, 0, 1);
+        col = prog >= 1 ? C.faint : net;
+        state = prog >= 1 ? "waiting" : "syncing";
+      }
+      c.fillStyle = C.sunk;
+      c.strokeStyle = isSlow ? C.bad : C.muted;
+      c.lineWidth = isSlow ? 2.2 : 1.2;
+      roundRect(c, R.x, R.y, R.w, R.h, 4); c.fill(); c.stroke();
+      // GPUs
+      const cols = 2, rows = 4;
+      const gw = (R.w - 10) / cols, gh = (R.h - 12) / rows;
+      for (let k = 0; k < cols * rows; k++) {
+        const gx = R.x + 5 + (k % cols) * gw, gy = R.y + 6 + Math.floor(k / cols) * gh;
+        const busy = phase === "compute";
+        c.fillStyle = busy ? acc : state === "waiting" ? rgba(C.text, 0.12) : rgba(net, 0.35);
+        if (busy) { c.shadowColor = acc; c.shadowBlur = 6; }
+        roundRect(c, gx + 1.5, gy + 1.5, gw - 3, gh - 3, 2); c.fill();
+        c.shadowBlur = 0;
+      }
+      // progress bar
+      const by = R.y + R.h + 7;
+      c.fillStyle = rgba(C.text, 0.1); roundRect(c, R.x, by, R.w, 5, 2.5); c.fill();
+      c.fillStyle = col; roundRect(c, R.x, by, Math.max(2, R.w * prog), 5, 2.5); c.fill();
+      // labels
+      c.textAlign = "center"; c.font = `600 ${R.w < 30 ? 9 : 10}px ${mono}`;
+      c.fillStyle = isSlow ? C.bad : C.muted;
+      c.fillText(String(i + 1), R.x + R.w / 2, by + 18);
+      c.fillStyle = cnt < S ? (cnt === 0 ? C.bad : C.warn) : C.faint;
+      c.fillText(`${cnt}/${S}`, R.x + R.w / 2, by + 30);
+    });
+    c.textAlign = "left"; c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    const lab = phase === "compute" ? "COMPUTING" : m.stalled ? "STUCK: A RACK IS CUT OFF" : "SYNCING RESULTS";
+    c.fillText(`RACKS · ${lab}`, G.rackList[0].x, G.rackList[0].y - 8);
+
+    // throughput strip chart
+    const cy = G.netH + 14, ch = G.chartH - 18, cx = 12, cw = G.w - 24;
+    c.fillStyle = C.sunk; roundRect(c, cx, cy, cw, ch + 14, 6); c.fill();
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`; c.textAlign = "left";
+    c.fillText("TRAINING SPEED, EACH STEP", cx + 8, cy + 13);
+    const maxV = MAX_R;
+    const bx = cx + 8, bw = cw - 16, bh = ch - 10, by0 = cy + 16 + bh;
+    const N = 40, barW = bw / N;
+    // ideal line for current rack count
+    const idealY = by0 - (racks.length / maxV) * bh;
+    c.strokeStyle = rgba(C.text, 0.25); c.setLineDash([2, 3]); c.lineWidth = 1;
+    c.beginPath(); c.moveTo(bx, idealY); c.lineTo(bx + bw, idealY); c.stroke(); c.setLineDash([]);
+    c.textAlign = "right"; c.fillStyle = C.faint;
+    c.fillText(`IDEAL ${racks.length}×`, bx + bw, idealY - 3);
+    history.forEach((v, i) => {
+      const x = bx + (N - history.length + i) * barW;
+      const hgt = (v / maxV) * bh;
+      c.fillStyle = v === 0 ? C.bad : i === history.length - 1 ? acc : rgba(acc, 0.55);
+      c.fillRect(x + 1, by0 - Math.max(1, hgt), barW - 2, Math.max(1, hgt));
+    });
+  }
+
+  /* ---------- controls ---------- */
+  const stRacks = stepper({
+    label: "Racks", value: racks.length, min: MIN_R, max: MAX_R,
+    onChange: (v, d) => {
+      if (d > 0) { const r = { links: [false, false, false, false] }; r.links[0] = true; racks.push(r); }
+      else racks.pop();
+      update();
+    },
+  });
+  const stSw = stepper({
+    label: "Switches", value: S, min: MIN_S, max: MAX_S,
+    onChange: (v, d) => {
+      if (d > 0) { racks.forEach((r) => (r.links[S] = true)); S++; }
+      else { S--; racks.forEach((r) => (r.links[S] = false)); }
+      update();
+    },
+  });
+  const bWire = button("Wire everything", () => { racks.forEach((r) => { for (let s = 0; s < S; s++) r.links[s] = true; }); update(); }, { small: true });
+  const bPlay = button("Pause", () => { playing = !playing; bPlay.setLabel(playing ? "Pause" : "Play", playing ? "pause" : "play"); Loop.wake(); }, { icon: "pause", small: true });
+  const bReset = button("Reset", () => { reset(); update(); }, { icon: "reset", small: true });
+  root.append(h("div", { class: "ctl-row" }, stRacks.el, stSw.el, h("div", { class: "btn-row" }, bWire, bPlay, bReset)));
+
+  const roStep = readout("Step time");
+  const roSpeed = readout("Speed vs one rack");
+  const roEff = readout("Scaling efficiency");
+  const roWeak = readout("Weakest rack");
+  root.append(h("div", { class: "readouts" }, roStep.el, roSpeed.el, roEff.el, roWeak.el));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  function update() {
+    relayout();
+    const m = model();
+    stRacks.set(racks.length);
+    stSw.set(S);
+    if (m.stalled) {
+      roStep.set("∞", " s"); roStep.state("bad");
+      roSpeed.set("0", "×"); roSpeed.state("bad");
+      roEff.set("0", "%"); roEff.state("bad");
+      roWeak.set(`Rack ${m.slow + 1}`, "", "cut off"); roWeak.state("bad");
+      status.innerHTML = `<b class="bad">Rack ${m.slow + 1} has no links.</b> The other racks can't finish swapping results, so the whole job is stuck. Tap one of its dashed lines to connect it, or remove it.`;
+    } else {
+      roStep.set(fmtNum(m.step, 3), " s"); roStep.state(m.slow >= 0 ? "bad" : null);
+      roSpeed.set(fmtNum(m.speed, 2), "×"); roSpeed.state("hi");
+      roEff.set(Math.round(m.eff * 100), "%"); roEff.state(null);
+      roWeak.set(`${m.minL}/${S}`, " links"); roWeak.state(m.minL < S ? "bad" : null);
+      if (m.slow >= 0) {
+        const missing = m.counts.reduce((a, k) => a + (S - k), 0);
+        const naive = (missing / (racks.length * S)) * 100;
+        let extra = "";
+        if (racks.length > MIN_R) {
+          const saved = racks.splice(m.slow, 1)[0];
+          const without = model();
+          racks.splice(m.slow, 0, saved);
+          if (!without.stalled && without.speed > m.speed) extra = ` Removing rack ${m.slow + 1} entirely would make the cluster <b>faster</b> (${fmtNum(without.speed, 2)}× instead of ${fmtNum(m.speed, 2)}×).`;
+        }
+        status.innerHTML = `<b>Rack ${m.slow + 1} is the straggler.</b> With ${m.minL} of ${S} links, its share of each sync takes ${fmtNum(S / m.minL, 2)}× longer, and all ${racks.length} racks wait for it. Training is <b class="bad">${Math.round(m.slowdown * 100)}% slower</b> than fully wired, though only ${fmtNum(naive, 2)}% of the links are missing.${extra}`;
+      } else if (m.minL < S) {
+        status.innerHTML = `<b>Every rack is missing links,</b> so every sync is ${fmtNum(S / m.minL, 2)}× slower. Training is <b class="bad">${Math.round(m.slowdown * 100)}% slower</b> than fully wired.`;
+      } else {
+        status.innerHTML = `<b>All ${racks.length} racks fully wired.</b> Each step is ${fmtNum(TC, 2)} s of computing, then ${fmtNum(m.ts, 2)} s swapping results. Tap a link to cut it, or add a rack.`;
+      }
+    }
+    Loop.wake();
+  }
+
+  Actions.cluster = (arg) => {
+    if (arg === "cut") {
+      reset();
+      racks[2].links[0] = false;
+      playing = true; bPlay.setLabel("Pause", "pause");
+      update();
+    }
+  };
+  Theme.on(draw);
+  Loop.add(stage.canvas, tick, () => true);
+  update();
+});
+
+/* ---- l03-silicon.js ---- */
+/* =====================================================================
+   Layer 3 · Silicon — (a) shrinking transistors, (b) wafer yield.
+   ===================================================================== */
+
+/* ---------- (a) Shrink the transistor ---------- */
+defineMount("node", (root) => {
+  // transistors, die area (mm²), process label
+  const CHIPS = [
+    { name: "Intel 4004", year: 1971, t: 2300, area: 12, node: "10 µm" },
+    { name: "Intel 386", year: 1985, t: 275e3, area: 104, node: "1.5 µm" },
+    { name: "Intel Pentium", year: 1993, t: 3.1e6, area: 294, node: "0.8 µm" },
+    { name: "Intel Pentium 4", year: 2000, t: 42e6, area: 217, node: "180 nm" },
+    { name: "Intel Core 2 Duo", year: 2006, t: 291e6, area: 143, node: "65 nm" },
+    { name: "NVIDIA GTX 480", year: 2010, t: 3.0e9, area: 529, node: "40 nm" },
+    { name: "NVIDIA P100", year: 2016, t: 15.3e9, area: 610, node: "16 nm" },
+    { name: "NVIDIA V100", year: 2017, t: 21.1e9, area: 815, node: "12 nm" },
+    { name: "NVIDIA A100", year: 2020, t: 54.2e9, area: 826, node: "7 nm" },
+    { name: "NVIDIA H100", year: 2022, t: 80e9, area: 814, node: "4N (5 nm class)" },
+    { name: "NVIDIA B200", year: 2024, t: 208e9, area: 1600, node: "4NP, two dies" },
+  ];
+  // side of the average square each transistor occupies, in µm
+  const cellUm = (ch) => Math.sqrt(ch.area / ch.t) * 1000;
+  const REFS = [
+    { name: "human hair", um: 70, kind: "hair" },
+    { name: "red blood cell", um: 7.5, kind: "cell" },
+    { name: "bacterium", um: 2, kind: "rod" },
+    { name: "flu virus", um: 0.1, kind: "virus" },
+  ];
+  let idx = 0;
+  let dispLogCell = Math.log(cellUm(CHIPS[0]));
+  let dispLogLens = Math.log(lensFor(cellUm(CHIPS[0])));
+  let dispLogT = Math.log(CHIPS[0].t);
+
+  function lensFor(cell) {
+    const raw = cell * 7;
+    const e = Math.floor(Math.log10(raw));
+    for (const m of [1, 2, 5, 10]) if (m * Math.pow(10, e) >= raw) return m * Math.pow(10, e);
+    return 10 * Math.pow(10, e);
+  }
+
+  let L = {};
+  const stage = new Stage(root, {
+    label: "A magnifying lens over transistors at true relative size, the chip's outline, and a chart of transistor counts from 1971 to 2024.",
+    height: (w) => (w >= 600 ? clamp(w * 0.66, 380, 470) : w * 0.56 + 215),
+    onResize: (w, hh) => {
+      const wide = w >= 600;
+      const chartH = wide ? 150 : 170;
+      const topH = hh - chartH - 12;
+      const lens = wide ? Math.min(topH - 30, w * 0.46) : Math.min(w * 0.56, topH - 30);
+      const dx = lens + (wide ? 40 : 18);
+      L = {
+        wide,
+        lens: { x: wide ? 10 : 2, y: 22, s: lens },
+        die: { x: dx, y: 22, w: w - dx - 6, h: topH - 22 },
+        chart: { x: wide ? 10 : 2, y: topH + 12, w: w - (wide ? 20 : 4), h: chartH - 4 },
+      };
+    },
+    draw: () => draw(),
+  });
+
+  function tick(dt) {
+    const ch = CHIPS[idx];
+    const tc = Math.log(cellUm(ch)), tl = Math.log(lensFor(cellUm(ch))), tt = Math.log(ch.t);
+    dispLogCell = approach(dispLogCell, tc, 6, dt);
+    dispLogLens = approach(dispLogLens, tl, 4, dt);
+    dispLogT = approach(dispLogT, tt, 6, dt);
+    draw();
+  }
+  const settled = () => {
+    const ch = CHIPS[idx];
+    return Math.abs(dispLogCell - Math.log(cellUm(ch))) > 0.002 || Math.abs(dispLogLens - Math.log(lensFor(cellUm(ch)))) > 0.002;
+  };
+
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !L.lens) return;
+    stage.clear();
+    const acc = C.l3, mono = Theme.mono;
+    const ch = CHIPS[idx];
+    const cell = Math.exp(dispLogCell), lensW = Math.exp(dispLogLens);
+    const { x: lx, y: ly, s } = L.lens;
+    const px = s / lensW; // pixels per µm
+
+    // lens
+    c.save();
+    c.fillStyle = C.sunk; roundRect(c, lx, ly, s, s, 12); c.fill();
+    c.beginPath(); roundRect(c, lx, ly, s, s, 12); c.clip();
+    const cp = cell * px;
+    const n = Math.ceil(s / cp) + 1;
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        const x = lx + i * cp, y = ly + j * cp;
+        if (cp < 5) {
+          c.fillStyle = rgba(acc, 0.5);
+          c.fillRect(x + cp * 0.2, y + cp * 0.2, Math.max(0.8, cp * 0.6), Math.max(0.8, cp * 0.6));
+          continue;
+        }
+        // transistor footprint: active area (fin) + gate across it + contacts
+        c.fillStyle = rgba(C.text, 0.06);
+        c.fillRect(x + cp * 0.06, y + cp * 0.06, cp * 0.88, cp * 0.88);
+        c.fillStyle = rgba(C.l6, 0.45);
+        c.fillRect(x + cp * 0.14, y + cp * 0.36, cp * 0.72, cp * 0.28);
+        c.fillStyle = acc;
+        c.fillRect(x + cp * 0.44, y + cp * 0.16, cp * 0.12, cp * 0.68);
+        if (cp > 14) {
+          c.fillStyle = rgba(C.text, 0.55);
+          c.fillRect(x + cp * 0.2, y + cp * 0.44, cp * 0.1, cp * 0.12);
+          c.fillRect(x + cp * 0.7, y + cp * 0.44, cp * 0.1, cp * 0.12);
+        }
+      }
+    }
+    // reference object at the same scale
+    let ref = null, best = 1e9;
+    for (const r of REFS) {
+      const ratio = r.um / lensW;
+      if (ratio < 0.04 || ratio > 1.2) continue;
+      const score = Math.abs(Math.log(ratio / 0.35));
+      if (score < best) { best = score; ref = r; }
+    }
+    if (ref) {
+      const rp = ref.um * px;
+      const cx = lx + s * 0.62, cy = ly + s * 0.6;
+      c.fillStyle = rgba(C.l9, 0.28); c.strokeStyle = rgba(C.l9, 0.95); c.lineWidth = 2;
+      c.beginPath();
+      if (ref.kind === "hair") { c.rect(lx - 5, cy - rp / 2, s + 10, rp); }
+      else if (ref.kind === "rod") { roundRect(c, cx - rp / 2, cy - rp / 4, rp, rp / 2, rp / 4); }
+      else { c.arc(cx, cy, rp / 2, 0, Math.PI * 2); }
+      c.fill(); c.stroke();
+      if (ref.kind === "virus" && rp > 10) {
+        for (let k = 0; k < 14; k++) {
+          const a = (k / 14) * Math.PI * 2;
+          c.beginPath(); c.moveTo(cx + Math.cos(a) * rp / 2, cy + Math.sin(a) * rp / 2);
+          c.lineTo(cx + Math.cos(a) * rp * 0.62, cy + Math.sin(a) * rp * 0.62); c.stroke();
+        }
+      }
+      c.fillStyle = C.text; c.font = `600 11px ${mono}`; c.textAlign = "center";
+      const ty = ref.kind === "hair" ? cy - rp / 2 - 8 : cy - (ref.kind === "rod" ? rp / 4 : rp / 2) - 8;
+      pill(c, `${ref.name} · ${fmtUm(ref.um)}`, ref.kind === "hair" ? lx + s / 2 : cx, Math.max(ly + 16, ty), C);
+    }
+    c.restore();
+    c.strokeStyle = C["line-2"]; c.lineWidth = 1.5; roundRect(c, lx, ly, s, s, 12); c.stroke();
+    // scale bar
+    const barUm = niceBelow(lensW / 3);
+    const barPx = barUm * px;
+    c.fillStyle = C.text;
+    c.fillRect(lx + 12, ly + s - 18, barPx, 3);
+    c.font = `600 11px ${mono}`; c.textAlign = "left";
+    pill(c, fmtUm(barUm), lx + 12 + barPx / 2, ly + s - 30, C);
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`; c.textAlign = "left";
+    c.fillText(`LENS: ${fmtUm(lensW)} ACROSS`, lx, ly - 8);
+
+    // die
+    const D = L.die;
+    c.textAlign = "left";
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    c.fillText(L.wide ? "THE WHOLE CHIP, TO SCALE" : "WHOLE CHIP", D.x, D.y - 8);
+    const maxSide = Math.sqrt(1600 / 2) * 2; // widest: B200's two dies side by side
+    const scale = Math.min((D.w - 4) / maxSide, (D.h - 76) / 33);
+    const dies = ch.area > 900 ? 2 : 1;
+    const side = Math.sqrt(ch.area / dies) * scale;
+    const dy = D.y + 8;
+    for (let k = 0; k < dies; k++) {
+      const dx = D.x + k * (side + 4);
+      const g = c.createLinearGradient(dx, dy, dx + side, dy + side);
+      g.addColorStop(0, rgba(acc, 0.55)); g.addColorStop(1, rgba(C.l2, 0.35));
+      c.fillStyle = g; c.fillRect(dx, dy, side, side);
+      c.strokeStyle = acc; c.lineWidth = 1; c.strokeRect(dx + 0.5, dy + 0.5, side - 1, side - 1);
+      if (side > 30) {
+        c.strokeStyle = rgba(C.bg, 0.35); c.lineWidth = 1;
+        const blocks = 4;
+        for (let b = 1; b < blocks; b++) {
+          c.beginPath(); c.moveTo(dx + (side * b) / blocks, dy); c.lineTo(dx + (side * b) / blocks, dy + side); c.stroke();
+          c.beginPath(); c.moveTo(dx, dy + (side * b) / blocks); c.lineTo(dx + side, dy + (side * b) / blocks); c.stroke();
+        }
+      }
+    }
+    // reticle limit outline
+    const rs = 33 * scale;
+    c.setLineDash([3, 3]); c.strokeStyle = C.faint; c.strokeRect(D.x + 0.5, dy + 0.5, 26 * scale, rs); c.setLineDash([]);
+    c.fillStyle = C.faint; c.font = `600 9px ${mono}`;
+    c.fillText("MAX ONE EXPOSURE", D.x, dy + rs + 12);
+    c.fillStyle = C.text; c.font = `700 ${L.wide ? 15 : 13}px ${Theme.body}`;
+    const ty0 = dy + Math.max(rs, side) + 34;
+    c.fillText(L.wide ? `${ch.name} · ${ch.year}` : ch.name, D.x, ty0);
+    c.fillStyle = C.muted; c.font = `500 ${L.wide ? 13 : 12}px ${Theme.body}`;
+    if (L.wide) c.fillText(`${fmtNum(ch.area, 3)} mm² · process "${ch.node}"`, D.x, ty0 + 19);
+    else { c.fillText(`${ch.year} · ${fmtNum(ch.area, 3)} mm²`, D.x, ty0 + 17); c.fillText(`"${ch.node.split(",")[0]}"`, D.x, ty0 + 33); }
+
+    drawChart(c, C, mono);
+  }
+
+  function pill(c, text, x, y, C) {
+    const w = c.measureText(text).width + 12;
+    c.fillStyle = rgba(C.bg, 0.8);
+    roundRect(c, x - w / 2, y - 11, w, 16, 5); c.fill();
+    c.fillStyle = C.text; c.textAlign = "center";
+    c.fillText(text, x, y + 1);
+  }
+
+  function drawChart(c, C, mono) {
+    const R = L.chart;
+    const pl = 30, pr = 10, pt = 18, pb = 20;
+    const x0 = R.x + pl, x1 = R.x + R.w - pr, y0 = R.y + R.h - pb, y1 = R.y + pt;
+    const X = (yr) => lerp(x0, x1, invLerp(1970, 2026, yr));
+    const Y = (t) => lerp(y0, y1, invLerp(3, 12, Math.log10(t)));
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`; c.textAlign = "left";
+    c.fillText("TRANSISTORS PER CHIP (LOG SCALE)", R.x, R.y + 8);
+    c.strokeStyle = C.line; c.lineWidth = 1;
+    c.font = `500 10px ${mono}`;
+    for (let e = 3; e <= 12; e += 3) {
+      c.beginPath(); c.moveTo(x0, Y(10 ** e)); c.lineTo(x1, Y(10 ** e)); c.stroke();
+      c.fillStyle = C.faint; c.textAlign = "right";
+      c.fillText({ 3: "1k", 6: "1M", 9: "1B", 12: "1T" }[e], x0 - 6, Y(10 ** e) + 3);
+    }
+    c.textAlign = "center";
+    for (const yr of [1970, 1980, 1990, 2000, 2010, 2020]) { c.fillStyle = C.faint; c.fillText(String(yr), X(yr), y0 + 14); }
+    // trend: doubling every 2 years from the 4004
+    c.strokeStyle = rgba(C.text, 0.25); c.setLineDash([4, 4]);
+    c.beginPath(); c.moveTo(X(1971), Y(2300)); c.lineTo(X(2024), Y(2300 * Math.pow(2, (2024 - 1971) / 2))); c.stroke(); c.setLineDash([]);
+    c.fillStyle = C.faint; c.textAlign = "left";
+    const tx = X(1996), tyy = Y(2300 * Math.pow(2, (1996 - 1971) / 2));
+    if (L.wide) c.fillText("doubling every 2 years", tx + 8, tyy + 14);
+    // points
+    CHIPS.forEach((ch, i) => {
+      const cur = i === idx;
+      c.fillStyle = cur ? C.l3 : rgba(C.l3, 0.45);
+      c.beginPath(); c.arc(X(ch.year), Y(ch.t), cur ? 6 : 3.5, 0, Math.PI * 2); c.fill();
+      if (cur) { c.strokeStyle = C.text; c.lineWidth = 1.5; c.stroke(); }
+    });
+    // moving marker for smooth transitions
+    const cur = CHIPS[idx];
+    c.fillStyle = C.text; c.font = `700 11px ${mono}`;
+    const lab = fmtWords(Math.exp(dispLogT), 2);
+    const lx = X(cur.year), ly = Y(cur.t) - 12;
+    c.textAlign = lx > x1 - 60 ? "right" : lx < x0 + 60 ? "left" : "center";
+    c.fillText(lab, lx, ly);
+  }
+
+  const niceBelow = (x) => { const e = Math.pow(10, Math.floor(Math.log10(x))); for (const m of [5, 2, 1]) if (m * e <= x) return m * e; return e; };
+  const fmtUm = (um) => (um = roundSig(um, 3), um >= 1000 ? fmtNum(um / 1000, 2) + " mm" : um >= 1 ? fmtNum(um, 2) + " µm" : fmtNum(um * 1000, 2) + " nm");
+
+  const sl = slider({
+    label: "Year and chip",
+    values: CHIPS.map((_, i) => i), value: 0,
+    fmt: (i) => `${CHIPS[i].year} · ${CHIPS[i].name}`,
+    ticks: [{ v: 0, label: "1971" }, { v: 3, label: "2000" }, { v: 6, label: "2016" }, { v: 10, label: "2024" }],
+    onInput: (i) => { idx = i; update(); },
+  });
+  root.append(h("div", { class: "ctl-row" }, sl.el));
+  const roT = readout("Transistors");
+  const roCell = readout("Space per transistor");
+  const roX = readout("Growth since 1971");
+  root.append(h("div", { class: "readouts" }, roT.el, roCell.el, roX.el));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  function update() {
+    const ch = CHIPS[idx];
+    roT.set(fmtWords(ch.t, 3));
+    roCell.set(fmtUm(cellUm(ch)), "");
+    roX.set(fmtWords(ch.t / 2300, 2), "×");
+    const cell = cellUm(ch);
+    let cmp;
+    if (cell > 30) cmp = "about the width of a human hair";
+    else if (cell > 5) cmp = "about the size of a red blood cell";
+    else if (cell > 1) cmp = "about the size of a bacterium";
+    else if (cell > 0.3) cmp = "a few times wider than a flu virus";
+    else if (cell > 0.095) cmp = "about the size of a flu virus";
+    else cmp = "a little smaller than a flu virus";
+    let extra = "";
+    if (idx >= 8) extra = ` Process names like "7 nm" and "4N" are labels; no feature on the chip measures that. Transistor gates sit roughly 50–60 nm apart.`;
+    if (idx === 10) extra = " No single piece of silicon can be bigger than about 858 mm², so the B200 joins two.";
+    status.innerHTML = `<b>${ch.name} (${ch.year}): ${fmtWords(ch.t, 3)} transistors.</b> Each one, with its share of wiring, takes up a square ${fmtUm(cell)} across, ${cmp}.${extra}`;
+    Loop.wake();
+  }
+  Theme.on(draw);
+  Loop.add(stage.canvas, tick, settled);
+  update();
+});
+
+/* ---------- (b) Wafer yield ---------- */
+defineMount("wafer", (root) => {
+  const WAFER_D = 300, EDGE = 3, COST = 20000;
+  const RU = WAFER_D / 2 - EDGE; // usable radius, mm
+  const AREA_CM2 = (Math.PI * RU * RU) / 100;
+  let D0 = 0.1, A = 400, seed = 11;
+  let cand = [], uCount = 0.5;
+
+  function reroll() {
+    const R = rng(seed);
+    uCount = clamp(R(), 0.02, 0.98);
+    cand = [];
+    while (cand.length < 3000) {
+      const x = (R() * 2 - 1) * RU, y = (R() * 2 - 1) * RU;
+      if (x * x + y * y <= RU * RU) cand.push([x, y]);
+    }
+  }
+  reroll();
+  /* Poisson quantile so that raising the defect rate adds defects */
+  function poissonQ(u, mean) {
+    if (mean > 200) return Math.round(mean + Math.sqrt(mean) * Math.SQRT2 * erfinv(2 * u - 1));
+    let k = 0, p = Math.exp(-mean), cdf = p;
+    while (cdf < u && k < 3000) { k++; p *= mean / k; cdf += p; }
+    return k;
+  }
+  function erfinv(x) {
+    const a = 0.147, ln = Math.log(1 - x * x);
+    const t = 2 / (Math.PI * a) + ln / 2;
+    return Math.sign(x) * Math.sqrt(Math.sqrt(t * t - ln / a) - t);
+  }
+  function layoutDies(area) {
+    const s = Math.sqrt(area);
+    let best = null;
+    for (const ox of [0, 0.5]) for (const oy of [0, 0.5]) {
+      const dies = [];
+      const n = Math.ceil(RU / s) + 1;
+      for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) {
+        const x = (i - ox) * s, y = (j - oy) * s;
+        const corners = [[x, y], [x + s, y], [x, y + s], [x + s, y + s]];
+        const inside = corners.every(([a, b]) => a * a + b * b <= RU * RU);
+        const touches = corners.some(([a, b]) => a * a + b * b <= (WAFER_D / 2) ** 2);
+        if (inside) dies.push({ x, y, s, whole: true });
+        else if (touches) dies.push({ x, y, s, whole: false });
+      }
+      const whole = dies.filter((d) => d.whole).length;
+      if (!best || whole > best.whole) best = { dies, whole };
+    }
+    return best;
+  }
+  function simulate() {
+    const lay = layoutDies(A);
+    const k = Math.min(cand.length, poissonQ(uCount, D0 * AREA_CM2));
+    const defects = cand.slice(0, k);
+    for (const d of lay.dies) d.bad = false;
+    for (const [x, y] of defects) {
+      for (const d of lay.dies) {
+        if (d.whole && x >= d.x && x < d.x + d.s && y >= d.y && y < d.y + d.s) { d.bad = true; break; }
+      }
+    }
+    const good = lay.dies.filter((d) => d.whole && !d.bad).length;
+    return { ...lay, defects, good };
+  }
+  /* analytic model for the curve */
+  const grossModel = (a) => Math.max(0, (Math.PI * RU * RU) / a - (Math.PI * 2 * RU) / Math.sqrt(2 * a));
+  const yieldModel = (a, d0) => Math.exp(-d0 * a / 100);
+  const costModel = (a, d0) => COST / Math.max(1e-9, grossModel(a) * yieldModel(a, d0));
+
+  let sim = simulate();
+  let L = {};
+  const stage = new Stage(root, {
+    label: "A 300 mm silicon wafer divided into chips, with random defects. Working chips are lit; chips hit by a defect are dark.",
+    height: (w) => (w >= 600 ? clamp(w * 0.5, 320, 400) : clamp(w * 1.5, 480, 600)),
+    onResize: (w, hh) => {
+      const wide = w >= 600;
+      const ws = wide ? Math.min(hh - 16, w * 0.52) : Math.min(w - 16, hh * 0.58);
+      L = {
+        wafer: { cx: wide ? ws / 2 + 8 : w / 2, cy: wide ? hh / 2 : ws / 2 + 8, r: ws / 2 - 4 },
+        chart: wide ? { x: ws + 30, y: 10, w: w - ws - 38, h: hh - 20 } : { x: 8, y: ws + 26, w: w - 16, h: hh - ws - 34 },
+      };
+    },
+    draw: () => draw(),
+  });
+
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !L.wafer) return;
+    stage.clear();
+    const { cx, cy, r } = L.wafer;
+    const k = r / (WAFER_D / 2);
+    const acc = C.l3, mono = Theme.mono;
+    // wafer disc
+    const g = c.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r);
+    g.addColorStop(0, Theme.dark ? "#3a3a4a" : "#d9d9e3"); g.addColorStop(1, Theme.dark ? "#1f1f2a" : "#b9b9c8");
+    c.fillStyle = g;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+    // notch
+    c.fillStyle = C.panel; c.beginPath(); c.arc(cx, cy + r, r * 0.02 + 2, 0, Math.PI * 2); c.fill();
+    // dies
+    c.save();
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.clip();
+    for (const d of sim.dies) {
+      const x = cx + d.x * k, y = cy + d.y * k, s = d.s * k;
+      const gap = Math.min(1.2, s * 0.08);
+      if (!d.whole) { c.strokeStyle = rgba(C.text, 0.12); c.lineWidth = 0.6; c.strokeRect(x + gap, y + gap, s - gap * 2, s - gap * 2); continue; }
+      c.fillStyle = d.bad ? rgba(C.bad, Theme.dark ? 0.28 : 0.35) : acc;
+      c.fillRect(x + gap, y + gap, s - gap * 2, s - gap * 2);
+    }
+    // defects
+    c.fillStyle = Theme.dark ? "#ffffff" : "#15131c";
+    const dotR = Math.max(1, r / 170);
+    for (const [x, y] of sim.defects) { c.beginPath(); c.arc(cx + x * k, cy + y * k, dotR, 0, Math.PI * 2); c.fill(); }
+    c.restore();
+    c.strokeStyle = C.muted; c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.stroke();
+
+    // cost curve
+    const R = L.chart;
+    const pl = 48, pb = 30, pt = 30, pr = 8;
+    const x0 = R.x + pl, x1 = R.x + R.w - pr, y0 = R.y + R.h - pb, y1 = R.y + pt;
+    const AMIN = 20, AMAX = 858;
+    const X = (a) => lerp(x0, x1, invLerp(Math.log(AMIN), Math.log(AMAX), Math.log(a)));
+    const CMIN = 1, CMAX = 1e6;
+    const Y = (v) => lerp(y0, y1, invLerp(Math.log10(CMIN), Math.log10(CMAX), Math.log10(clamp(v, CMIN, CMAX))));
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`; c.textAlign = "left";
+    c.fillText("COST PER WORKING CHIP", R.x, R.y + 12);
+    c.font = `500 10px ${mono}`;
+    for (const v of [1, 10, 100, 1000, 1e4, 1e5, 1e6]) {
+      c.strokeStyle = C.line; c.beginPath(); c.moveTo(x0, Y(v)); c.lineTo(x1, Y(v)); c.stroke();
+      c.fillStyle = C.faint; c.textAlign = "right"; c.fillText(v >= 1e6 ? "$1M" : v >= 1000 ? `$${v / 1000}k` : `$${v}`, x0 - 5, Y(v) + 3);
+    }
+    c.textAlign = "center";
+    for (const a of [20, 50, 100, 200, 400, 858]) { c.fillStyle = C.faint; c.fillText(String(a), X(a), y0 + 14); }
+    c.fillText("chip area, mm² (log)", (x0 + x1) / 2, y0 + 27);
+    // no-defect line
+    c.strokeStyle = rgba(C.text, 0.35); c.setLineDash([4, 4]); c.lineWidth = 1.2;
+    c.beginPath();
+    for (let i = 0; i <= 60; i++) { const a = AMIN * Math.pow(AMAX / AMIN, i / 60); const v = COST / Math.max(1e-9, grossModel(a)); i ? c.lineTo(X(a), Y(v)) : c.moveTo(X(a), Y(v)); }
+    c.stroke(); c.setLineDash([]);
+    // with defects
+    c.strokeStyle = acc; c.lineWidth = 2.2;
+    c.beginPath();
+    for (let i = 0; i <= 80; i++) { const a = AMIN * Math.pow(AMAX / AMIN, i / 80); const v = costModel(a, D0); i ? c.lineTo(X(a), Y(v)) : c.moveTo(X(a), Y(v)); }
+    c.stroke();
+    c.fillStyle = C.faint; c.textAlign = "left";
+    c.fillText("if no defects", X(300), Y(COST / grossModel(300)) + 16);
+    // marker
+    const mv = costModel(A, D0);
+    c.fillStyle = C.text; c.beginPath(); c.arc(X(A), Y(mv), 5, 0, Math.PI * 2); c.fill();
+    c.font = `700 11px ${mono}`;
+    c.textAlign = X(A) > x1 - 70 ? "right" : "left";
+    c.fillText(`~${fmtMoney(mv)}`, X(A) + (c.textAlign === "right" ? -9 : 9), Y(mv) - 7);
+  }
+
+  const slD = slider({
+    label: "Defect rate", min: 0.02, max: 2, value: D0, log: true,
+    round: (v) => roundSig(v, 2),
+    fmt: (v) => `${fmtNum(v, 2)} per cm²`,
+    ticks: [{ v: 0.02, label: "0.02" }, { v: 0.1, label: "mature" }, { v: 0.5, label: "new" }, { v: 2, label: "2" }],
+    onInput: (v) => { D0 = v; update(); },
+  });
+  const slA = slider({
+    label: "Chip area", min: 20, max: 858, value: A, log: true,
+    round: (v) => (v >= 850 ? 858 : Math.round(v / (v < 100 ? 5 : 10)) * (v < 100 ? 5 : 10)),
+    fmt: (v) => `${fmtInt(v)} mm²`,
+    ticks: [{ v: 20, label: "20" }, { v: 100, label: "phone chip" }, { v: 814, label: "H100" }],
+    onInput: (v) => { A = v; update(); },
+  });
+  const bNew = button("New wafer", () => { seed++; reroll(); update(); }, { icon: "dice", small: true });
+  root.append(h("div", { class: "ctl-row" }, slD.el, slA.el, h("div", { class: "btn-row" }, bNew)));
+  const roGross = readout("Whole chips");
+  const roGood = readout("Working");
+  const roYield = readout("Yield");
+  const roCost = readout("Cost per working chip");
+  root.append(h("div", { class: "readouts" }, roGross.el, roGood.el, roYield.el, roCost.el));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  function update() {
+    sim = simulate();
+    const y = sim.whole ? sim.good / sim.whole : 0;
+    roGross.set(fmtInt(sim.whole), "", "per 300 mm wafer");
+    roGood.set(fmtInt(sim.good), "", `${fmtInt(sim.defects.length)} defects landed`);
+    roYield.set(Math.round(y * 100), "%", `model: ~${Math.round(yieldModel(A, D0) * 100)}%`);
+    if (sim.good) { roCost.set(fmtMoney(COST / sim.good)); roCost.state("hi"); }
+    else { roCost.set("no chips"); roCost.state("bad"); }
+    const a2 = Math.min(858, A * 2);
+    const ratio = costModel(a2, D0) / costModel(A, D0);
+    status.innerHTML = a2 > A
+      ? `At this defect rate, going from ${fmtInt(A)} to ${fmtInt(a2)} mm² multiplies the cost of each working chip by about <b>${fmtNum(ratio, 2)}×</b>, not 2×: fewer chips fit, and each is more likely to catch a defect.`
+      : `This is the biggest chip one exposure can print (~858 mm²). Anything larger has to be built from several dies.`;
+    draw();
+  }
+  Actions.wafer = (arg) => {
+    if (arg === "double") {
+      slD.set(0.1, false); D0 = 0.1;
+      slA.set(400, true);
+      setTimeout(() => slA.set(800, true), 1100);
+    }
+  };
+  Theme.on(draw);
+  update();
+});
+
+/* ---- l04-chips.js ---- */
+/* =====================================================================
+   Layer 4 · Chips — (a) CPU vs GPU race, (b) the memory wall.
+   ===================================================================== */
+
+/* ---------- (a) CPU vs GPU ---------- */
+defineMount("race", (root) => {
+  const CPU = { cores: 16, cost: 1, launch: 0, name: "CPU", sub: "16 fast cores" };
+  const GPU = { cores: 1024, cost: 4, launch: 200, name: "GPU", sub: "1,024 simple cores" };
+  let N = 32;
+  let clock = 0; // simulated time units elapsed
+  let running = false, finished = false;
+  let rate = 1; // time units per second of animation
+
+  const total = (P) => P.launch + Math.ceil((N * N) / P.cores) * N * P.cost;
+  /* completion time of output cell k on processor P */
+  const doneAt = (P, k) => P.launch + (Math.floor(k / P.cores) + 1) * N * P.cost;
+  const startAt = (P, k) => P.launch + Math.floor(k / P.cores) * N * P.cost;
+
+  let L = {};
+  const stage = new Stage(root, {
+    label: "Two grids filling in as a CPU and a GPU compute each cell of a matrix product.",
+    height: (w) => (w >= 560 ? clamp(w * 0.52, 300, 380) : clamp(w * 1.6, 520, 640)),
+    onResize: (w, hh) => {
+      const wide = w >= 560;
+      const pw = wide ? (w - 24) / 2 : w;
+      const ph = wide ? hh : hh / 2 - 6;
+      L = { panels: [{ P: CPU, x: 0, y: 0, w: pw, h: ph }, { P: GPU, x: wide ? pw + 24 : 0, y: wide ? 0 : ph + 12, w: pw, h: ph }] };
+    },
+    draw: () => draw(),
+  });
+
+  function tick(dt) {
+    if (running) {
+      clock += dt * rate;
+      const end = Math.max(total(CPU), total(GPU));
+      if (clock >= end) { clock = end; running = false; finished = true; bRace.setLabel("Race again", "play"); showResult(); }
+    }
+    draw();
+  }
+
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !L.panels) return;
+    stage.clear();
+    const mono = Theme.mono;
+    for (const pan of L.panels) {
+      const { P, x, y, w, h: ph } = pan;
+      const T = total(P);
+      const acc = P === CPU ? C.l3 : C.l4;
+      const isDone = clock >= T;
+      // header
+      c.textAlign = "left"; c.fillStyle = C.text; c.font = `700 15px ${Theme.body}`;
+      c.fillText(P.name, x + 2, y + 16);
+      c.fillStyle = C.muted; c.font = `500 12px ${Theme.body}`;
+      c.fillText(P.sub, x + 2 + c.measureText(P.name).width * 1.25 + 10, y + 16);
+      c.textAlign = "right"; c.font = `700 13px ${mono}`;
+      c.fillStyle = isDone ? (winner() === P ? C.good : C.text) : C.muted;
+      c.fillText(`${fmtInt(Math.min(clock, T))} ticks${isDone ? " ✓" : ""}`, x + w - 2, y + 16);
+      // grid
+      const gpuCw = Math.min(5, (w - 20) / 64);
+      const coresH = P === CPU ? Math.min(22, (w - 20) / 16 - 3) : 16 * gpuCw * 0.9;
+      const gs = Math.min(w - 4, ph - 28 - 12 - coresH - 22);
+      const gx = x + (w - gs) / 2, gy = y + 28;
+      const cs = gs / N;
+      c.fillStyle = C.sunk; c.fillRect(gx, gy, gs, gs);
+      const inLaunch = clock < P.launch;
+      for (let k = 0; k < N * N; k++) {
+        const i = k % N, j = Math.floor(k / N);
+        const t0 = startAt(P, k), t1 = doneAt(P, k);
+        let f = clamp((clock - t0) / (t1 - t0), 0, 1);
+        if (f <= 0) continue;
+        c.fillStyle = f >= 1 ? acc : rgba(acc, 0.25 + 0.5 * f);
+        const g = cs > 4 ? 0.8 : 0;
+        c.fillRect(gx + i * cs + g, gy + j * cs + g, cs - g * 2, cs - g * 2);
+      }
+      if (inLaunch && running) {
+        c.fillStyle = rgba(C.bg, 0.6); c.fillRect(gx, gy, gs, gs);
+        c.fillStyle = C.text; c.textAlign = "center"; c.font = `600 12px ${mono}`;
+        c.fillText("starting the job…", gx + gs / 2, gy + gs / 2);
+      }
+      // cores strip
+      const cy = gy + gs + 12;
+      const busyCount = clock < P.launch || clock >= T ? 0 : Math.min(P.cores, N * N - Math.floor((clock - P.launch) / (N * P.cost)) * P.cores);
+      if (P === CPU) {
+        const cw = Math.min(22, (w - 20) / 16 - 3);
+        const tot = 16 * (cw + 3);
+        for (let k = 0; k < 16; k++) {
+          c.fillStyle = k < busyCount ? acc : rgba(C.text, 0.12);
+          roundRect(c, x + (w - tot) / 2 + k * (cw + 3), cy, cw, cw, 3); c.fill();
+        }
+      } else {
+        const cols = 64, rows = 16;
+        const cw = Math.min(5, (w - 20) / cols);
+        const tot = cols * cw;
+        for (let k = 0; k < cols * rows; k++) {
+          c.fillStyle = k < busyCount ? acc : rgba(C.text, 0.12);
+          c.fillRect(x + (w - tot) / 2 + (k % cols) * cw, cy + Math.floor(k / cols) * cw * 0.9, cw - 1, cw * 0.9 - 1);
+        }
+      }
+      c.fillStyle = C.faint; c.font = `600 10px ${mono}`; c.textAlign = "center";
+      c.fillText(running || finished ? `${busyCount} of ${fmtInt(P.cores)} cores busy` : `${fmtInt(P.cores)} cores`, x + w / 2, cy + coresH + 14);
+    }
+  }
+  const winner = () => (total(CPU) <= total(GPU) ? CPU : GPU);
+
+  const seg = segmented({
+    label: "Matrix size",
+    options: [8, 16, 32, 64].map((v) => ({ value: v, label: `${v}×${v}` })),
+    value: N,
+    onChange: (v) => { N = v; clock = 0; finished = false; running = false; bRace.setLabel("Race", "play"); status.innerHTML = describe(); draw(); },
+  });
+  const bRace = button("Race", () => {
+    clock = 0; finished = false; running = true;
+    rate = Math.max(total(CPU), total(GPU)) / 3.2;
+    bRace.setLabel("Racing…", "play");
+    status.innerHTML = describe();
+    Loop.wake();
+  }, { kind: "primary", icon: "play" });
+  root.append(h("div", { class: "ctl-row" }, seg.el, h("div", { class: "btn-row" }, bRace)));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  function describe() {
+    const cells = N * N;
+    return `An ${N}×${N} answer has <b>${fmtInt(cells)} cells</b>, each a sum of ${N} multiplications. The CPU does 16 at a time; the GPU could do 1,024 at a time${cells < 1024 ? `, but only ${fmtInt(cells)} exist` : ""}.`;
+  }
+  function showResult() {
+    const a = total(CPU), b = total(GPU);
+    const w = winner();
+    const r = w === CPU ? b / a : a / b;
+    status.innerHTML = w === CPU
+      ? `<b>The CPU wins by ${fmtNum(r, 2)}×.</b> Starting a GPU job costs time, and there isn't enough work to keep its cores busy. Try a bigger matrix.`
+      : `<b>The GPU wins by ${fmtNum(r, 2)}×.</b> ${N >= 64 ? "The bigger the job, the bigger its lead: real AI matrices have thousands of rows." : "Try an even bigger matrix."}`;
+    Announcer(status.textContent);
+  }
+
+  Actions.race = (arg) => {
+    if (arg === "small") { seg.set(8, true); setTimeout(() => bRace.click(), 250); }
+  };
+  status.innerHTML = describe();
+  Theme.on(draw);
+  Loop.add(stage.canvas, tick, () => running);
+});
+
+/* ---------- (b) the memory wall ---------- */
+defineMount("wall", (root) => {
+  const WORK = [
+    { v: 1, label: "Chat, 1 user", note: "one user: each weight read from memory is used once" },
+    { v: 32, label: "32 users", note: "32 users share every weight read" },
+    { v: 256, label: "256 users", note: "256 users share every weight read" },
+    { v: 1000, label: "Training", note: "big training batches reuse each byte many times" },
+  ];
+  let bw = 3.35; // TB/s
+  let peakMul = 1; // × 1,000 TFLOPS
+  let I = 1; // operations per byte
+  const peak = () => 1000 * peakMul;
+  const achieved = () => Math.min(peak(), bw * I);
+  const util = () => achieved() / peak();
+
+  const tiles = Array.from({ length: 64 }, () => ({ on: 0, t: Math.random() }));
+  const parts = [];
+  const R = rng(3);
+  let L = {};
+  const stage = new Stage(root, {
+    label: "Memory stacks feed a pipe of data into a grid of compute units; units light up only when data arrives.",
+    height: (w) => (w >= 560 ? clamp(w * 0.62, 340, 430) : clamp(w * 1.3, 440, 560)),
+    onResize: (w, hh) => {
+      const wide = w >= 560;
+      const chipH = wide ? hh * 0.52 : hh * 0.5;
+      L = { wide, chip: { x: 0, y: 0, w, h: chipH }, chart: { x: 0, y: chipH + 16, w, h: hh - chipH - 16 } };
+      parts.length = 0;
+    },
+    draw: () => draw(0),
+  });
+
+  function tick(dt) {
+    const u = util();
+    // particles: rate ∝ bandwidth
+    const want = Math.round(clamp(8 + 26 * Math.log2(bw + 1), 8, 150));
+    if (!reducedMotion()) {
+      while (parts.length < want) parts.push({ s: R(), lane: R() });
+      if (parts.length > want) parts.length = want;
+      const sp = 0.35 + 0.25 * Math.log2(bw + 1);
+      for (const p of parts) { p.s += dt * sp * 0.5; if (p.s > 1) { p.s -= 1; p.lane = R(); } }
+      for (const t of tiles) {
+        t.t -= dt;
+        if (t.t <= 0) { t.on = R() < u ? 1 : 0; t.t = 0.15 + R() * 0.25; }
+      }
+    } else {
+      tiles.forEach((t, i) => (t.on = i / tiles.length < u ? 1 : 0));
+      if (!parts.length) for (let i = 0; i < want; i++) parts.push({ s: R(), lane: R() });
+    }
+    draw(dt);
+  }
+
+  function draw() {
+    const c = stage.ctx, C = Theme.c;
+    if (!stage.w || !L.chip) return;
+    stage.clear();
+    const acc = C.l4, dat = C.l6, mono = Theme.mono;
+    const K = L.chip;
+    // memory stacks
+    const memW = Math.min(K.w * 0.2, 110), memX = K.x + 6;
+    const stacks = 4, gridS0 = Math.min(K.h - 30, K.w * 0.36), sh = gridS0 / stacks;
+    c.textAlign = "left"; c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    c.fillText("MEMORY (HBM)", memX, K.y + 12);
+    for (let s = 0; s < stacks; s++) {
+      const y = K.y + 22 + s * sh;
+      for (let l = 0; l < 6; l++) {
+        c.fillStyle = rgba(dat, 0.25 + l * 0.08);
+        roundRect(c, memX + l * 1.5, y + l * ((sh - 14) / 8), memW - 12, (sh - 14) / 8 - 1, 2); c.fill();
+      }
+    }
+    // compute grid
+    const gridS = Math.min(K.h - 30, K.w * 0.36);
+    const gx = K.x + K.w - gridS - 6, gy = K.y + 22;
+    c.fillStyle = C.muted; c.textAlign = "left";
+    c.fillText(`MATH UNITS${peakMul > 1 ? " (2× FASTER)" : ""}`, gx, K.y + 12);
+    const n = 8, ts = gridS / n;
+    tiles.forEach((t, i) => {
+      const x = gx + (i % n) * ts, y = gy + Math.floor(i / n) * ts;
+      c.fillStyle = t.on ? acc : rgba(C.text, 0.08);
+      if (t.on) { c.shadowColor = acc; c.shadowBlur = 8; }
+      roundRect(c, x + 2, y + 2, ts - 4, ts - 4, 3); c.fill();
+      c.shadowBlur = 0;
+    });
+    // pipe
+    const px0 = memX + memW, px1 = gx - 8;
+    const pipeH = clamp(4 + 9 * Math.log2(bw + 1), 5, gridS * 0.8);
+    const py = gy + gridS / 2;
+    c.fillStyle = rgba(dat, 0.12);
+    roundRect(c, px0, py - pipeH / 2, px1 - px0, pipeH, pipeH / 2); c.fill();
+    c.strokeStyle = rgba(dat, 0.45); c.lineWidth = 1;
+    roundRect(c, px0, py - pipeH / 2, px1 - px0, pipeH, pipeH / 2); c.stroke();
+    for (const p of parts) {
+      c.fillStyle = dat;
+      c.beginPath(); c.arc(lerp(px0 + 4, px1 - 4, p.s), py - pipeH / 2 + 3 + p.lane * (pipeH - 6), 2.2, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = C.text; c.textAlign = "center"; c.font = `700 12px ${mono}`;
+    c.fillText(`${fmtNum(bw, 3)} TB/s`, (px0 + px1) / 2, py - pipeH / 2 - 8);
+    c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    const uu = util() * 100;
+    c.fillText(`${uu < 1 ? fmtNum(uu, 1) : Math.round(uu)}% ${gridS > 170 ? "OF MATH UNITS " : ""}BUSY`, gx + gridS / 2, gy + gridS + 14);
+
+    drawRoof(c, C, mono);
+  }
+
+  function drawRoof(c, C, mono) {
+    const R2 = L.chart;
+    const pl = 46, pr = 12, pt = 20, pb = 30;
+    const x0 = R2.x + pl, x1 = R2.x + R2.w - pr, y0 = R2.y + R2.h - pb, y1 = R2.y + pt;
+    const IMIN = 0.25, IMAX = 4096, FMIN = 0.1, FMAX = 5000;
+    const X = (i) => lerp(x0, x1, invLerp(Math.log(IMIN), Math.log(IMAX), Math.log(i)));
+    const Y = (f) => lerp(y0, y1, invLerp(Math.log(FMIN), Math.log(FMAX), Math.log(clamp(f, FMIN, FMAX))));
+    c.textAlign = "left"; c.fillStyle = C.muted; c.font = `600 10px ${mono}`;
+    c.fillText("SPEED (TRILLION OPS/S) VS OPERATIONS PER BYTE READ", R2.x, R2.y + 8);
+    c.font = `500 10px ${mono}`;
+    for (const f of [1, 10, 100, 1000]) {
+      c.strokeStyle = C.line; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, Y(f)); c.lineTo(x1, Y(f)); c.stroke();
+      c.fillStyle = C.faint; c.textAlign = "right"; c.fillText(fmtInt(f), x0 - 6, Y(f) + 3);
+    }
+    c.textAlign = "center";
+    for (const i of [1, 4, 16, 64, 256, 1024, 4096]) { c.fillStyle = C.faint; c.fillText(String(i), X(i), y0 + 14); }
+    // roof
+    const ridge = peak() / bw;
+    c.strokeStyle = C.l4; c.lineWidth = 2.5;
+    c.beginPath(); c.moveTo(X(IMIN), Y(bw * IMIN)); c.lineTo(X(Math.min(ridge, IMAX)), Y(Math.min(peak(), bw * IMAX))); if (ridge < IMAX) c.lineTo(X(IMAX), Y(peak())); c.stroke();
+    c.fillStyle = C.faint; c.textAlign = "left";
+    if (ridge > IMIN && ridge < IMAX) {
+      c.setLineDash([2, 3]); c.strokeStyle = rgba(C.text, 0.3); c.lineWidth = 1;
+      c.beginPath(); c.moveTo(X(ridge), Y(peak())); c.lineTo(X(ridge), y0); c.stroke(); c.setLineDash([]);
+      c.fillText("memory-bound ←", Math.max(x0 + 2, X(ridge) - 108), y0 - 6);
+      if (X(ridge) + 110 < x1) c.fillText("→ compute-bound", X(ridge) + 4, y0 - 6);
+    }
+    // workload markers
+    for (const wk of WORK) {
+      c.fillStyle = wk.v === I ? C.text : C.faint;
+      c.beginPath(); c.moveTo(X(wk.v), y0 + 2); c.lineTo(X(wk.v) - 4, y0 + 8); c.lineTo(X(wk.v) + 4, y0 + 8); c.fill();
+    }
+    // operating point
+    const a = achieved();
+    c.fillStyle = C.text; c.beginPath(); c.arc(X(I), Y(a), 6, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = C.l4; c.lineWidth = 2; c.stroke();
+    c.font = `700 11px ${mono}`;
+    c.textAlign = X(I) > x1 - 90 ? "right" : "left";
+    c.fillText(`${fmtNum(a, 3)} TFLOPS`, X(I) + (c.textAlign === "right" ? -10 : 10), Y(a) - 8);
+  }
+
+  const slBW = slider({
+    label: "Memory bandwidth", min: 0.5, max: 16, value: bw, log: true,
+    round: (v) => { for (const s of [0.9, 2, 3.35, 8]) if (Math.abs(Math.log(v / s)) < 0.04) return s; return roundSig(v, 2); },
+    fmt: (v) => `${fmtNum(v, 3)} TB/s`,
+    ticks: [{ v: 0.5, label: "0.5" }, { v: 0.9, label: "2017" }, { v: 3.35, label: "H100" }, { v: 8, label: "B200" }, { v: 16, label: "16" }],
+    onInput: (v) => { bw = v; update(); },
+  });
+  const segW = segmented({
+    label: "Workload",
+    options: WORK.map((w) => ({ value: w.v, label: w.label })),
+    value: I,
+    onChange: (v) => { I = v; update(); },
+  });
+  const segP = segmented({
+    label: "Math speed",
+    options: [{ value: 1, label: "1×" }, { value: 2, label: "2×" }],
+    value: 1,
+    onChange: (v) => { peakMul = v; update(); },
+  });
+  root.append(h("div", { class: "ctl-row" }, slBW.el), h("div", { class: "ctl-row" }, segW.el, segP.el));
+  const roA = readout("Achieved");
+  const roU = readout("Math units busy");
+  const roB = readout("Limited by");
+  const roT = readout("70B model, tokens/s");
+  root.append(h("div", { class: "readouts" }, roA.el, roU.el, roB.el, roT.el));
+  const status = h("p", { class: "status", "aria-live": "polite" });
+  root.append(status);
+
+  function update() {
+    const a = achieved(), u = util();
+    roA.set(fmtNum(a, 3), " TFLOPS");
+    roU.set(u < 0.01 ? fmtNum(u * 100, 1) : Math.round(u * 100), "%"); roU.state(u < 0.25 ? "bad" : u > 0.95 ? "good" : null);
+    const memBound = bw * I < peak();
+    roB.set(memBound ? "Memory" : "Math"); roB.state(memBound ? "bad" : "good");
+    if (I <= 256) {
+      // 70B params at 16-bit = 140 GB read per decode step; each step makes one token per user
+      const steps = Math.min((bw * 1e12) / 140e9, (peak() * 1e12) / (2 * 70e9 * I));
+      roT.set(fmtInt(steps * I), "", I === 1 ? "for one user" : `${fmtInt(steps)} per user`);
+    } else roT.set("—", "", "not generating text");
+    const wk = WORK.find((w) => w.v === I);
+    status.innerHTML = memBound && u > 0.7
+      ? `<b>Nearly balanced:</b> ${wk.note}, which almost keeps up with the math units. They're busy ${Math.round(u * 100)}% of the time.`
+      : memBound
+      ? `<b>Memory-bound:</b> ${wk.note}, so the math units wait. ${peakMul > 1 ? "Doubling the math speed changed nothing." : "Faster math wouldn't help here; more bandwidth or more reuse would."}`
+      : `<b>Compute-bound:</b> ${wk.note}, so data arrives faster than the math units can use it. ${peakMul > 1 ? "Here, doubling the math speed does help." : "Only faster math would speed this up."}`;
+    Loop.wake();
+  }
+  Actions.wall = (arg) => {
+    if (arg === "chat") { segW.set(1, true); slBW.set(3.35, true); segP.set(1, true); setTimeout(() => segP.set(2, true), 1200); }
+  };
+  Theme.on(() => draw());
+  Loop.add(stage.canvas, tick);
+  update();
+});
+
+/* ---- zz-boot.js ---- */
 /* =====================================================================
    Boot: mount every figure, then wire navigation.
    ===================================================================== */

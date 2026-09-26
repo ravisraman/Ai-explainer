@@ -389,7 +389,7 @@ h1 { margin-top: 18px; }
 
 .seg {
   display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px;
-  background: var(--sunk); border: 1px solid var(--line); border-radius: 999px;
+  background: var(--sunk); border: 1px solid var(--line); border-radius: 22px;
   max-width: 100%;
 }
 .seg button {
@@ -629,3 +629,26 @@ h1 { margin-top: 18px; }
 
 .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 @media (min-width: 1180px) { .theme-btn-m { display: none; } }
+
+/* ---------- L1 power meter ---------- */
+.powerbar { margin-top: 14px; }
+.pb-title { font: 600 0.66rem/1.25 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.pb-track { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunk); gap: 2px; }
+.pb-seg { height: 100%; transition: width 0.5s ease; }
+.pb-it, i.pb-it { background: var(--l1); }
+.pb-cool, i.pb-cool { background: var(--l6); }
+.pb-other, i.pb-other { background: var(--faint); }
+.pb-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; font-size: 0.8rem; color: var(--muted); }
+.pb-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+/* stepper */
+.ctl-stp { flex: 0 0 auto; }
+.stp { display: inline-flex; align-items: center; background: var(--sunk); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.stp-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--raised); cursor: pointer;
+  display: grid; place-items: center; padding: 0; color: var(--text);
+}
+.stp-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.stp-btn:hover:not(:disabled) { background: var(--c); color: var(--on-accent); }
+.stp-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.stp-val { min-width: 2.6em; text-align: center; font: 600 1rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }

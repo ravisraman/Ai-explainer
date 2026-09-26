@@ -94,6 +94,9 @@ const Theme = {
     for (const k of keys) this.c[k] = cs.getPropertyValue("--" + k).trim();
     for (let i = 1; i <= 10; i++) this.c["l" + i] = cs.getPropertyValue("--l" + i).trim();
     this.dark = cs.getPropertyValue("--is-dark").trim() !== "0";
+    this.mono = cs.getPropertyValue("--font-mono").trim();
+    this.body = cs.getPropertyValue("--font-body").trim();
+    this.display = cs.getPropertyValue("--font-display").trim();
   },
   on(fn) { this.fns.add(fn); },
   changed() {
@@ -172,9 +175,10 @@ class Stage {
     this.w = 0;
     this.h = 0;
     this.dpr = 1;
+    /* The observer's first callback does the initial sizing, after the
+       figure's own setup code has finished running. */
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(this.wrap);
-    this.resize();
   }
   resize() {
     const w = Math.round(this.wrap.clientWidth);
@@ -430,6 +434,31 @@ function button(label, onClick, opts = {}) {
   setLabel(label, opts.icon);
   b.setLabel = setLabel;
   return b;
+}
+
+/* stepper({ label, value, min, max, fmt, onChange }) -> compact − value + control */
+function stepper(o) {
+  let value = o.value;
+  const val = h("output", { class: "stp-val" });
+  const minus = h("button", { type: "button", class: "stp-btn", "aria-label": `Fewer ${o.label.toLowerCase()}`, html: ICONS.minus });
+  const plus = h("button", { type: "button", class: "stp-btn", "aria-label": `More ${o.label.toLowerCase()}`, html: ICONS.plus });
+  const el = h("div", { class: "ctl ctl-stp" }, h("span", { class: "ctl-label" }, o.label), h("div", { class: "stp" }, minus, val, plus));
+  const paint = () => {
+    val.textContent = o.fmt ? o.fmt(value) : String(value);
+    minus.disabled = value <= o.min;
+    plus.disabled = value >= o.max;
+  };
+  const change = (d) => {
+    const v = clamp(value + d, o.min, o.max);
+    if (v === value) return;
+    value = v;
+    paint();
+    if (o.onChange) o.onChange(v, d);
+  };
+  minus.addEventListener("click", () => change(-1));
+  plus.addEventListener("click", () => change(1));
+  paint();
+  return { el, get value() { return value; }, set(v) { value = v; paint(); } };
 }
 
 /* readout(label, { unit, sub, cls }) -> { el, set(text, unit?, sub?) } */
