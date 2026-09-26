@@ -36,7 +36,7 @@ defineMount("journey", (root) => {
     { n: 1, dir: "down", title: "Electricity in, heat out", text: () => `The server draws ~10 kW. Split across the batch, your share is ~${fmtInt(share)} W, plus ~20% for cooling. Every watt ends up as heat.`, add: () => ({ wh: wh(prefillTime() + QUEUE) }) },
     { n: 9, dir: "up", title: "Writing the answer, one token at a time", text: () => `Now “decode”: ${fmtInt(pr().tout)} tokens, each a full pass through all 80 layers, at about ${TPS} tokens per second${pr().tout > 3000 ? ". Most of these are hidden “reasoning” tokens you never see" : ""}.`, add: () => ({ ops: decodeOps(), t: decodeTime(), tokens: pr().tout, wh: wh(decodeTime()) }) },
     { n: 6, dir: "up", title: "Numbers back to words", text: () => "Each token ID is turned back into text as soon as it's chosen, so the answer can stream.", add: () => ({}) },
-    { n: 10, dir: "up", title: "The answer appears", text: () => pr().answer, answer: true, add: () => ({ t: NET }) },
+    { n: 10, dir: "up", title: "The answer appears", text: () => `Back through the app and across the network, the words stream onto your screen. The whole round trip took about ${fmtDur(NET * 2 + QUEUE + prefillTime() + decodeTime())}:`, answer: true, add: () => ({ t: NET }) },
   ];
   let i = 0, playing = false, dwell = 0, anim = 1;
   let shown = { t: 0, ops: 0, wh: 0, tokens: 0 };

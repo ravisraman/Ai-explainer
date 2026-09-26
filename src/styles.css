@@ -443,7 +443,7 @@ h1 { margin-top: 18px; }
   font: 600 1.3rem/1.15 var(--font-mono); font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.ro-unit { font-size: 0.72em; color: var(--muted); margin-left: 2px; }
+.ro-unit { display: inline-block; font-size: 0.72em; color: var(--muted); margin-left: 2px; }
 .ro-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; line-height: 1.35; }
 .ro.hi .ro-val { color: var(--c); }
 .ro.bad .ro-val { color: var(--bad); }

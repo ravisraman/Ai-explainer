@@ -268,7 +268,9 @@ defineMount("power", (root) => {
     }
     c.fillStyle = C.muted; c.font = `600 10px ${mono}`; c.textAlign = "left";
     c.fillText("POWER PLANTS", 6, 12);
-    c.fillText("DATA CENTER", g.bld.x + 8, g.bld.y + 13);
+    const dw = c.measureText("DATA CENTER").width;
+    c.fillStyle = rgba(C.panel, 0.9); c.fillRect(g.bld.x + 4, g.bld.y + 3, dw + 8, 14);
+    c.fillStyle = C.muted; c.fillText("DATA CENTER", g.bld.x + 8, g.bld.y + 13);
   }
 
   function drawPlant(c, C, p, u, on) {
