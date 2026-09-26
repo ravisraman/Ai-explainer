@@ -350,7 +350,7 @@ hardware ends and software begins.
 - Each section sets `--c` to its hue; headings, slider thumbs, active pills, chart marks and particles
   in that section use it.
 - **Type:** *Archivo* at expanded width and heavy weight for display (layer names read like equipment
-  nameplates) · *Atkinson Hyperlegible Next* for body (designed for legibility, good on dark glass) ·
+  nameplates) · *Instrument Sans* for body (a clean, slightly narrow grotesque that stays legible at small sizes) ·
   *Atkinson Hyperlegible Mono* for readouts, tick labels and spec plates.
 - **Control language (learned once):** range sliders with a hue-filled track and a large ringed thumb,
   label left and live mono readout right; segmented pills for either/or choices; filled button = primary
