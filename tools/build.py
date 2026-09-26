@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build the single-file page.
 
-Inlines src/styles.css, src/body.html and src/js/*.js (in filename order) into
-index.html. Data files in src/data are injected wherever the JS contains the
+Inlines src/styles.css (then src/css/*.css), src/body.html and src/js/*.js
+(each in filename order) into index.html. Data files in src/data are injected wherever the JS contains the
 string literal "@DATA:<filename>".
 
     python3 tools/build.py                  # writes index.html
@@ -35,9 +35,18 @@ def js_bundle():
     return re.sub(r'"@DATA:([\w.-]+)"', inject, js)
 
 
+def css_bundle():
+    parts = [read("styles.css")]
+    css_dir = SRC / "css"
+    if css_dir.is_dir():
+        for f in sorted(css_dir.glob("*.css")):
+            parts.append(f"/* ---- css/{f.name} ---- */\n{f.read_text(encoding='utf-8')}")
+    return "\n".join(parts)
+
+
 def build():
     head = read("head.html").strip()
-    css = read("styles.css")
+    css = css_bundle()
     body = read("body.html").strip()
     js = js_bundle()
     style = f"<style>\n{css}\n</style>"
