@@ -31,7 +31,7 @@
     --bg:#f3f2f7; --surface:#ffffff; --surface-2:#eceaf2; --line:#dcd8e5; --line-strong:#bfb9cd;
     --text:#17151e; --text-2:#34303f; --muted:#5f596d;
     --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
-    --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#0075b8;
+    --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#00679f;
     --on-accent:#ffffff; --glow-mix: 11%;
     --shadow: 0 1px 2px rgba(23,18,40,.05), 0 18px 36px -24px rgba(23,18,40,.28);
   }
@@ -41,7 +41,7 @@
   --bg:#f3f2f7; --surface:#ffffff; --surface-2:#eceaf2; --line:#dcd8e5; --line-strong:#bfb9cd;
   --text:#17151e; --text-2:#34303f; --muted:#5f596d;
   --l1:#a44f00; --l2:#b13f00; --l3:#b63613; --l4:#b52f48; --l5:#ab3276;
-  --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#0075b8;
+  --l6:#943fa2; --l7:#774cbc; --l8:#5658c8; --l9:#1c65c8; --l10:#00679f;
   --on-accent:#ffffff; --glow-mix: 11%;
   --shadow: 0 1px 2px rgba(23,18,40,.05), 0 18px 36px -24px rgba(23,18,40,.28);
 }
@@ -213,8 +213,9 @@ details[open] > .body{animation:fadeUp .35s ease both}
 .cool-bar{display:flex;gap:2px;height:46px;margin-top:22px;border-radius:8px;overflow:hidden}
 .cool-seg{flex:0 1 0;min-width:4px;transition:flex-grow .7s cubic-bezier(.2,.8,.2,1)}
 /* scale explorer */
-.scale-body{display:grid;gap:18px;align-items:center}
-@media (min-width:720px){ .scale-body{grid-template-columns:1.1fr 1fr;gap:32px} }
+.scale-body{display:grid;gap:18px;align-items:center;grid-template-areas:"pic" "ctl" "info"}
+.scale-pic{grid-area:pic}.scale-controls{grid-area:ctl}.scale-info{grid-area:info}
+@media (min-width:720px){ .scale-body{grid-template-columns:1.1fr 1fr;gap:20px 32px;grid-template-areas:"pic info" "ctl ctl"} }
 .scale-pic{border-radius:14px;background:var(--bg);padding:12px;border:1px solid var(--line)}
 .scale-svg{width:100%;height:auto;display:block;max-height:280px}
 .scale-svg > *{animation:fadeIn .45s ease both}
@@ -226,10 +227,10 @@ details[open] > .body{animation:fadeUp .35s ease both}
 .scale-stats{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0;padding-top:14px;border-top:1px solid var(--line)}
 .scale-stats dt{font:500 12px/1.6 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .scale-stats dd{margin:0;font:600 15px/1.5 var(--font-mono);font-variant-numeric:tabular-nums}
-.scale-controls{margin-top:22px;display:grid;gap:2px}
+.scale-controls{display:grid;gap:4px}
 .scale-ticks{display:none}
 @media (min-width:720px){
-  .scale-ticks{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+  .scale-ticks{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding-inline:44px}
   .scale-ticks button{background:none;border:0;padding:4px 0;font:500 11px/1.2 var(--font-mono);color:var(--muted);cursor:pointer;text-align:center}
   .scale-ticks button.on{color:var(--accent);font-weight:600}
 }
@@ -323,8 +324,6 @@ details[open] > .body{animation:fadeUp .35s ease both}
 .tb-track{height:18px;background:var(--surface-2);border-radius:4px;overflow:hidden}
 .tb-fill{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .3s ease}
 .tb-pct{font:600 13.5px var(--font-mono);text-align:right;font-variant-numeric:tabular-nums}
-.samples{margin:14px 0 0;padding-left:1.5em;display:grid;gap:5px;color:var(--text-2);font-size:.95rem}
-.samples b{color:var(--accent)}
 /* agent loop */
 .agent-grid{display:grid;gap:26px}
 @media (min-width:780px){ .agent-grid{grid-template-columns:1fr 1.1fr;align-items:start} }
@@ -395,6 +394,43 @@ details[open] > .body{animation:fadeUp .35s ease both}
 .limit p{color:var(--text-2);font-size:.98rem}
 .foot{padding-block:40px 32px;border-top:1px solid var(--line);font-size:.88rem;line-height:1.6;color:var(--muted);display:grid;gap:12px}
 .foot h2{font-size:1.15rem;color:var(--text)}
+
+/* decode */
+#decodeFig{--accent:var(--l9)}
+.dc-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px;min-height:40px}
+.dc-lbl{font:500 11.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:4.6rem}
+.dc-tok{font:15px/1 var(--font-mono);padding:8px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--text-2);white-space:pre;transition:background .3s,border-color .3s}
+.dc-tok.in{background:color-mix(in srgb, var(--l6) 20%, transparent);border-color:color-mix(in srgb, var(--l6) 45%, transparent);color:var(--text)}
+.dc-tok.in.now{box-shadow:0 0 0 2px var(--l6)}
+.dc-tok.out{background:color-mix(in srgb, var(--accent) 16%, transparent);border-color:color-mix(in srgb, var(--accent) 40%, transparent);color:var(--text)}
+.dc-tok.feed{box-shadow:0 0 0 2px var(--l6)}
+.dc-tok.new{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);animation:fadeUp .35s ease both}
+.dc-tok.ghost{border-style:dashed;color:var(--muted);background:transparent}
+.dc-cachewrap{display:grid;gap:6px;margin-top:10px}
+.dc-cachelbl{font:500 11.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dc-cache{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;max-width:520px}
+.dc-cache i{height:16px;border-radius:3px;background:var(--surface-2);border:1px solid var(--line);transition:background .3s}
+.dc-cache i.p{background:color-mix(in srgb, var(--l6) 55%, transparent);border-color:transparent}
+.dc-cache i.a{background:color-mix(in srgb, var(--accent) 60%, transparent);border-color:transparent}
+.dc-count{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:14px;font-size:.92rem;color:var(--text-2)}
+.dc-count b{font:700 1.3rem var(--font-display);color:var(--accent);margin-left:6px;font-variant-numeric:tabular-nums}
+.dc-status{margin-top:10px;min-height:3.2em;color:var(--text)}
+/* scale zoom row */
+.zoom-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.btn.icon{width:44px;padding:0;font:600 20px/1 var(--font-mono)}
+/* parallelism */
+.par-grid{display:grid;gap:14px}
+@media (min-width:640px){ .par-grid{grid-template-columns:1fr 1fr} }
+.par{padding:16px;border-radius:14px;background:var(--surface-2);display:grid;gap:8px;align-content:start}
+.par h4{font-size:1.1rem}
+.par p{font-size:.9rem;line-height:1.5;color:var(--text-2)}
+.par-svg{width:100%;max-width:260px;height:auto;display:block}
+/* temperature samples */
+.sample-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.sample-chip{padding:6px 10px;border-radius:999px;background:color-mix(in srgb, var(--accent) 16%, transparent);border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);font-size:.92rem;animation:fadeUp .3s ease both}
+.sample-tally{margin-top:10px;font-size:.9rem;color:var(--text-2)}
+.sample-sentence{margin-top:6px;color:var(--text-2)}
+.sample-sentence b{color:var(--accent)}
 
 /* ================= NAVIGATION ================= */
 .rail{display:none}
@@ -754,7 +790,7 @@ details[open] > .body{animation:fadeUp .35s ease both}
     <div id="parallel" class="par-grid">
       <div class="par"><h4>Data parallel</h4><p>Every group of chips holds a full copy of the model and trains on different data. They average their gradients after each step.</p></div>
       <div class="par"><h4>Tensor parallel</h4><p>Each big matrix is sliced across the GPUs in one rack. They exchange partial results many times per layer, so they need the fastest links.</p></div>
-      <div class="par"><h4>Pipeline parallel</h4><p>Different layers live on different chips, like stations on an assembly line. Batches flow through in waves.</p></div>
+      <div class="par"><h4>Pipeline parallel</h4><p>Different layers live on different chips (say, layers 1–20 on the first), like stations on an assembly line. Batches flow through in waves.</p></div>
       <div class="par"><h4>Expert parallel</h4><p>In mixture-of-experts models, different "expert" sub-networks live on different chips and tokens are routed to them.</p></div>
     </div>
   </figure>
@@ -1002,6 +1038,11 @@ details[open] > .body{animation:fadeUp .35s ease both}
       <p class="breaks"><b>Where it breaks</b> the "notes" aren't words; they are intermediate numbers for every layer. They grow with every token, and eventually their size limits how long a context can be and how many users one chip can serve.</p>
     </aside>
   </div>
+
+  <figure class="figure wide" id="decodeFig">
+    <figcaption class="fig-cap"><b>One token at a time.</b> The first pass reads the whole prompt at once (prefill). Every later pass feeds in just the newest token and looks back at the KV cache (decode). Each pass produces exactly one new token.</figcaption>
+    <div id="decode"></div>
+  </figure>
 
   <figure class="figure wide" id="tempFig">
     <figcaption class="fig-cap"><b>Temperature.</b> The model's next-word probabilities (illustrative numbers). Low temperature sharpens them toward the top choice; high temperature flattens them.</figcaption>
@@ -1322,7 +1363,7 @@ function segmented(options, value, onChange, label) {
     const d = DATA[k];
     d.parts.forEach((p, i) => { segs[i].style.flexGrow = p; items[i].lastChild.textContent = `~${p} W`; });
     bar.setAttribute("aria-label", NAMES.map((n, i) => `${n}: about ${d.parts[i]} watts`).join("; "));
-    readout.innerHTML = `<b>PUE ≈ ${d.pue}.</b> ${d.note} Of every 100 W drawn from the grid, about <b>${d.parts[0]} W</b> reach the computers. <span class="muted">Illustrative split; real sites vary with climate and design.</span>`;
+    readout.innerHTML = `<b>PUE ≈ ${d.pue}</b> <span class="muted">(power usage effectiveness: total power ÷ power reaching the computers)</span>. ${d.note} Of every 100 W drawn from the grid, about <b>${d.parts[0]} W</b> reach the computers. <span class="muted">Illustrative split; real sites vary with climate and design.</span>`;
   }
   root.append(segmented([{ label: "Air-cooled", value: "air" }, { label: "Liquid-cooled", value: "liquid" }], "air", render, "Cooling design"), bar, legend, readout);
   render("air");
@@ -1421,11 +1462,16 @@ function segmented(options, value, onChange, label) {
     const pos = (Math.log10(l.m) - lo) / (hi - lo);
     rMark.style.left = (clamp(pos, 0, 1) * 100) + "%";
     $$("button", ticks).forEach((b, j) => b.classList.toggle("on", j === i));
+    zin.disabled = i === 0; zout.disabled = i === L.length - 1;
     input.setAttribute("aria-valuetext", `${l.name}, ${l.gpus === "—" ? "" : l.gpus + " GPUs, "}${l.power}`);
   }
   input.addEventListener("input", render);
   const info = el("div", { class: "scale-info" }, title, contains, stats);
-  root.append(el("div", { class: "scale-body" }, el("div", { class: "scale-pic" }, svg), info), el("div", { class: "scale-controls" }, el("label", { for: "scaleRange", class: "ctl-label" }, "Zoom: transistor → campus"), input, ticks), ruler,
+  const nudge = d => { input.value = clamp(Number(input.value) + d, 0, L.length - 1); render(); };
+  const zin = el("button", { type: "button", class: "btn icon", "aria-label": "Zoom in one level", onclick: () => nudge(-1) }, "−");
+  const zout = el("button", { type: "button", class: "btn icon", "aria-label": "Zoom out one level", onclick: () => nudge(1) }, "+");
+  root.append(el("div", { class: "scale-body" }, el("div", { class: "scale-pic" }, svg),
+    el("div", { class: "scale-controls" }, el("label", { for: "scaleRange", class: "ctl-label" }, "Zoom: transistor → campus"), el("div", { class: "zoom-row" }, zin, input, zout), ticks), info), ruler,
     el("p", { class: "note" }, "Example based on NVIDIA GB200 NVL72 systems; building and campus sizes are typical of large 2025–26 AI sites and vary widely. All counts approximate."));
   render();
 })();
@@ -1843,8 +1889,8 @@ function segmented(options, value, onChange, label) {
     chart.append(el("div", { class: "tb", role: "listitem" }, el("span", { class: "tb-w" }, w), el("span", { class: "tb-track" }, fill), pct));
     return { fill, pct };
   });
-  const samples = el("ol", { class: "samples", "aria-live": "polite" });
-  const sampleBtn = el("button", { type: "button", class: "btn primary" }, "Sample 5 completions");
+  const samples = el("div", { class: "samples", "aria-live": "polite" });
+  const sampleBtn = el("button", { type: "button", class: "btn primary" }, "Sample 10 next words");
   function render() {
     const T = Number(slider.value);
     out.textContent = T.toFixed(2);
@@ -1861,10 +1907,13 @@ function segmented(options, value, onChange, label) {
   }
   function sample() {
     const p = probs(Number(slider.value));
-    samples.replaceChildren(...Array.from({ length: 5 }, () => {
-      let r = Math.random(), i = 0; while (i < p.length - 1 && r >= p[i]) { r -= p[i]; i++; }
-      return el("li", {}, prompt + " ", el("b", {}, C[i][0]), ".");
-    }));
+    const picks = Array.from({ length: 10 }, () => { let r = Math.random(), i = 0; while (i < p.length - 1 && r >= p[i]) { r -= p[i]; i++; } return i; });
+    const counts = {}; picks.forEach(i => { counts[i] = (counts[i] || 0) + 1; });
+    const tally = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([i, n]) => `${C[i][0]} ×${n}`).join(" · ");
+    samples.replaceChildren(
+      el("div", { class: "sample-chips" }, picks.map((i, k) => el("span", { class: "sample-chip", style: `animation-delay:${k * 40}ms` }, C[i][0]))),
+      el("p", { class: "sample-tally" }, el("span", { class: "ctl-label" }, "Tally "), tally),
+      el("p", { class: "sample-sentence" }, prompt + " ", el("b", {}, C[picks[0]][0]), "."));
   }
   slider.addEventListener("input", render);
   sampleBtn.addEventListener("click", sample);
@@ -1910,6 +1959,15 @@ function segmented(options, value, onChange, label) {
   const log = el("ol", { class: "trace", "aria-live": "polite" });
   const next = el("button", { type: "button", class: "btn primary" }, "Next step");
   const restart = el("button", { type: "button", class: "btn" }, "Restart");
+  const auto = el("button", { type: "button", class: "btn" }, "▶ Play");
+  let timer = null;
+  const stopAuto = () => { clearInterval(timer); timer = null; auto.textContent = "▶ Play"; };
+  auto.addEventListener("click", () => {
+    if (timer) { stopAuto(); return; }
+    if (i >= TRACE.length - 1) { i = 0; render(); }
+    auto.textContent = "❚❚ Pause";
+    timer = setInterval(() => { if (i >= TRACE.length - 1) { stopAuto(); return; } i++; render(); }, 1300);
+  });
   const count = el("span", { class: "muted small" });
   function render() {
     const shown = TRACE.slice(0, i + 1);
@@ -1922,9 +1980,9 @@ function segmented(options, value, onChange, label) {
     next.disabled = i >= TRACE.length - 1;
     log.scrollTop = log.scrollHeight;
   }
-  next.addEventListener("click", () => { if (i < TRACE.length - 1) { i++; render(); } });
-  restart.addEventListener("click", () => { i = 0; render(); });
-  root.append(el("div", { class: "agent-grid" }, ring, el("div", { class: "agent-log" }, el("p", { class: "ctl-label" }, "Example: a coding agent"), log, el("div", { class: "btn-row" }, next, restart, count))));
+  next.addEventListener("click", () => { stopAuto(); if (i < TRACE.length - 1) { i++; render(); } });
+  restart.addEventListener("click", () => { stopAuto(); i = 0; render(); });
+  root.append(el("div", { class: "agent-grid" }, ring, el("div", { class: "agent-log" }, el("p", { class: "ctl-label" }, "Example: a coding agent"), log, el("div", { class: "btn-row" }, next, auto, restart), el("p", { class: "note" }, count))));
   render();
 })();
 
@@ -2055,6 +2113,70 @@ function segmented(options, value, onChange, label) {
         el("p", {}, "Compute ≈ 2 × active parameters × tokens. Hardware: an accelerator with a peak of 2 × 10¹⁵ 8-bit operations per second, drawing 1.5 kW including its share of the server, network and cooling (roughly H100/B200-class, 2024–26). Reading the prompt (prefill) is assumed to run 3× more efficiently than writing, capped at 60% utilization, because it processes many tokens in parallel."),
         el("p", {}, "Left out: attention's extra cost at very long contexts, prompt caching (which makes repeated input much cheaper), idle capacity kept for traffic spikes, and your device and network. Real deployments can land 2–3× either side of this estimate. With the defaults it gives about 0.3 Wh, in line with 2025 published estimates for a typical query."))));
   render();
+})();
+
+
+/* ---------- 12. Decode: one token per pass ---------- */
+(function decode() {
+  const root = $("#decode"); if (!root) return;
+  const P = ["Why", " is", " the", " sky", " blue", "?"];
+  const A = ["The", " sky", " looks", " blue", " because", " air", " scatters", " blue", " light", " most", "."];
+  let pass = A.length, timer = null; // at rest: show the finished answer
+  const promptRow = el("div", { class: "dc-row" });
+  const answerRow = el("div", { class: "dc-row" });
+  const cache = el("div", { class: "dc-cache", "aria-hidden": "true" });
+  const cacheLbl = el("span", { class: "dc-cachelbl" });
+  const status = el("p", { class: "dc-status", "aria-live": "polite" });
+  const passes = el("b"), toks = el("b");
+  const play = el("button", { type: "button", class: "btn primary" }, "▶ Replay");
+  const step = el("button", { type: "button", class: "btn" }, "Step");
+  const chip = (t, cls) => el("span", { class: "dc-tok " + cls }, t.replace(/^ /, "·"));
+  function render() {
+    const cached = pass === 0 ? 0 : P.length + pass - 1; // the newest output isn't cached until it's fed back in
+    promptRow.replaceChildren(el("span", { class: "dc-lbl" }, "Prompt"), ...P.map(t => chip(t, pass === 1 ? "in now" : pass > 0 ? "in" : "")));
+    answerRow.replaceChildren(el("span", { class: "dc-lbl" }, "Answer"), ...A.slice(0, pass).map((t, i) => chip(t, "out" + (i === pass - 1 ? " new" : "") + (i === pass - 2 && pass > 1 ? " feed" : ""))),
+      ...(pass < A.length ? [el("span", { class: "dc-tok ghost" }, "…")] : []));
+    cache.replaceChildren(...Array.from({ length: P.length + A.length - 1 }, (_, i) => el("i", { class: i < cached ? (i < P.length ? "p" : "a") : "" })));
+    cacheLbl.textContent = `KV cache: ${cached} token${cached === 1 ? "" : "s"} stored`;
+    passes.textContent = String(pass); toks.textContent = String(pass);
+    status.textContent = pass === 0 ? "Nothing has run yet. Press Step or Play."
+      : pass === 1 ? "Pass 1 (prefill): all 6 prompt tokens go through the network together, filling the cache, and out comes the first token: “The”."
+      : pass === A.length ? `Done: ${A.length} passes produced ${A.length} tokens, one per pass. The cache holds ${cached} tokens, and an end-of-answer token would come next. Press Replay to watch it happen.`
+      : `Pass ${pass} (decode): only “${A[pass - 2].trim()}” goes in; it looks back at the ${cached - 1} cached tokens and produces “${A[pass - 1].trim()}”.`;
+    step.textContent = pass >= A.length ? "Step from the start" : "Step";
+  }
+  const stop = () => { clearInterval(timer); timer = null; play.textContent = "▶ Replay"; };
+  play.addEventListener("click", () => {
+    if (timer) { stop(); return; }
+    if (pass >= A.length) pass = 0;
+    play.textContent = "❚❚ Pause"; render();
+    timer = setInterval(() => { pass++; render(); if (pass >= A.length) stop(); }, reduceMotion.matches ? 1400 : 900);
+  });
+  step.addEventListener("click", () => { stop(); if (pass >= A.length) pass = 0; pass++; render(); });
+  root.append(promptRow, answerRow,
+    el("div", { class: "dc-cachewrap" }, cacheLbl, cache),
+    el("div", { class: "dc-count" }, el("span", {}, "Passes through the network ", passes), el("span", {}, "Tokens produced ", toks)),
+    status, el("div", { class: "btn-row" }, play, step),
+    el("p", { class: "note" }, "Real answers run to hundreds of tokens, and each pass goes through every layer of the model. Tokens shown with · start with a space."));
+  render();
+})();
+
+
+/* ---------- parallelism mini-diagrams ---------- */
+(function parallelDiagrams() {
+  const cards = $$("#parallel .par"); if (cards.length !== 4) return;
+  const A = "var(--accent)", M = "var(--line-strong)";
+  const box = (x, y, w, h, a = {}) => sv("rect", { x, y, width: w, height: h, rx: 3, fill: "none", stroke: M, "stroke-width": 1.2, ...a });
+  const bar = (x, y, w, fill = A, op = .8) => sv("rect", { x, y, width: w, height: 6, rx: 1.5, fill, "fill-opacity": op });
+  const lbl = (x, y, t) => sv("text", { x, y, class: "svg-label small", "text-anchor": "middle" }, t);
+  const D = [
+    () => [0, 1, 2, 3].flatMap(i => { const x = 8 + i * 48; return [box(x, 14, 40, 40), bar(x + 6, 22, 28), bar(x + 6, 31, 28), bar(x + 6, 40, 28), sv("circle", { cx: x + 20, cy: 6, r: 3.5, fill: `var(--l${[2, 6, 8, 10][i]})` }), lbl(x + 20, 68, "GPU " + (i + 1))]; }),
+    () => [box(20, 10, 160, 44), ...[0, 1, 2, 3].flatMap(i => [sv("rect", { x: 24 + i * 39, y: 14, width: 35, height: 36, rx: 2, fill: A, "fill-opacity": .25 + i * .18 }), lbl(41.5 + i * 39, 68, "GPU " + (i + 1))])],
+    () => [0, 1, 2, 3].flatMap(i => { const x = 6 + i * 50; return [box(x, 16, 38, 34), bar(x + 6, 30, 26), lbl(x + 19, 68, "GPU " + (i + 1)), ...(i < 3 ? [sv("path", { d: `M${x + 40} 33 h8`, stroke: A, "stroke-width": 1.5 }), sv("path", { d: `M${x + 45} 30 l3 3 l-3 3`, fill: "none", stroke: A, "stroke-width": 1.5 })] : [])]; }),
+    () => [sv("circle", { cx: 16, cy: 34, r: 7, fill: A }), lbl(16, 62, "router"),
+      ...[0, 1, 2, 3].flatMap(i => { const y = 4 + i * 16, on = i === 1 || i === 2; return [sv("path", { d: `M23 34 L96 ${y + 6}`, stroke: on ? A : M, "stroke-width": on ? 1.6 : 1, "stroke-dasharray": on ? "" : "3 3", fill: "none" }), box(98, y, 60, 12, on ? { stroke: A, fill: "color-mix(in srgb, var(--accent) 20%, transparent)" } : {}), sv("text", { x: 166, y: y + 10, class: "svg-label small" }, "expert " + (i + 1))]; })],
+  ];
+  cards.forEach((c, i) => c.prepend(sv("svg", { viewBox: "0 0 200 72", class: "par-svg", "aria-hidden": "true" }, ...D[i]())));
 })();
 
 /* ---------- decorations: neighbor colors, go-deeper tags ---------- */
