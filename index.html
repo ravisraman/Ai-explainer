@@ -1053,7 +1053,7 @@ h1 { margin-top: 18px; }
         <div class="predict-a" hidden><p>Well over 100,000: roughly 170,000–230,000 homes, depending on the cooling. The chips and servers alone draw ~180 MW, and cooling and power conversion add another 15–50%. An average US home uses about 1.2 kW averaged over a year.</p></div>
       </div>
       <div class="note"><h4>Watts in, heat out</h4><p>Chips turn electricity into computation, but physically nearly every joule ends up as heat. After computing, a data center's main job is carrying that heat outside.</p></div>
-      <div class="note"><h4>Why liquid</h4><p>Water carries about 3,500 times more heat than the same volume of air. Air cooling runs out around 30–40 kW per rack. The densest AI racks draw ~130 kW (next-generation designs aim near 200 kW, est.), so water is piped to cold plates sitting on the chips.</p></div>
+      <div class="note"><h4>Why liquid</h4><p>Water carries about 3,500 times more heat than the same volume of air. Air cooling runs out around 30–40 kW per rack. The densest AI racks draw ~130–140 kW; Vera Rubin racks, shipping from late 2026, reach ~180–220 kW, and designs for 2027 aim near 600 kW (est.). So water is piped to cold plates sitting on the chips.</p></div>
     </aside>
   </div>
 
@@ -1674,7 +1674,7 @@ h1 { margin-top: 18px; }
 
 <footer class="sources" id="sources">
   <h2>Sources and notes</h2>
-  <p>Figures are rounded and many are estimates; they reflect what was public by 2026 and will drift. Key sources: IEA, <i>Energy and AI</i> (2025); Lawrence Berkeley National Laboratory, US data center energy report (2024); Uptime Institute surveys; NVIDIA, ASML, TSMC and Zeiss product materials; Gholami et al., "AI and Memory Wall" (2024); Meta, "The Llama 3 Herd of Models" (2024); DeepSeek-V3 technical report (2024); Vaswani et al., "Attention Is All You Need" (2017); Hoffmann et al., "Training Compute-Optimal Large Language Models" (2022) and the Epoch AI re-fit by Besiroglu et al. (2024); Kaplan et al., "Scaling Laws for Neural Language Models" (2020); Bai et al., "Constitutional AI" (2022); Epoch AI analyses of training compute, data stocks and per-query energy; Google (2025) and OpenAI (2025) statements on per-prompt energy; OpenAI's reported user numbers (2025); US EIA household electricity data.</p>
+  <p>Figures are rounded and many are estimates; they reflect what was public by 2026 and will drift. Key sources: IEA, <i>Energy and AI</i> (2025); Lawrence Berkeley National Laboratory, US data center energy report (2024); Uptime Institute surveys; SemiAnalysis (data-center, rack-power, chip and GPU-rental analyses, including InferenceX); NVIDIA, ASML, TSMC and Zeiss product materials; Gholami et al., "AI and Memory Wall" (2024); Meta, "The Llama 3 Herd of Models" (2024); DeepSeek-V3 technical report (2024); Vaswani et al., "Attention Is All You Need" (2017); Hoffmann et al., "Training Compute-Optimal Large Language Models" (2022) and the Epoch AI re-fit by Besiroglu et al. (2024); Kaplan et al., "Scaling Laws for Neural Language Models" (2020); Bai et al., "Constitutional AI" (2022); Epoch AI analyses of training compute, data stocks and per-query energy; Google (2025) and OpenAI (2025) statements on per-prompt energy; OpenAI's reported user numbers (2025); US EIA household electricity data.</p>
   <p>Every interactive is a simplified model built for this page. The tokenizer is a real byte-pair encoder with a small vocabulary; the next-word model is a real trigram model trained on a tiny corpus; the neural networks really train in your browser. Attention weights, embeddings, agent transcripts and data-pipeline pages are hand-made to illustrate the idea.</p>
 </footer>
 </main>
@@ -4476,8 +4476,8 @@ defineMount("zoom", (root) => {
       text: "One compute unit (NVIDIA calls it a streaming multiprocessor): four blocks of tensor cores for matrix math, plus registers and cache. Each die has dozens." },
     { key: "die", name: "Die", w: 0.026, h: 0.031, view: 0.05, gpus: 0.5, t: 104e9, watts: 500,
       text: "One die: the largest piece of silicon a scanner can print in one exposure, holding ~104 billion transistors." },
-    { key: "package", name: "GPU", w: 0.09, h: 0.075, view: 0.15, gpus: 1, t: 208e9, watts: 1100,
-      text: "One GPU: two dies joined side by side, surrounded by eight stacks of high-bandwidth memory. About 1,000–1,200 W." },
+    { key: "package", name: "GPU", w: 0.09, h: 0.075, view: 0.15, gpus: 1, t: 208e9, watts: 1200,
+      text: "One GPU: two dies joined side by side, surrounded by eight stacks of high-bandwidth memory. About 1,000–1,400 W." },
     { key: "tray", name: "Compute tray", w: 0.44, h: 0.86, view: 1.2, gpus: 4, t: 4 * 208e9, watts: 6000,
       text: "One compute tray: four GPUs and two CPUs on cold plates, with coolant pipes. It slides into a rack like a drawer." },
     { key: "rack", name: "Rack", w: 0.6, h: 1.07, view: 3.2, gpus: 72, t: 72 * 208e9, watts: 130e3,
@@ -7513,7 +7513,7 @@ defineMount("reliability", (root) => {
 
 defineMount("journey", (root) => {
   const P = 70e9, SERVER_W = 10000, BATCH = 48, TPS = 50, PUE = 1.2, NET = 0.08, QUEUE = 0.1;
-  const RENT = 16; // $/hour for the 8-GPU server
+  const RENT = 18; // $/hour for the 8-GPU server (~$2.25/GPU-hour, SemiAnalysis H100 index, 2026)
   const PRESETS = {
     quick: { label: "A quick question", prompt: "Why is the sky blue?", tin: 600, tout: 300, answer: "Sunlight contains every color. Air molecules scatter short, blue wavelengths far more than long, red ones, so blue light reaches your eyes from all across the sky." },
     essay: { label: "An essay", prompt: "Write a 1,000-word essay on the history of the printing press.", tin: 650, tout: 1500, answer: "The printing press did not appear from nowhere. Block printing had spread across East Asia for centuries before Johannes Gutenberg… (about 1,000 more words)" },

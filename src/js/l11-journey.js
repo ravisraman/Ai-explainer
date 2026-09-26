@@ -7,7 +7,7 @@
 
 defineMount("journey", (root) => {
   const P = 70e9, SERVER_W = 10000, BATCH = 48, TPS = 50, PUE = 1.2, NET = 0.08, QUEUE = 0.1;
-  const RENT = 16; // $/hour for the 8-GPU server
+  const RENT = 18; // $/hour for the 8-GPU server (~$2.25/GPU-hour, SemiAnalysis H100 index, 2026)
   const PRESETS = {
     quick: { label: "A quick question", prompt: "Why is the sky blue?", tin: 600, tout: 300, answer: "Sunlight contains every color. Air molecules scatter short, blue wavelengths far more than long, red ones, so blue light reaches your eyes from all across the sky." },
     essay: { label: "An essay", prompt: "Write a 1,000-word essay on the history of the printing press.", tin: 650, tout: 1500, answer: "The printing press did not appear from nowhere. Block printing had spread across East Asia for centuries before Johannes Gutenberg… (about 1,000 more words)" },
