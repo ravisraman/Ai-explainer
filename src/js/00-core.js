@@ -229,6 +229,18 @@ class Stage {
   }
 }
 
+/* rounded rectangle path */
+function roundRect(c, x, y, w, hh, r) {
+  r = Math.max(0, Math.min(r, w / 2, hh / 2));
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + hh, r);
+  c.arcTo(x + w, y + hh, x, y + hh, r);
+  c.arcTo(x, y + hh, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+
 /* ---------- number formatting ---------- */
 function roundSig(x, sig = 3) {
   if (x === 0 || !isFinite(x)) return x;

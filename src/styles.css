@@ -953,3 +953,4 @@ h1 { margin-top: 18px; }
 .fl-item i { width: 10px; height: 10px; border-radius: 2px; }
 .fl-item b { color: var(--text); font: 600 0.78rem var(--font-mono); }
 .fl-item.gone { opacity: 0.5; text-decoration: line-through; }
+.homes { margin-top: 10px; }

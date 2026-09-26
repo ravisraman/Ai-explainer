@@ -157,7 +157,7 @@ defineMount("wall", (root) => {
   const achieved = () => Math.min(peak(), bw * I);
   const util = () => achieved() / peak();
 
-  const tiles = Array.from({ length: 64 }, () => ({ on: 0, t: Math.random() }));
+  const tiles = Array.from({ length: 64 }, () => ({ on: 0, busy: 0, pending: 0 }));
   const parts = [];
   const R = rng(3);
   let L = {};
@@ -173,22 +173,41 @@ defineMount("wall", (root) => {
     draw: () => draw(0),
   });
 
+  /* Chunks of data stream out of memory at a rate set by the bandwidth.
+     Each chunk flies to a math unit and keeps it busy for a time set by the
+     operations per byte. Busy fraction ≈ min(1, bandwidth × ops/byte ÷ peak). */
+  const ARRIVE = 12; // chunks per second per TB/s
+  const CHUNK_WORK = 64 / (1000 * ARRIVE); // seconds of work per chunk per op/byte, at 1× math speed
+  const flights = [];
+  let emitAcc = 0;
   function tick(dt) {
     const u = util();
-    // particles: rate ∝ bandwidth
-    const want = Math.round(clamp(8 + 26 * Math.log2(bw + 1), 8, 150));
     if (!reducedMotion()) {
-      while (parts.length < want) parts.push({ s: R(), lane: R() });
-      if (parts.length > want) parts.length = want;
-      const sp = 0.35 + 0.25 * Math.log2(bw + 1);
-      for (const p of parts) { p.s += dt * sp * 0.5; if (p.s > 1) { p.s -= 1; p.lane = R(); } }
-      for (const t of tiles) {
-        t.t -= dt;
-        if (t.t <= 0) { t.on = R() < u ? 1 : 0; t.t = 0.15 + R() * 0.25; }
+      const rate = bw * ARRIVE;
+      emitAcc += rate * dt;
+      while (emitAcc >= 1) { emitAcc -= 1; if (parts.length < 160) parts.push({ s: 0, lane: R(), t: -1 }); }
+      const sp = 0.9;
+      for (const p of parts) p.s += dt * sp;
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        if (p.s >= 1) {
+          parts.splice(i, 1);
+          // deliver to an idle unit if there is one, else the least-busy one
+          let best = 0;
+          const load = (t) => t.busy + t.pending;
+          for (let k = 1; k < tiles.length; k++) if (load(tiles[k]) < load(tiles[best])) best = k;
+          const work = (I * CHUNK_WORK) / peakMul;
+          tiles[best].pending += work;
+          flights.push({ k: best, f: 0, lane: p.lane, work });
+        }
       }
+      for (const f of flights) f.f += dt * 4;
+      for (let i = flights.length - 1; i >= 0; i--) {
+        if (flights[i].f >= 1) { const t = tiles[flights[i].k]; t.pending -= flights[i].work; t.busy += flights[i].work; flights.splice(i, 1); }
+      }
+      for (const t of tiles) { t.busy = Math.max(0, t.busy - dt); t.on = t.busy > 0 ? 1 : approach(t.on, 0, 14, dt); }
     } else {
       tiles.forEach((t, i) => (t.on = i / tiles.length < u ? 1 : 0));
-      if (!parts.length) for (let i = 0; i < want; i++) parts.push({ s: R(), lane: R() });
     }
     draw(dt);
   }
@@ -219,10 +238,14 @@ defineMount("wall", (root) => {
     const n = 8, ts = gridS / n;
     tiles.forEach((t, i) => {
       const x = gx + (i % n) * ts, y = gy + Math.floor(i / n) * ts;
-      c.fillStyle = t.on ? acc : rgba(C.text, 0.08);
-      if (t.on) { c.shadowColor = acc; c.shadowBlur = 8; }
+      c.fillStyle = rgba(C.text, 0.07);
       roundRect(c, x + 2, y + 2, ts - 4, ts - 4, 3); c.fill();
-      c.shadowBlur = 0;
+      if (t.on > 0.02) {
+        c.fillStyle = rgba(acc, t.on);
+        if (t.on > 0.9) { c.shadowColor = acc; c.shadowBlur = 8; }
+        roundRect(c, x + 2, y + 2, ts - 4, ts - 4, 3); c.fill();
+        c.shadowBlur = 0;
+      }
     });
     // pipe
     const px0 = memX + memW, px1 = gx - 8;
@@ -235,6 +258,14 @@ defineMount("wall", (root) => {
     for (const p of parts) {
       c.fillStyle = dat;
       c.beginPath(); c.arc(lerp(px0 + 4, px1 - 4, p.s), py - pipeH / 2 + 3 + p.lane * (pipeH - 6), 2.2, 0, Math.PI * 2); c.fill();
+    }
+    // chunks flying from the end of the pipe to the unit that will use them
+    for (const f of flights) {
+      const tx = gx + (f.k % n) * ts + ts / 2, ty = gy + Math.floor(f.k / n) * ts + ts / 2;
+      const sx = px1 - 4, sy = py - pipeH / 2 + 3 + f.lane * (pipeH - 6);
+      const e = easeOut(f.f);
+      c.fillStyle = dat;
+      c.beginPath(); c.arc(lerp(sx, tx, e), lerp(sy, ty, e) - Math.sin(Math.PI * f.f) * 10, 2.2, 0, Math.PI * 2); c.fill();
     }
     c.fillStyle = C.text; c.textAlign = "center"; c.font = `700 12px ${mono}`;
     c.fillText(`${fmtNum(bw, 3)} TB/s`, (px0 + px1) / 2, py - pipeH / 2 - 8);
