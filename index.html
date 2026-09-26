@@ -81,6 +81,7 @@ details.deeper .body{padding-top:10px;display:grid;gap:10px}
   .elevator{display:none}
   main{margin-left:240px}
 }
+.tok-out{display:flex;flex-wrap:wrap;gap:4px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
@@ -893,6 +894,789 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 window.addEventListener("resize", updateActive);
 updateActive();
+</script>
+
+<script>
+"use strict";
+/* ================= INTERACTIVES ================= */
+const fmtInt = n => Math.round(n).toLocaleString("en-US");
+function fmtBig(n) {
+  if (!isFinite(n)) return "—";
+  const units = [[1e15, "quadrillion"], [1e12, "trillion"], [1e9, "billion"], [1e6, "million"]];
+  for (const [v, w] of units) if (n >= v) { const x = n / v; return (x >= 100 ? Math.round(x) : x >= 10 ? x.toFixed(0) : x.toFixed(1).replace(/\.0$/, "")) + " " + w; }
+  return fmtInt(n);
+}
+function sci(n) {
+  if (n <= 0 || !isFinite(n)) return "0";
+  const e = Math.floor(Math.log10(n)); const m = n / 10 ** e;
+  const mm = m.toFixed(1).replace(/\.0$/, "");
+  return e < 4 ? fmtInt(n) : `${mm === "1" ? "" : mm + " × "}10<sup>${e}</sup>`;
+}
+function roundSig(x, s = 2) { if (x === 0) return 0; const e = Math.floor(Math.log10(Math.abs(x))) - s + 1; return Math.round(x / 10 ** e) * 10 ** e; }
+function fmtNum(x) { // human-friendly rounded number
+  if (x === 0) return "0";
+  if (x >= 1000) return fmtInt(roundSig(x, 2));
+  if (x >= 10) return String(Math.round(x));
+  if (x >= 1) return x.toFixed(1).replace(/\.0$/, "");
+  return String(roundSig(x, 2));
+}
+const svgNS = "http://www.w3.org/2000/svg";
+const sv = (tag, attrs = {}, ...kids) => {
+  const n = document.createElementNS(svgNS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) n.append(k);
+  return n;
+};
+const cssVar = (name, node = document.body) => getComputedStyle(node).getPropertyValue(name).trim();
+function segmented(options, value, onChange, label) {
+  const g = el("div", { class: "seg", role: "group", "aria-label": label });
+  const btns = options.map(o => el("button", { type: "button", "aria-pressed": String(o.value === value), onclick: () => { btns.forEach(b => b.setAttribute("aria-pressed", String(b === btn(o)))); onChange(o.value); } }, o.label));
+  const btn = o => btns[options.indexOf(o)];
+  g.append(...btns);
+  g.set = v => btns.forEach((b, i) => b.setAttribute("aria-pressed", String(options[i].value === v)));
+  return g;
+}
+
+/* ---------- 1. Cooling: where 100 W go ---------- */
+(function cooling() {
+  const root = $("#cooling"); if (!root) return;
+  const DATA = {
+    air: { pue: 1.5, note: "Typical older or enterprise air-cooled facility.", parts: [67, 26, 7] },
+    liquid: { pue: 1.15, note: "Modern hyperscale facility with liquid cooling.", parts: [87, 9, 4] },
+  };
+  const NAMES = ["Computing (chips, servers, network)", "Cooling", "Power conversion and other losses"];
+  const COLORS = ["var(--l1)", "var(--l9)", "var(--muted)"];
+  const bar = el("div", { class: "cool-bar", role: "img" });
+  const segs = NAMES.map((n, i) => el("span", { class: "cool-seg", style: `background:${COLORS[i]}` }));
+  bar.append(...segs);
+  const legend = el("ul", { class: "legend" });
+  const items = NAMES.map((n, i) => el("li", {}, el("i", { style: `background:${COLORS[i]}` }), el("span", { class: "lg-name" }, n), el("b", { class: "lg-val" }, "")));
+  legend.append(...items);
+  const readout = el("p", { class: "readout" });
+  function render(k) {
+    const d = DATA[k];
+    d.parts.forEach((p, i) => { segs[i].style.flexBasis = p + "%"; items[i].lastChild.textContent = `~${p} W`; });
+    bar.setAttribute("aria-label", NAMES.map((n, i) => `${n}: about ${d.parts[i]} watts`).join("; "));
+    readout.innerHTML = `<b>PUE ≈ ${d.pue}.</b> ${d.note} Of every 100 W drawn from the grid, about <b>${d.parts[0]} W</b> reach the computers. <span class="muted">Illustrative split; real sites vary with climate and design.</span>`;
+  }
+  root.append(segmented([{ label: "Air-cooled", value: "air" }, { label: "Liquid-cooled", value: "liquid" }], "air", render, "Cooling design"), bar, legend, readout);
+  render("air");
+})();
+
+/* ---------- 2. Scale explorer ---------- */
+(function scaleExplorer() {
+  const root = $("#scale"); if (!root) return;
+  const L = [
+    { name: "Transistor", size: "~50 nm between gates", m: 5e-8, gpus: "—", tr: "1", power: "~5 nW on average", contains: "A switch: a voltage on the gate lets current through, or stops it.", draw: "transistor" },
+    { name: "GPU die", size: "~2.8 cm across (~800 mm²)", m: 0.028, gpus: "½", tr: "~100 billion", power: "~500 W", contains: "One piece of silicon: thousands of cores, tensor cores and on-chip memory.", draw: "die" },
+    { name: "GPU package", size: "~palm-sized", m: 0.08, gpus: "1", tr: "~208 billion (logic)", power: "~1,000 W", contains: "2 dies + 8 stacks of high-bandwidth memory (~192 GB) on one base.", draw: "package" },
+    { name: "Compute tray", size: "~1 m deep, a few cm tall", m: 0.9, gpus: "4", tr: "~1 trillion", power: "~6 kW", contains: "4 GPUs + 2 CPUs, cold plates and liquid pipes.", draw: "tray" },
+    { name: "Rack", size: "~2.2 m tall, ~1.4 tonnes", m: 2.2, gpus: "72", tr: "~15 trillion", power: "~120 kW", contains: "18 compute trays + 9 network-switch trays, wired as one 72-GPU unit.", draw: "rack" },
+    { name: "Pod", size: "~a 15 m row", m: 15, gpus: "576", tr: "~120 trillion", power: "~1 MW", contains: "8 racks joined by the scale-out network.", draw: "pod" },
+    { name: "Data hall", size: "several football fields", m: 300, gpus: "~50,000", tr: "~10 quadrillion", power: "~100 MW", contains: "~90 pods, plus power rooms and cooling plant.", draw: "hall" },
+    { name: "Campus", size: "~1–2 km across", m: 1500, gpus: "~400,000+", tr: "~80 quadrillion", power: "~1 GW", contains: "Several buildings, a substation and cooling, drawing about as much as a large power plant produces.", draw: "campus" },
+  ];
+  const input = el("input", { type: "range", id: "scaleRange", min: 0, max: L.length - 1, step: 1, value: 4, "aria-label": "Zoom level" });
+  const ticks = el("div", { class: "scale-ticks", "aria-hidden": "true" }, L.map((l, i) => el("button", { type: "button", tabindex: "-1", onclick: () => { input.value = i; render(); } }, l.name)));
+  const svg = sv("svg", { viewBox: "0 0 360 220", class: "scale-svg", role: "img" });
+  const title = el("h4", { class: "scale-title" });
+  const contains = el("p", { class: "scale-contains" });
+  const stats = el("dl", { class: "scale-stats" });
+  const ruler = el("div", { class: "ruler", "aria-hidden": "true" });
+  // log ruler 10 nm .. 10 km
+  const lo = -8, hi = 4;
+  const rTrack = el("div", { class: "ruler-track" });
+  const rMark = el("span", { class: "ruler-mark" });
+  rTrack.append(rMark);
+  [[-8, "10 nm"], [-6, "1 µm"], [-3, "1 mm"], [0, "1 m"], [3, "1 km"]].forEach(([e, t]) => rTrack.append(el("span", { class: "ruler-tick", style: `left:${((e - lo) / (hi - lo)) * 100}%` }, t)));
+  ruler.append(el("span", { class: "ruler-label" }, "Physical size (log scale)"), rTrack);
+
+  const A = "var(--accent)";
+  const P = { fill: "none", stroke: A, "stroke-width": 1.5 };
+  function draw(kind) {
+    const g = [];
+    const R = (x, y, w, h, a = {}) => sv("rect", { x, y, width: w, height: h, rx: 2, ...P, ...a });
+    const T = (x, y, s, a = {}) => sv("text", { x, y, class: "svg-label", ...a }, s);
+    if (kind === "transistor") {
+      g.push(R(40, 160, 280, 40, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }), T(180, 186, "silicon substrate", { "text-anchor": "middle" }));
+      g.push(R(160, 70, 40, 90, { fill: "color-mix(in srgb, var(--accent) 25%, transparent)" }));
+      g.push(sv("path", { d: "M130 160 V50 H230 V160", ...P, "stroke-width": 3 }));
+      g.push(T(180, 40, "gate", { "text-anchor": "middle" }), T(70, 120, "source"), T(250, 120, "drain"), T(182, 118, "channel", { "text-anchor": "middle", class: "svg-label small" }));
+      g.push(sv("path", { d: "M100 140 H130 M230 140 H270", stroke: A, "stroke-width": 1.5, "stroke-dasharray": "3 3" }));
+    } else if (kind === "die") {
+      g.push(R(80, 10, 200, 200, { fill: "var(--surface-2)" }));
+      for (let r = 0; r < 12; r++) for (let c = 0; c < 12; c++) g.push(sv("rect", { x: 92 + c * 15, y: 22 + r * 15, width: 11, height: 11, rx: 1, fill: (r === 5 || r === 6) ? "var(--line-strong)" : "color-mix(in srgb, var(--accent) 45%, transparent)" }));
+      g.push(T(290, 60, "~140 cores"), T(290, 76, "(SMs), each with"), T(290, 92, "tensor cores"), T(290, 118, "cache"), T(290, 134, "in the middle"));
+    } else if (kind === "package") {
+      g.push(R(30, 20, 300, 180, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }));
+      g.push(R(100, 40, 78, 140, { fill: "color-mix(in srgb, var(--accent) 35%, transparent)" }), R(182, 40, 78, 140, { fill: "color-mix(in srgb, var(--accent) 35%, transparent)" }));
+      for (let i = 0; i < 4; i++) { g.push(R(48, 40 + i * 36, 40, 30, { stroke: "var(--muted)" })); g.push(R(272, 40 + i * 36, 40, 30, { stroke: "var(--muted)" })); }
+      g.push(T(139, 114, "die", { "text-anchor": "middle" }), T(221, 114, "die", { "text-anchor": "middle" }), T(68, 214, "HBM stacks", { "text-anchor": "middle", class: "svg-label small" }), T(292, 214, "HBM stacks", { "text-anchor": "middle", class: "svg-label small" }));
+    } else if (kind === "tray") {
+      g.push(R(10, 40, 340, 140, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }));
+      [[40, 70], [40, 120], [240, 70], [240, 120]].forEach(([x, y]) => g.push(R(x, y, 44, 40, { fill: "color-mix(in srgb, var(--accent) 35%, transparent)" })));
+      g.push(R(150, 75, 36, 30, { stroke: "var(--muted)" }), R(150, 125, 36, 30, { stroke: "var(--muted)" }));
+      g.push(sv("path", { d: "M84 90 H150 M84 140 H150 M186 90 H240 M186 140 H240", stroke: "var(--l9)", "stroke-width": 2, fill: "none", opacity: .7 }));
+      g.push(T(62, 196, "GPUs", { "text-anchor": "middle" }), T(168, 196, "CPUs", { "text-anchor": "middle" }), T(262, 196, "GPUs", { "text-anchor": "middle" }), T(180, 30, "liquid lines in blue", { "text-anchor": "middle", class: "svg-label small" }));
+    } else if (kind === "rack") {
+      g.push(R(130, 4, 100, 212, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }));
+      for (let i = 0; i < 27; i++) {
+        const sw = i >= 9 && i < 18; // switch trays in the middle
+        g.push(sv("rect", { x: 136, y: 9 + i * 7.6, width: 88, height: 5.6, rx: 1, fill: sw ? "var(--muted)" : "color-mix(in srgb, var(--accent) 55%, transparent)" }));
+      }
+      g.push(T(240, 40, "compute trays"), T(240, 110, "switch trays"), T(240, 180, "compute trays"));
+    } else if (kind === "pod") {
+      for (let r = 0; r < 8; r++) {
+        g.push(R(22 + r * 41, 30, 32, 150, { fill: "var(--surface-2)" }));
+        for (let i = 0; i < 18; i++) g.push(sv("rect", { x: 25 + r * 41, y: 34 + i * 8, width: 26, height: 5, fill: "color-mix(in srgb, var(--accent) 45%, transparent)" }));
+      }
+      g.push(sv("path", { d: "M38 196 H330", stroke: "var(--l9)", "stroke-width": 2 }), T(180, 214, "scale-out network", { "text-anchor": "middle", class: "svg-label small" }));
+    } else if (kind === "hall") {
+      g.push(R(10, 10, 340, 200, { fill: "var(--surface-2)", stroke: "var(--line-strong)" }));
+      for (let r = 0; r < 11; r++) for (let c = 0; c < 36; c++) g.push(sv("rect", { x: 22 + c * 8.8, y: 22 + r * 14, width: 6, height: 9, fill: "color-mix(in srgb, var(--accent) 50%, transparent)" }));
+      g.push(R(22, 180, 150, 20, { stroke: "var(--muted)" }), T(97, 194, "power rooms", { "text-anchor": "middle", class: "svg-label small" }), R(188, 180, 150, 20, { stroke: "var(--l9)" }), T(263, 194, "cooling plant", { "text-anchor": "middle", class: "svg-label small" }));
+    } else {
+      [[20, 20], [130, 20], [240, 20], [20, 110], [130, 110]].forEach(([x, y]) => {
+        g.push(R(x, y, 100, 76, { fill: "var(--surface-2)" }));
+        for (let r = 0; r < 5; r++) g.push(sv("rect", { x: x + 8, y: y + 10 + r * 12, width: 84, height: 6, fill: "color-mix(in srgb, var(--accent) 40%, transparent)" }));
+      });
+      g.push(R(240, 110, 100, 76, { stroke: "var(--muted)" }), T(290, 145, "substation", { "text-anchor": "middle", class: "svg-label small" }), T(290, 160, "(~1 GW)", { "text-anchor": "middle", class: "svg-label small" }));
+      for (let i = 0; i < 8; i++) g.push(sv("circle", { cx: 30 + i * 22, cy: 204, r: 7, fill: "none", stroke: "var(--l9)", "stroke-width": 1.5 }));
+      g.push(T(214, 208, "cooling towers", { class: "svg-label small" }));
+    }
+    return g;
+  }
+  function render() {
+    const i = Number(input.value), l = L[i];
+    svg.replaceChildren(...draw(l.draw));
+    svg.setAttribute("aria-label", `${l.name}: ${l.contains}`);
+    title.textContent = l.name;
+    contains.textContent = l.contains;
+    stats.replaceChildren(...[["Size", l.size], ["GPUs", l.gpus], ["Transistors", l.tr], ["Power", l.power]].flatMap(([k, v]) => [el("dt", {}, k), el("dd", {}, v)]));
+    const pos = (Math.log10(l.m) - lo) / (hi - lo);
+    rMark.style.left = (clamp(pos, 0, 1) * 100) + "%";
+    $$("button", ticks).forEach((b, j) => b.classList.toggle("on", j === i));
+    input.setAttribute("aria-valuetext", `${l.name}, ${l.gpus === "—" ? "" : l.gpus + " GPUs, "}${l.power}`);
+  }
+  input.addEventListener("input", render);
+  const info = el("div", { class: "scale-info" }, title, contains, stats);
+  root.append(el("div", { class: "scale-body" }, el("div", { class: "scale-pic" }, svg), info), el("div", { class: "scale-controls" }, el("label", { for: "scaleRange", class: "ctl-label" }, "Zoom: transistor → campus"), input, ticks), ruler,
+    el("p", { class: "note" }, "Example based on NVIDIA GB200 NVL72 systems; building and campus sizes are typical of large 2025–26 AI sites and vary widely. All counts approximate."));
+  render();
+})();
+
+/* ---------- 3. Sand to chip + chokepoints ---------- */
+(function fab() {
+  const root = $("#fab"); if (!root) return;
+  const steps = [
+    ["Sand", "Quartz (silicon dioxide) is reduced to silicon"],
+    ["Purify", "Refined to ~99.9999999% pure polysilicon"],
+    ["Grow", "A single crystal ingot is pulled from the melt"],
+    ["Slice", "Cut and polished into 300 mm wafers"],
+    ["Pattern", "Deposit, expose, etch; repeated for dozens of layers over ~3 months"],
+    ["Test & dice", "Probe every die, cut the wafer apart"],
+    ["Package", "Join dies with memory stacks on a shared base"],
+  ];
+  const ol = el("ol", { class: "fab-steps" }, steps.map(([t, d], i) => el("li", {}, el("span", { class: "fab-n" }, String(i + 1)), el("b", {}, t), el("span", {}, d))));
+  const chokes = [
+    { what: "EUV lithography scanners", who: "ASML (Netherlands)", share: 100, label: "sole supplier" },
+    { what: "Leading-edge logic chips", who: "TSMC (mostly Taiwan)", share: 90, label: "~90%" },
+    { what: "High-bandwidth memory", who: "SK hynix, Samsung, Micron", share: 100, label: "3 suppliers", split: [50, 25, 25] },
+  ];
+  const table = el("div", { class: "chokes" }, el("h4", {}, "Chokepoints"), chokes.map(c => el("div", { class: "choke" },
+    el("div", { class: "choke-text" }, el("b", {}, c.what), el("span", {}, c.who)),
+    el("div", { class: "choke-bar", role: "img", "aria-label": `${c.who}: ${c.label}` },
+      c.split ? c.split.map((s, i) => el("span", { class: "choke-fill", style: `width:${s}%;opacity:${1 - i * .25}` })) : el("span", { class: "choke-fill", style: `width:${c.share}%` })),
+    el("span", { class: "choke-val" }, c.label))));
+  root.append(ol, table, el("p", { class: "note" }, "HBM segments show that three firms share the market; widths are not exact shares (SK hynix has led since 2023)."));
+})();
+
+/* ---------- 4. Memory wall chart ---------- */
+(function wall() {
+  const root = $("#wall"); if (!root) return;
+  const W = 640, H = 300, m = { l: 64, r: 110, t: 16, b: 40 };
+  const years = 20;
+  const S = [
+    { name: "Peak compute", rate: 3, color: "var(--l4)" },
+    { name: "Memory bandwidth", rate: 1.6, color: "var(--l10)" },
+  ];
+  const x = t => m.l + (t / years) * (W - m.l - m.r);
+  const y = v => m.t + (1 - Math.log10(v) / 5) * (H - m.t - m.b);
+  const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, class: "chart", role: "img", "aria-label": "Line chart: over 20 years, peak compute grows about 60,000 times while memory bandwidth grows about 100 times." });
+  for (let e = 0; e <= 5; e++) {
+    svg.append(sv("line", { x1: m.l, x2: W - m.r, y1: y(10 ** e), y2: y(10 ** e), class: "grid" }));
+    svg.append(sv("text", { x: m.l - 8, y: y(10 ** e) + 4, class: "axis", "text-anchor": "end" }, ["1×", "10×", "100×", "1,000×", "10,000×", "100,000×"][e]));
+  }
+  for (let t = 0; t <= years; t += 5) svg.append(sv("text", { x: x(t), y: H - m.b + 20, class: "axis", "text-anchor": "middle" }, t === 0 ? "Year 0" : `${t}`));
+  svg.append(sv("text", { x: (m.l + W - m.r) / 2, y: H - 4, class: "axis", "text-anchor": "middle" }, "years"));
+  S.forEach(s => {
+    let d = ""; for (let t = 0; t <= years; t += .25) d += (t ? "L" : "M") + x(t).toFixed(1) + " " + y(s.rate ** (t / 2)).toFixed(1);
+    svg.append(sv("path", { d, fill: "none", stroke: s.color, "stroke-width": 2.5, "stroke-linecap": "round" }));
+    const end = s.rate ** (years / 2);
+    svg.append(sv("text", { x: x(years) + 8, y: y(end) - 2, class: "chart-label" }, s.name));
+    svg.append(sv("text", { x: x(years) + 8, y: y(end) + 14, class: "axis" }, "~" + fmtNum(roundSig(end, 1)) + "×"));
+  });
+  const cross = sv("line", { y1: m.t, y2: H - m.b, class: "crosshair", visibility: "hidden" });
+  const dots = S.map(s => sv("circle", { r: 5, fill: s.color, stroke: "var(--surface)", "stroke-width": 2, visibility: "hidden" }));
+  svg.append(cross, ...dots);
+  const tip = el("div", { class: "tip", hidden: true });
+  const box = el("div", { class: "chart-box" }, svg, tip);
+  function move(ev) {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (W / r.width);
+    const t = clamp(Math.round(((px - m.l) / (W - m.l - m.r)) * years), 0, years);
+    cross.setAttribute("x1", x(t)); cross.setAttribute("x2", x(t)); cross.setAttribute("visibility", "visible");
+    S.forEach((s, i) => { dots[i].setAttribute("cx", x(t)); dots[i].setAttribute("cy", y(s.rate ** (t / 2))); dots[i].setAttribute("visibility", "visible"); });
+    const c = 3 ** (t / 2), b = 1.6 ** (t / 2);
+    tip.innerHTML = `<b>Year ${t}</b><span><i style="background:var(--l4)"></i>Compute ${fmtNum(roundSig(c, 2))}×</span><span><i style="background:var(--l10)"></i>Bandwidth ${fmtNum(roundSig(b, 2))}×</span><span class="muted">Gap: ${fmtNum(roundSig(c / b, 2))}×</span>`;
+    tip.hidden = false;
+    const left = (x(t) / W) * r.width;
+    tip.style.left = clamp(left, 70, r.width - 70) + "px";
+  }
+  const hide = () => { tip.hidden = true; cross.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("visibility", "hidden")); };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", hide);
+  const legend = el("ul", { class: "legend" }, S.map(s => el("li", {}, el("i", { style: `background:${s.color}` }), el("span", { class: "lg-name" }, `${s.name} (~${s.rate}× every 2 years)`))));
+  root.append(legend, el("div", { class: "scroll-x" }, box),
+    el("p", { class: "note" }, "Trend lines, not measurements of specific chips. The gap is why a chip's math units often sit idle waiting for data."));
+})();
+
+/* ---------- 5. Tokenizer (approximate) ---------- */
+(function tokenizer() {
+  const root = $("#tokenizer"); if (!root) return;
+  const COMMON = ("the of and to a in is it you that he was for on are with as i his they be at one have this from or had by not word but what some we can out other were all there when up use your how said an each she which do their time if will way about many then them write would like so these her long make thing see him two has look more day could go come did number sound no most people my over know water than call first who may down side been now find any new work part take get place made live where after back little only round man year came show every good me give our under name very through just form sentence great think say help low line differ turn cause much mean before move right boy old too same tell does set three want air well also play small end put home read hand port large spell add even land here must big high such follow act why ask men change went light kind off need house picture try us again animal point mother world near build self earth father head stand own page should country found answer school grow study still learn plant cover food sun four between state keep eye never last let thought city tree cross farm hard start might story saw far sea draw left late run don't while press close night real life few north open seem together next white children begin got walk example ease paper group always music those both mark often letter until mile river car feet care second book carry took science eat room friend began idea fish mountain stop once base hear horse cut sure watch color face wood main enough plain girl usual young ready above ever red list though feel talk bird soon body dog family direct pose leave song measure door product black short numeral class wind question happen complete ship area half rock order fire south problem piece told knew pass since top whole king space heard best hour better true during hundred five remember step early hold west ground interest reach fast verb sing listen six table travel less morning ten simple several vowel toward war lay against pattern slow center love person money serve appear road map rain rule govern pull cold notice voice unit power town fine certain fly fall lead cry dark machine note wait plan figure star box noun field rest correct able pound done beauty drive stood contain front teach week final gave green oh quick develop ocean warm free minute strong special mind behind clear tail produce fact street inch multiply nothing course stay wheel full force blue object decide surface deep moon island foot system busy test record boat common gold possible plane stead dry wonder laugh thousand ago ran check game shape equate hot miss brought heat snow tire bring yes distant fill east paint language among model data learn chip energy brown fox jumps lazy computer because sky let's i'm").split(/\s+/);
+  const COMMON_SET = new Map(COMMON.map((w, i) => [w, i]));
+  const PREFIXES = ["under", "inter", "trans", "super", "micro", "multi", "over", "anti", "pre", "dis", "non", "sub", "un", "re"];
+  const SUFFIXES = ["ization", "ational", "ically", "ably", "ibly", "ation", "ition", "ments", "ment", "ness", "able", "ible", "ally", "less", "ings", "tion", "sion", "ful", "ing", "ous", "ive", "est", "ers", "ity", "ize", "ise", "ism", "ist", "er", "ed", "ly", "al", "s"];
+  const CJK = /[぀-ヿ㐀-鿿가-힯豈-﫿]/u;
+  const LATIN = /^[A-Za-zÀ-ɏ]+$/;
+  const PRE = /'(?:s|t|re|ve|m|ll|d)\b| ?\p{L}+| ?\p{N}{1,3}| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu;
+  const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const idFor = (tok) => {
+    const lead = tok.startsWith(" ");
+    const core = tok.trim().toLowerCase();
+    if (COMMON_SET.has(core) && tok.trim() === tok.trim().toLowerCase()) return 260 + COMMON_SET.get(core) * 2 + (lead ? 0 : 1);
+    return 2000 + (hash(tok) % 98000);
+  };
+  const chunk = (s, size) => { const k = Math.ceil(s.length / size); const out = []; const n = s.length; let p = 0; for (let i = 0; i < k; i++) { const len = Math.round((n - p) / (k - i)); out.push(s.slice(p, p + len)); p += len; } return out; };
+  function splitWord(w) {
+    const low = w.toLowerCase();
+    const isCommon = COMMON_SET.has(low) && (w === low || w === low[0].toUpperCase() + low.slice(1));
+    if (isCommon) return [w];
+    if (!LATIN.test(w)) { // other scripts: short chunks
+      if (CJK.test(w)) return Array.from(w);
+      return chunk(w, 2);
+    }
+    if (w.length > 3 && w === w.toUpperCase()) return chunk(w, 2); // ALL CAPS splits badly
+    if (w.length <= 4) return [w];
+    const head = [], tail = [];
+    let stem = w;
+    for (const p of PREFIXES) if (stem.toLowerCase().startsWith(p) && stem.length - p.length >= 4) { head.push(stem.slice(0, p.length)); stem = stem.slice(p.length); break; }
+    for (let k = 0; k < 2; k++) {
+      const sl = stem.toLowerCase();
+      const suf = SUFFIXES.find(s => sl.endsWith(s) && sl.length - s.length >= (s === "s" ? 4 : 3) && !(s === "s" && sl.endsWith("ss")));
+      if (!suf) break;
+      tail.unshift(stem.slice(stem.length - suf.length)); stem = stem.slice(0, stem.length - suf.length);
+    }
+    const mid = (COMMON_SET.has(stem.toLowerCase()) || stem.length <= 5) ? [stem] : chunk(stem, 4);
+    return [...head, ...mid, ...tail];
+  }
+  function tokenize(text) {
+    const out = [];
+    for (const m of text.matchAll(PRE)) {
+      const piece = m[0];
+      if (/^\s+$/.test(piece)) { out.push({ t: piece, kind: "space" }); continue; }
+      const lead = piece.startsWith(" ") ? " " : "";
+      const body = lead ? piece.slice(1) : piece;
+      if (/^\p{L}+$/u.test(body)) {
+        splitWord(body).forEach((p, i) => out.push({ t: (i === 0 ? lead : "") + p, kind: "word" }));
+      } else if (/^\p{N}+$/u.test(body)) {
+        out.push({ t: lead + body, kind: "num" });
+      } else if (/^'/.test(body)) {
+        out.push({ t: body, kind: "word" });
+      } else { // punctuation, symbols, emoji
+        let first = true;
+        const chars = Array.from(body);
+        let buf = "";
+        const flush = () => { if (buf) { out.push({ t: (first ? lead : "") + buf, kind: "punct" }); first = false; buf = ""; } };
+        for (const ch of chars) {
+          if (ch.codePointAt(0) < 128) { buf += ch; if (buf.length >= 3) flush(); continue; }
+          flush();
+          const bytes = new TextEncoder().encode(ch).length;
+          const n = Math.max(1, Math.ceil(bytes / 2)); // unfamiliar characters fall back to byte pieces
+          out.push({ t: (first ? lead : "") + ch, kind: "byte", parts: n }); first = false;
+          for (let k = 1; k < n; k++) out.push({ t: "", kind: "byte-cont", parts: n, src: ch + k });
+        }
+        flush();
+      }
+    }
+    return out.map(o => ({ ...o, id: o.kind === "byte-cont" ? 100 + (hash(o.src) % 156) : idFor(o.t) }));
+  }
+  const PRESETS = [
+    ["English", "The quick brown fox jumps over the lazy dog."],
+    ["Rare words", "Unbelievably, the antidisestablishmentarianism debate reemerged."],
+    ["Code", "for (let i = 0; i < 10; i++) { total += prices[i]; }"],
+    ["Numbers", "In 2026, the model read 15,000,000,000,000 tokens."],
+    ["German", "Die Donaudampfschifffahrtsgesellschaft ist berühmt."],
+    ["Japanese", "空はなぜ青いのですか？"],
+    ["Emoji", "I love this 🤖✨ so much!"],
+  ];
+  const ta = el("textarea", { id: "tokInput", rows: 3, maxlength: 2000, spellcheck: "false", "aria-label": "Text to tokenize" });
+  ta.value = "Why is the sky blue? Tokenization isn't word-splitting.";
+  const presets = el("div", { class: "chips" }, el("span", { class: "ctl-label" }, "Try:"), PRESETS.map(([n, t]) => el("button", { type: "button", class: "chip", onclick: () => { ta.value = t; render(); } }, n)));
+  const out = el("div", { class: "tok-out", "aria-live": "polite" });
+  const stats = el("div", { class: "tok-stats" });
+  const idsBox = el("p", { class: "tok-ids" });
+  const toggle = el("label", { class: "check" }, el("input", { type: "checkbox", id: "tokIdsOnly" }), " Show only what the model sees (IDs)");
+  function render() {
+    const text = ta.value;
+    if (!text.trim()) {
+      out.replaceChildren(el("p", { class: "muted" }, "Type something above to see it split into tokens."));
+      stats.replaceChildren(); idsBox.textContent = ""; return;
+    }
+    const toks = tokenize(text);
+    const idsOnly = $("#tokIdsOnly").checked;
+    out.classList.toggle("ids-only", idsOnly);
+    out.replaceChildren(...toks.map((tk, i) => {
+      const shown = tk.kind === "space" ? tk.t.replace(/\n/g, "↵").replace(/ /g, "·").replace(/\t/g, "→") : tk.kind === "byte-cont" ? "⋯" : tk.t.replace(/^ /, "·");
+      return el("span", { class: `tk tk-${i % 5} ${tk.kind}`, title: `Token ${i + 1}: ID ${tk.id}` }, el("span", { class: "tk-t" }, shown), el("span", { class: "tk-id" }, String(tk.id)));
+    }));
+    const chars = Array.from(text).length;
+    const words = (text.trim().match(/\S+/g) || []).length;
+    stats.replaceChildren(...[["Tokens", toks.length], ["Characters", chars], ["Words", words], ["Characters per token", (chars / toks.length).toFixed(1)]].map(([k, v]) => el("div", {}, el("b", {}, String(v)), el("span", {}, k))));
+    idsBox.textContent = "[" + toks.map(t => t.id).join(", ") + "]";
+  }
+  ta.addEventListener("input", render);
+  root.append(ta, presets, stats, toggle, out,
+    el("p", { class: "note" }, "· marks a leading space, which is part of the token. ⋯ marks extra byte-pieces for characters the vocabulary doesn't cover as a whole. The number under each token is its ID in an illustrative vocabulary."),
+    el("details", { class: "mini" }, el("summary", {}, "The integer sequence"), idsBox));
+  $("#tokIdsOnly").addEventListener("change", render);
+  render();
+})();
+
+/* ---------- 6. Attention visualizer ---------- */
+(function attention() {
+  const root = $("#attention"); if (!root) return;
+  const base = ["The", "animal", "didn't", "cross", "the", "street", "because", "it", "was", "too"];
+  const SPEC = {
+    1: { 0: .5 }, 2: { 1: .5 }, 3: { 1: .4, 2: .25 }, 4: { 3: .3 }, 5: { 3: .35, 4: .2 },
+    6: { 2: .25, 3: .2 }, 7: { 1: .35, 5: .3 }, 8: { 7: .45 }, 9: { 8: .2, 7: .15 }, 11: { 10: .25, 6: .1 },
+  };
+  let variant = "tired", sel = 10;
+  const words = () => [...base, variant, "."];
+  function weights(i) {
+    const w = new Array(i + 1).fill(.02);
+    w[0] += .12; w[i] += .15; if (i > 0) w[i - 1] += .1;
+    const s = i === 10 ? (variant === "tired" ? { 1: .5, 7: .25 } : { 5: .5, 7: .25 }) : SPEC[i] || {};
+    for (const [j, v] of Object.entries(s)) w[j] += v;
+    const sum = w.reduce((a, b) => a + b, 0);
+    return w.map(v => v / sum);
+  }
+  const NOTES = {
+    7: "At “it”, the sentence hasn't said yet whether it means the animal or the street, so this head splits its attention between both.",
+    10: { tired: "“tired” settles it: animals get tired, streets don't. This head links back to “animal” and to “it”.", wide: "“wide” settles it the other way: streets are wide. The same head now links back to “street”." },
+    0: "The first word can only look at itself.",
+  };
+  const generic = "Each word can only look back at earlier words and itself. The first word also soaks up leftover attention; real models do this too, a pattern called an “attention sink.”";
+  const row = el("div", { class: "att-words", role: "group", "aria-label": "Sentence; select a word to see its attention" });
+  const note = el("p", { class: "att-note" });
+  const bars = el("div", { class: "att-bars" });
+  function render() {
+    const ws = words(), w = weights(sel);
+    row.replaceChildren(...ws.map((t, j) => {
+      const b = el("button", { type: "button", class: "att-w" + (j === sel ? " sel" : "") + (j > sel ? " future" : ""), "aria-pressed": String(j === sel) }, t);
+      if (j <= sel && j !== sel) b.style.setProperty("--a", Math.round(w[j] * 100 * 1.6) + "%");
+      b.addEventListener("pointerenter", e => { if (e.pointerType === "mouse" && sel !== j) { sel = j; render(); row.children[j].focus({ preventScroll: true }); } });
+      b.addEventListener("click", () => { sel = j; render(); row.children[j].focus({ preventScroll: true }); });
+      b.addEventListener("focus", () => { if (sel !== j) { sel = j; render(); row.children[j].focus({ preventScroll: true }); } });
+      b.setAttribute("aria-label", j > sel ? `${t} (later word, not visible to the selected word)` : j === sel ? `${t}, selected` : `${t}: ${Math.round(w[j] * 100)} percent`);
+      return b;
+    }));
+    const n = NOTES[sel];
+    note.textContent = typeof n === "object" ? n[variant] : (n || generic);
+    const order = w.map((v, j) => [v, j]).sort((a, b) => b[0] - a[0]);
+    bars.replaceChildren(el("p", { class: "ctl-label" }, `Where “${ws[sel]}” looks`), ...order.map(([v, j]) => el("div", { class: "att-bar" + (j === sel ? " self" : "") },
+      el("span", { class: "att-bw" }, ws[j] + (j === sel ? " (itself)" : "")),
+      el("span", { class: "att-track" }, el("span", { class: "att-fill", style: `width:${(v / order[0][0]) * 100}%` })),
+      el("span", { class: "att-pct" }, Math.round(v * 100) + "%"))));
+  }
+  const seg = segmented([{ label: "…too tired.", value: "tired" }, { label: "…too wide.", value: "wide" }], variant, v => { variant = v; render(); }, "Sentence ending");
+  root.append(el("div", { class: "att-top" }, el("span", { class: "ctl-label" }, "Ending:"), seg), row, note, bars,
+    el("p", { class: "note" }, "Faded words come later in the sentence. A language model reading left to right can't attend to them yet."));
+  render();
+})();
+
+/* ---------- 7. Gradient descent ---------- */
+(function gradient() {
+  const root = $("#gd"); if (!root) return;
+  const f = x => 0.1 * x ** 4 - x * x + 0.4 * x + 0.15 * Math.sin(3 * x) + 3;
+  const df = x => 0.4 * x ** 3 - 2 * x + 0.4 + 0.45 * Math.cos(3 * x);
+  const X0 = 3.6, XMIN = -4, XMAX = 4, YMIN = -1.2, YMAX = 9;
+  let x = X0, start = X0, steps = 0, running = false, timer = null, hist = [f(X0)], trail = [X0], status = "";
+  const lrFromV = v => 0.002 * 500 ** (v / 100);
+  const vFromLr = lr => Math.log(lr / 0.002) / Math.log(500) * 100;
+  const canvas = el("canvas", { class: "gd-canvas", tabindex: 0, "aria-label": "Loss curve with a ball. Left and right arrow keys move the starting point." });
+  const lossCv = el("canvas", { class: "gd-loss", "aria-hidden": "true" });
+  const lr = el("input", { type: "range", id: "gdLr", min: 0, max: 100, step: .5, value: vFromLr(0.05) });
+  const lrOut = el("output", { for: "gdLr", class: "val" });
+  const runBtn = el("button", { type: "button", class: "btn primary" }, "Run");
+  const stepBtn = el("button", { type: "button", class: "btn" }, "Step");
+  const resetBtn = el("button", { type: "button", class: "btn" }, "Reset");
+  const readout = el("div", { class: "gd-read", "aria-live": "polite" });
+  const presets = el("div", { class: "chips" }, el("span", { class: "ctl-label" }, "Presets:"),
+    [["Tiny", 0.005], ["Moderate", 0.05], ["Big", 0.3], ["Too big", 0.45], ["Way too big", 0.8]].map(([n, v]) => el("button", { type: "button", class: "chip", onclick: () => { lr.value = vFromLr(v); onLr(); reset(); } }, `${n} (${v})`)));
+  const getLr = () => roundSig(lrFromV(Number(lr.value)), 2);
+  function onLr() { lrOut.textContent = String(getLr()); }
+  let ctx, lctx, Wd = 0, Hd = 0, anim = null;
+  function size() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    Wd = canvas.clientWidth; Hd = canvas.clientHeight;
+    canvas.width = Wd * dpr; canvas.height = Hd * dpr;
+    ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    lossCv.width = lossCv.clientWidth * dpr; lossCv.height = lossCv.clientHeight * dpr;
+    lctx = lossCv.getContext("2d"); lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw(x);
+  }
+  const px = v => 12 + ((v - XMIN) / (XMAX - XMIN)) * (Wd - 24);
+  const py = v => 10 + (1 - (v - YMIN) / (YMAX - YMIN)) * (Hd - 20);
+  function draw(bx, hop = 0) {
+    if (!ctx) return;
+    const C = { line: cssVar("--line"), text: cssVar("--muted"), acc: cssVar("--l8"), ball: cssVar("--l3"), good: cssVar("--l10"), surf: cssVar("--surface") };
+    ctx.clearRect(0, 0, Wd, Hd);
+    // curve + fill
+    ctx.beginPath();
+    for (let i = 0; i <= Wd; i += 2) { const xv = XMIN + ((i - 12) / (Wd - 24)) * (XMAX - XMIN); const yv = f(xv); i ? ctx.lineTo(i, py(yv)) : ctx.moveTo(i, py(yv)); }
+    ctx.strokeStyle = C.acc; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.lineTo(Wd, Hd); ctx.lineTo(0, Hd); ctx.closePath();
+    ctx.fillStyle = C.acc; ctx.globalAlpha = .09; ctx.fill(); ctx.globalAlpha = 1;
+    // minima labels
+    ctx.font = "12px " + cssVar("--font-mono"); ctx.fillStyle = C.text; ctx.textAlign = "center";
+    ctx.fillText("lowest valley", px(-2.39), py(f(-2.39)) + 22);
+    ctx.fillText("local valley", px(1.99), py(f(1.99)) + 22);
+    // trail
+    ctx.setLineDash([3, 4]); ctx.strokeStyle = C.text; ctx.lineWidth = 1; ctx.beginPath();
+    trail.forEach((t, i) => { const yy = py(clamp(f(t), YMIN, YMAX + 3)); i ? ctx.lineTo(px(t), yy) : ctx.moveTo(px(t), yy); });
+    ctx.stroke(); ctx.setLineDash([]);
+    // start marker
+    ctx.fillStyle = C.text; ctx.beginPath(); ctx.arc(px(start), py(f(start)), 3, 0, 7); ctx.fill();
+    // ball
+    const inView = bx >= XMIN - .2 && bx <= XMAX + .2 && f(bx) < YMAX + 1;
+    if (inView) {
+      const by = py(f(bx)) - 9 - hop;
+      ctx.beginPath(); ctx.arc(px(bx), by, 8, 0, 7); ctx.fillStyle = C.ball; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = C.surf; ctx.stroke();
+    }
+    // loss history
+    if (lctx) {
+      const lw = lossCv.clientWidth, lh = lossCv.clientHeight;
+      lctx.clearRect(0, 0, lw, lh);
+      lctx.fillStyle = C.text; lctx.font = "11px " + cssVar("--font-mono"); lctx.textAlign = "left";
+      lctx.fillText("loss per step", 4, 12);
+      const n = Math.max(20, hist.length);
+      lctx.beginPath();
+      hist.forEach((v, i) => { const X = 4 + (i / (n - 1)) * (lw - 8); const Y = 18 + (1 - (clamp(v, YMIN, YMAX) - YMIN) / (YMAX - YMIN)) * (lh - 24); i ? lctx.lineTo(X, Y) : lctx.moveTo(X, Y); });
+      lctx.strokeStyle = C.ball; lctx.lineWidth = 2; lctx.stroke();
+    }
+  }
+  function describe() {
+    const lossTxt = isFinite(f(x)) && Math.abs(x) < 6 ? f(x).toFixed(2) : "off the chart";
+    readout.innerHTML = `<span><b>${steps}</b> steps</span><span>position <b>${Math.abs(x) < 6 ? x.toFixed(2) : "—"}</b></span><span>loss <b>${lossTxt}</b></span><span class="gd-status">${status}</span>`;
+  }
+  function stop() { running = false; clearTimeout(timer); runBtn.textContent = "Run"; }
+  function doStep() {
+    if (status.startsWith("Diverged")) return false;
+    const rate = getLr();
+    const nx = x - rate * df(x);
+    steps++;
+    if (!isFinite(nx) || Math.abs(nx) > 6) {
+      status = "Diverged: each step overshot by more than the last, and the ball flew off. The learning rate is too big.";
+      animate(x, clamp(nx, -8, 8), () => { x = nx; hist.push(YMAX + 5); describe(); draw(99); });
+      return false;
+    }
+    const moved = Math.abs(nx - x);
+    const from = x; x = nx; trail.push(x); hist.push(f(x));
+    if (moved < 1e-4) {
+      status = x < 0 ? (rate >= 0.2 && start > 0 ? "Settled in the lowest valley, because a big step happened to hop over the hill. That's luck, not a strategy: a little bigger and it never settles." : "Settled in the lowest valley (the global minimum).") : "Settled in a valley, but not the lowest one. Gradient descent only sees the local slope, so it got stuck in a local minimum.";
+      describe(); draw(x); return false;
+    }
+    if (steps >= 150) {
+      status = rate > 0.3 ? "Still bouncing after 150 steps: the step is too big to settle into the valley." : "Still creeping after 150 steps: tiny steps are safe but slow.";
+      animate(from, x, () => { describe(); }); return false;
+    }
+    status = rate < 0.01 ? "Tiny steps: safe, but slow." : "";
+    animate(from, x, describe);
+    return true;
+  }
+  function animate(a, b, done) {
+    cancelAnimationFrame(anim);
+    if (reduceMotion.matches) { draw(b); done && done(); return; }
+    const t0 = performance.now(), dur = 220;
+    const hopH = Math.min(60, Math.abs(px(b) - px(a)) * .35);
+    const tick = now => {
+      const t = clamp((now - t0) / dur, 0, 1);
+      const e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+      draw(a + (b - a) * e, Math.sin(Math.PI * t) * hopH);
+      if (t < 1) anim = requestAnimationFrame(tick); else done && done();
+    };
+    anim = requestAnimationFrame(tick);
+  }
+  function loop() { if (!running) return; if (doStep()) timer = setTimeout(loop, reduceMotion.matches ? 60 : 260); else stop(); }
+  function reset() { stop(); cancelAnimationFrame(anim); x = start; steps = 0; hist = [f(start)]; trail = [start]; status = "Press Run or Step."; describe(); draw(x); }
+  runBtn.addEventListener("click", () => { if (running) { stop(); return; } if (status.startsWith("Diverged") || status.startsWith("Settled") || steps >= 150) reset(); running = true; runBtn.textContent = "Pause"; loop(); });
+  stepBtn.addEventListener("click", () => { stop(); if (steps >= 150 || status.startsWith("Settled")) return; doStep(); });
+  resetBtn.addEventListener("click", reset);
+  lr.addEventListener("input", onLr);
+  canvas.addEventListener("pointerdown", e => {
+    const r = canvas.getBoundingClientRect();
+    start = roundSig(clamp(XMIN + ((e.clientX - r.left - 12) / (r.width - 24)) * (XMAX - XMIN), -3.8, 3.8), 3);
+    reset();
+  });
+  canvas.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault(); start = clamp(start + (e.key === "ArrowLeft" ? -.2 : .2), -3.8, 3.8); reset();
+  });
+  root.append(el("div", { class: "gd-stage" }, canvas, lossCv),
+    el("div", { class: "ctl-row" }, el("label", { for: "gdLr", class: "ctl-label" }, "Learning rate"), lr, lrOut),
+    presets, el("div", { class: "btn-row" }, runBtn, stepBtn, resetBtn), readout);
+  onLr(); reset();
+  new ResizeObserver(size).observe(canvas);
+  document.addEventListener("themechange", () => draw(x));
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => draw(x));
+})();
+
+/* ---------- 8. Temperature ---------- */
+(function temperature() {
+  const root = $("#temperature"); if (!root) return;
+  const prompt = "After a long day, I like to relax with a cup of";
+  const C = [["tea", 3.0], ["coffee", 2.4], ["hot chocolate", 1.3], ["cocoa", 0.9], ["wine", 0.6], ["chamomile", 0.5], ["something", 0.0], ["soup", -0.3], ["gravel", -3.0]];
+  const probs = T => {
+    if (T < 0.01) { const mx = Math.max(...C.map(c => c[1])); return C.map(c => (c[1] === mx ? 1 : 0)); }
+    const z = C.map(c => c[1] / T); const m = Math.max(...z); const e = z.map(v => Math.exp(v - m)); const s = e.reduce((a, b) => a + b, 0);
+    return e.map(v => v / s);
+  };
+  const slider = el("input", { type: "range", id: "tempRange", min: 0, max: 2, step: .05, value: .8 });
+  const out = el("output", { for: "tempRange", class: "val" });
+  const mood = el("p", { class: "temp-mood" });
+  const chart = el("div", { class: "temp-bars", role: "list" });
+  const rows = C.map(([w]) => {
+    const fill = el("span", { class: "tb-fill" }), pct = el("span", { class: "tb-pct" });
+    chart.append(el("div", { class: "tb", role: "listitem" }, el("span", { class: "tb-w" }, w), el("span", { class: "tb-track" }, fill), pct));
+    return { fill, pct };
+  });
+  const samples = el("ol", { class: "samples", "aria-live": "polite" });
+  const sampleBtn = el("button", { type: "button", class: "btn primary" }, "Sample 5 completions");
+  function render() {
+    const T = Number(slider.value);
+    out.textContent = T.toFixed(2);
+    const p = probs(T);
+    p.forEach((v, i) => {
+      rows[i].fill.style.width = (v * 100) + "%";
+      const pc = v * 100;
+      rows[i].pct.textContent = pc >= 10 ? Math.round(pc) + "%" : pc >= 0.1 ? pc.toFixed(1) + "%" : pc > 0 ? "<0.1%" : "0%";
+    });
+    mood.innerHTML = T < 0.01 ? "<b>T = 0 (greedy):</b> always picks the single most likely word. Predictable, and prone to repeating itself in long text."
+      : T < 0.5 ? "<b>Low temperature:</b> sharpened toward the top choice. Good for facts and code."
+      : T <= 1.1 ? "<b>Around 1:</b> close to the model's own probabilities. A common default for conversation."
+      : "<b>High temperature:</b> flattened. Rare words get real chances, and at the extreme even “gravel” shows up.";
+  }
+  function sample() {
+    const p = probs(Number(slider.value));
+    samples.replaceChildren(...Array.from({ length: 5 }, () => {
+      let r = Math.random(), i = 0; while (i < p.length - 1 && r >= p[i]) { r -= p[i]; i++; }
+      return el("li", {}, prompt + " ", el("b", {}, C[i][0]), ".");
+    }));
+  }
+  slider.addEventListener("input", render);
+  sampleBtn.addEventListener("click", sample);
+  root.append(el("p", { class: "temp-prompt" }, el("span", { class: "muted" }, "Prompt: "), `“${prompt} …”`),
+    el("div", { class: "ctl-row" }, el("label", { for: "tempRange", class: "ctl-label" }, "Temperature"), slider, out),
+    mood, chart, el("div", { class: "btn-row" }, sampleBtn), samples,
+    el("p", { class: "note" }, "A real model scores its whole vocabulary of 100,000+ tokens; nine are shown here, with made-up scores, renormalized to add up to 100%. “hot chocolate” is shown as one choice, though it would be two tokens."));
+  render(); sample();
+})();
+
+/* ---------- 9. Agent loop ---------- */
+(function agent() {
+  const root = $("#agent"); if (!root) return;
+  const NODES = [
+    { k: "model", t: "Model decides", d: "Reads everything so far and writes its next move." },
+    { k: "call", t: "Tool request", d: "A structured message naming a tool and its inputs." },
+    { k: "run", t: "App runs the tool", d: "Search, code, files, APIs: the application does it." },
+    { k: "result", t: "Result added", d: "The output is pasted into the conversation as text." },
+  ];
+  const TRACE = [
+    ["user", "You", "The checkout test is failing. Can you fix it?"],
+    ["model", "Model", "I should run the tests to see the failure."],
+    ["call", "Tool request", 'run_tests()'],
+    ["run", "App", "Runs the test suite."],
+    ["result", "Result", "1 failed: test_total expected 10, got 9"],
+    ["model", "Model", "The total is one short. Let me read the cart code."],
+    ["call", "Tool request", 'read_file("cart.py")'],
+    ["run", "App", "Reads the file."],
+    ["result", "Result", "for i in range(1, len(items)): total += items[i].price"],
+    ["model", "Model", "The loop skips the first item. I'll start it at 0."],
+    ["call", "Tool request", 'edit_file("cart.py", "range(1," → "range(0,")'],
+    ["run", "App", "Applies the edit."],
+    ["result", "Result", "Edit applied."],
+    ["model", "Model", "Now re-run the tests to check."],
+    ["call", "Tool request", "run_tests()"],
+    ["run", "App", "Runs the test suite."],
+    ["result", "Result", "All 24 tests passed."],
+    ["answer", "Answer", "Fixed: the loop in cart.py skipped the first item. All tests pass now."],
+  ];
+  let i = 0;
+  const ring = el("div", { class: "ring" }, NODES.map((n, j) => el("div", { class: `ring-node n${j}`, "data-k": n.k }, el("b", {}, n.t), el("span", {}, n.d))),
+    el("div", { class: "ring-center", "aria-hidden": "true" }, "↻", el("small", {}, "repeat until done")));
+  const log = el("ol", { class: "trace", "aria-live": "polite" });
+  const next = el("button", { type: "button", class: "btn primary" }, "Next step");
+  const restart = el("button", { type: "button", class: "btn" }, "Restart");
+  const count = el("span", { class: "muted small" });
+  function render() {
+    const shown = TRACE.slice(0, i + 1);
+    log.replaceChildren(...shown.map(([k, who, txt]) => el("li", { class: "tr-" + k }, el("b", {}, who), el("span", { class: /request|Result/.test(who) ? "mono" : "" }, txt))));
+    const cur = TRACE[i][0];
+    $$(".ring-node", ring).forEach(n => n.classList.toggle("on", n.dataset.k === cur));
+    ring.classList.toggle("done", cur === "answer");
+    const calls = shown.filter(s => s[0] === "model").length;
+    count.textContent = `Model calls so far: ${calls}${cur === "answer" ? " (plus the final answer)" : ""}`;
+    next.disabled = i >= TRACE.length - 1;
+    log.scrollTop = log.scrollHeight;
+  }
+  next.addEventListener("click", () => { if (i < TRACE.length - 1) { i++; render(); } });
+  restart.addEventListener("click", () => { i = 0; render(); });
+  root.append(el("div", { class: "agent-grid" }, ring, el("div", { class: "agent-log" }, el("p", { class: "ctl-label" }, "Example: a coding agent"), log, el("div", { class: "btn-row" }, next, restart, count))));
+  render();
+})();
+
+/* ---------- 10. Follow one prompt ---------- */
+(function walk() {
+  const root = $("#walk"); if (!root) return;
+  const S = [
+    { l: 10, dir: "down", title: "You press Enter", t: "0 s", e: 0, text: "You type “Why is the sky blue?” The app adds its hidden instructions (the system prompt) and the conversation so far, and sends it all over an encrypted connection." },
+    { l: 2, dir: "down", title: "Into a data center", t: "~0.05 s", e: 0, text: "The request crosses the internet to a data center, maybe hundreds of kilometers away. A load balancer routes it to a server that already has the model loaded in GPU memory." },
+    { l: 6, dir: "down", title: "Text becomes tokens", t: "~0.05 s", e: 0, text: "Your question becomes about six tokens: “Why”, “ is”, “ the”, “ sky”, “ blue”, “?”. With the system prompt, the model may receive a few thousand tokens in all." },
+    { l: 9, dir: "down", title: "Joining a batch", t: "~0.1 s", e: 0, text: "A scheduler slots your request into a batch with other people's requests on the same GPUs, and reserves memory for your KV cache." },
+    { l: 8, dir: "down", title: "Frozen weights", t: "~0.1 s", e: 0, text: "The weights doing the work were fixed when training finished, months ago. Answering you doesn't change them; the model isn't learning from this chat." },
+    { l: 7, dir: "down", title: "Prefill: reading the prompt", t: "~0.3 s", e: 0.02, text: "All the tokens flow through every layer at once: embeddings, then about a hundred rounds of attention and feed-forward blocks. Each layer's keys and values are saved in the KV cache." },
+    { l: 5, dir: "down", title: "Kernels and collectives", t: "~0.3 s", e: 0.02, text: "Each layer runs as a sequence of GPU kernels: matrix multiplies, attention, normalizations. The model is split across several GPUs, which swap partial results over fast links many times per token." },
+    { l: 4, dir: "down", title: "Tensor cores and memory", t: "~0.3 s", e: 0.02, text: "Tensor cores do the multiplications. For every token the GPUs have to stream the model's active weights out of high-bandwidth memory, so memory speed sets the pace." },
+    { l: 3, dir: "down", title: "Transistors switching", t: "~0.3 s", e: 0.02, text: "Underneath, tens of billions of transistors per chip switch on and off about two billion times a second. Every switch turns a little energy into heat." },
+    { l: 1, dir: "down", title: "Power in, heat out", t: "~0.3 s", e: 0.02, text: "The GPUs, CPUs, network and cooling draw power from the grid. By the end of the answer your share will be roughly 0.3 Wh (est.), about one second of a microwave oven, and nearly all of it leaves as heat in the cooling water." },
+    { l: 9, dir: "up", title: "Decode, one token at a time", t: "~3.5 s", e: 0.3, text: "Now the model writes. For each new token: run it through all the layers, look back at the KV cache, score every possible next token, sample one (temperature!), append it, repeat. About 300 tokens at roughly 100 per second." },
+    { l: 10, dir: "up", title: "Back to your screen", t: "~3.5 s", e: 0.3, text: "Each token is turned back into text and streamed to you as it's made, which is why answers appear word by word: “The sky looks blue because air molecules scatter short, blue wavelengths of sunlight far more than long, red ones…”" },
+  ];
+  let i = 0, playing = null;
+  const mini = el("ol", { class: "mini-stack", "aria-hidden": "true" }, [...LAYERS].reverse().map(L => el("li", { style: `--c:var(--l${L.n})`, "data-l": L.n }, el("span", {}, L.n), el("em", {}, L.name))));
+  const badge = el("p", { class: "walk-badge" });
+  const title = el("h3", { class: "walk-title" });
+  const text = el("p", { class: "walk-text" });
+  const tallyT = el("b"), tallyE = el("b");
+  const tally = el("div", { class: "tally" }, el("div", {}, el("span", {}, "Elapsed"), tallyT), el("div", {}, el("span", {}, "Energy so far"), tallyE));
+  const dots = el("div", { class: "walk-dots", role: "group", "aria-label": "Steps" }, S.map((s, j) => el("button", { type: "button", "aria-label": `Step ${j + 1}: ${s.title}`, onclick: () => { stopPlay(); go(j); } })));
+  const prev = el("button", { type: "button", class: "btn" }, "← Back");
+  const next = el("button", { type: "button", class: "btn primary" }, "Next →");
+  const play = el("button", { type: "button", class: "btn" }, "▶ Play");
+  const card = el("div", { class: "walk-card", "aria-live": "polite" }, badge, title, text);
+  function go(j) {
+    i = clamp(j, 0, S.length - 1);
+    const s = S[i], L = LAYERS[s.l - 1];
+    root.style.setProperty("--accent", `var(--l${s.l})`);
+    badge.textContent = `Step ${i + 1} of ${S.length} · Layer ${s.l}: ${L.name} · ${s.dir === "down" ? "going down ↓" : "coming back up ↑"}`;
+    title.textContent = s.title; text.textContent = s.text;
+    tallyT.textContent = s.t;
+    tallyE.textContent = s.e === 0 ? "negligible" : `~${s.e} Wh`;
+    $$("li", mini).forEach(li => { const n = Number(li.dataset.l); li.classList.toggle("on", n === s.l); li.classList.toggle("seen", S.slice(0, i + 1).some(x => x.l === n)); });
+    $$("button", dots).forEach((b, j) => { b.classList.toggle("on", j === i); b.setAttribute("aria-current", j === i ? "step" : "false"); });
+    prev.disabled = i === 0; next.disabled = i === S.length - 1;
+    card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
+  }
+  function stopPlay() { clearInterval(playing); playing = null; play.textContent = "▶ Play"; }
+  prev.addEventListener("click", () => { stopPlay(); go(i - 1); });
+  next.addEventListener("click", () => { stopPlay(); go(i + 1); });
+  play.addEventListener("click", () => {
+    if (playing) { stopPlay(); return; }
+    if (i === S.length - 1) go(0);
+    play.textContent = "❚❚ Pause";
+    playing = setInterval(() => { if (i >= S.length - 1) stopPlay(); else go(i + 1); }, 4200);
+  });
+  root.addEventListener("keydown", e => {
+    if (e.target.closest("input,textarea")) return;
+    if (e.key === "ArrowRight") { stopPlay(); go(i + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { stopPlay(); go(i - 1); e.preventDefault(); }
+  });
+  root.append(el("div", { class: "walk-grid" }, mini, el("div", { class: "walk-main" }, card, tally)),
+    dots, el("div", { class: "btn-row" }, prev, next, play),
+    el("p", { class: "note" }, "Timings and energy are rough estimates for a short answer from a large model in 2025–26. Longer prompts, long answers and “thinking” modes can take far longer and use 10–100× more energy."));
+  go(0);
+})();
+
+/* ---------- 11. Cost of one answer ---------- */
+(function calculator() {
+  const root = $("#calcPanel"); if (!root) return;
+  const PEAK = 2e15, WATTS = 1500;
+  const P = { // log sliders: value 0..100
+    params: { min: 1e9, max: 2e12, def: 100e9 },
+    input: { min: 1, max: 1e6, def: 1000 },
+    output: { min: 1, max: 1e5, def: 500 },
+  };
+  const toVal = (k, v) => Math.log(v / P[k].min) / Math.log(P[k].max / P[k].min) * 100;
+  const fromVal = (k, s) => P[k].min * (P[k].max / P[k].min) ** (s / 100);
+  const mk = (id, label, k) => {
+    const input = el("input", { type: "range", id, min: 0, max: 100, step: .1, value: toVal(k, P[k].def) });
+    const out = el("output", { for: id, class: "val" });
+    return { k, input, out, row: el("div", { class: "ctl-row" }, el("label", { for: id, class: "ctl-label" }, label), input, out) };
+  };
+  const cParams = mk("cParams", "Active parameters", "params");
+  const cIn = mk("cIn", "Input tokens", "input");
+  const cOut = mk("cOut", "Output tokens", "output");
+  const util = el("input", { type: "range", id: "cUtil", min: 2, max: 40, step: 1, value: 10 });
+  const utilOut = el("output", { for: "cUtil", class: "val" });
+  const utilRow = el("div", { class: "ctl-row" }, el("label", { for: "cUtil", class: "ctl-label" }, "Chip utilization while writing"), util, utilOut);
+  const nice = (k, v) => k === "params" ? fmtBig(roundSig(v, 2)) : fmtInt(roundSig(v, v < 10 ? 1 : 2));
+  const valOf = c => roundSig(fromVal(c.k, Number(c.input.value)), 2);
+  const results = el("div", { class: "calc-results" });
+  const comps = el("ul", { class: "calc-comps" });
+  const PRESETS = [
+    ["Short chat reply", 100e9, 1000, 500, 10],
+    ["Summarize a long report", 100e9, 100000, 1000, 10],
+    ["Reasoning (“thinking”) answer", 100e9, 2000, 10000, 10],
+    ["Agentic coding task", 100e9, 1000000, 20000, 10],
+    ["Small model, short reply", 8e9, 1000, 500, 10],
+  ];
+  const presetRow = el("div", { class: "chips" }, el("span", { class: "ctl-label" }, "Presets:"), PRESETS.map(([n, p, a, b, u]) => el("button", { type: "button", class: "chip", onclick: () => { cParams.input.value = toVal("params", p); cIn.input.value = toVal("input", a); cOut.input.value = toVal("output", b); util.value = u; render(); } }, n)));
+  function render() {
+    const N = valOf(cParams), tin = valOf(cIn), tout = valOf(cOut), u = Number(util.value) / 100;
+    [cParams, cIn, cOut].forEach(c => { c.out.textContent = nice(c.k, valOf(c)); });
+    utilOut.textContent = Math.round(u * 100) + "%";
+    const uPre = Math.min(0.6, 3 * u);
+    const fl = 2 * N * (tin + tout);
+    const sec = (2 * N * tin) / (PEAK * uPre) + (2 * N * tout) / (PEAK * u);
+    const wh = sec * WATTS / 3600;
+    const fmtWh = w => w >= 1000 ? fmtNum(w / 1000) + " kWh" : fmtNum(w) + " Wh";
+    results.innerHTML = `
+      <div><span>Compute</span><b>${sci(fl)}</b><small>operations</small></div>
+      <div><span>Chip time</span><b>${sec >= 120 ? fmtNum(sec / 60) + " min" : fmtNum(sec) + " s"}</b><small>on one accelerator</small></div>
+      <div class="hl"><span>Energy</span><b>~${fmtWh(wh)}</b><small>including cooling and overhead</small></div>`;
+    const micro = wh * 3.6, led = wh * 6, phone = wh / 15 * 100;
+    comps.replaceChildren(
+      el("li", {}, "Microwave oven (1,000 W): ", el("b", {}, micro >= 120 ? fmtNum(micro / 60) + " minutes" : fmtNum(micro) + " seconds")),
+      el("li", {}, "10 W LED bulb: ", el("b", {}, led >= 120 ? fmtNum(led / 60) + " hours" : fmtNum(led) + " minutes")),
+      el("li", {}, "Phone charge (~15 Wh battery): ", el("b", {}, fmtNum(phone) + "%")),
+      el("li", {}, "A million answers like this: ", el("b", {}, wh >= 1 ? fmtNum(wh) + " MWh" : fmtNum(wh * 1e3) + " kWh"))
+    );
+  }
+  [cParams, cIn, cOut].forEach(c => c.input.addEventListener("input", render));
+  util.addEventListener("input", render);
+  root.append(presetRow, el("div", { class: "calc-grid" },
+    el("div", { class: "calc-inputs" }, cParams.row, cIn.row, cOut.row, utilRow),
+    el("div", { class: "calc-out" }, results, comps)),
+    el("details", { class: "mini" }, el("summary", {}, "Assumptions and what this leaves out"),
+      el("div", { class: "body" },
+        el("p", {}, "Compute ≈ 2 × active parameters × tokens. Hardware: an accelerator with a peak of 2 × 10¹⁵ 8-bit operations per second, drawing 1.5 kW including its share of the server, network and cooling (roughly H100/B200-class, 2024–26). Reading the prompt (prefill) is assumed to run 3× more efficiently than writing, capped at 60% utilization, because it processes many tokens in parallel."),
+        el("p", {}, "Left out: attention's extra cost at very long contexts, prompt caching (which makes repeated input much cheaper), idle capacity kept for traffic spikes, and your device and network. Real deployments can land 2–3× either side of this estimate. With the defaults it gives about 0.3 Wh, in line with 2025 published estimates for a typical query."))));
+  render();
+})();
 </script>
 </body>
 </html>
