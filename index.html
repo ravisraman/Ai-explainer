@@ -967,6 +967,224 @@ h1 { margin-top: 18px; }
 .fl-item.gone { opacity: 0.5; text-decoration: line-through; }
 .homes { margin-top: 10px; }
 
+/* ---- css/primer.css ---- */
+/* =====================================================================
+   "Build it up, step by step" primers for the software layers (5–10)
+   ===================================================================== */
+.primer{max-width:780px;margin-top:48px}
+.primer + .bench{margin-top:36px}
+.primer p{line-height:1.62}
+.steps{position:relative;display:grid;gap:44px;margin-block:8px}
+.primer.cont{margin-top:40px}
+.steps::before{content:"";position:absolute;left:15px;top:44px;bottom:0;width:2px;border-radius:1px;background:linear-gradient(var(--c),color-mix(in srgb, var(--c) 8%, transparent))}
+.steps.cont::before{top:0}
+.steps-kicker{font:500 12px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:-16px}
+.step{position:relative;padding-left:50px;display:grid;gap:14px;min-width:0}
+.step::before{content:attr(data-n);position:absolute;left:0;top:-3px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font:600 13px var(--font-mono);background:var(--sunk);border:1.5px solid var(--c);color:var(--c)}
+.step h3{font-size:clamp(1.3rem,3.2vw,1.62rem);font-variation-settings:"wdth" 88;line-height:1.15}
+.step p{color:var(--text)}
+.step b,.step strong{color:var(--text);font-weight:600}
+.mini-fig{padding:16px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+@media (max-width:560px){
+  .step{padding-left:40px}
+  .steps::before{left:13px}
+  .step::before{width:28px;height:28px;font-size:12px}
+  .mini-fig,.step > .bigpic,.step > .pseudo,.step > .transcript,.step > .compare,.step > .pipeline,.step > .mathrows,.step > .blanks{margin-left:-40px}
+}
+.plain-list{margin:0;padding-left:1.15em;display:grid;gap:9px;color:var(--text)}
+.plain-list li::marker{color:var(--c)}
+.mathrows{display:grid;border-block:1px solid var(--line)}
+.mathrows div{display:grid;grid-template-columns:1fr minmax(0,42%);gap:16px;align-items:baseline;padding-block:10px}
+.mathrows div + div{border-top:1px solid var(--line)}
+.mathrows span{font-size:.92rem;color:var(--muted)}
+.mathrows b{font:700 1.1rem/1.25 var(--font-display);color:var(--c);text-align:right;font-variant-numeric:tabular-nums}
+.bigpic{display:grid;gap:10px;padding:16px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.lane-h{font:700 1.02rem/1.2 var(--font-display);color:var(--text)}
+.lane-h span{display:block;font:500 11px/1.6 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lane-link{text-align:center;font:500 12px var(--font-mono);color:var(--c)}
+.flow{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 28px}
+.flow li{position:relative;padding:8px 12px;border-radius:10px;background:var(--raised);font-size:.88rem;line-height:1.35;color:var(--text)}
+.flow li:not(:last-child)::after{content:"→";position:absolute;right:-21px;top:50%;transform:translateY(-50%);color:var(--c);font:600 15px var(--font-mono)}
+.flow li.out{background:color-mix(in srgb, var(--c) 18%, var(--raised));color:var(--text);font-weight:600}
+.flow-wide li{flex:1 1 140px}
+.flow-tag{display:block;font:500 10.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:640px){
+  .flow{flex-direction:column;gap:22px}
+  .flow li:not(:last-child)::after{content:"↓";right:auto;left:18px;top:auto;bottom:-21px;transform:none}
+}
+.pseudo,.transcript{margin:0;padding:16px 18px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font:13.5px/1.75 var(--font-mono);color:var(--text);overflow-x:auto;white-space:pre;tab-size:4}
+.pseudo .kw{color:var(--c);font-weight:600}
+.pseudo .cm{color:var(--muted)}
+.t-role{display:inline-block;min-width:9.5em;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.t-model{color:var(--c)}
+.t-app{color:var(--l10)}
+.t-note{color:var(--muted);font-size:12px}
+.t-mark{color:var(--l6)}
+.t-cursor{display:inline-block;width:.6em;height:1.1em;vertical-align:-.2em;background:var(--c);animation:blink 1s steps(2,jump-none) infinite}
+.blanks{display:grid;gap:6px}
+.blanks div{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 14px;padding:10px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.blanks span{color:var(--text)}
+.blanks b{font:500 11px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--c)}
+.compare{display:grid;gap:10px}
+.compare span{display:block;font:500 11px/1.6 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.cmp-prompt{padding:12px 14px;border-radius:10px;background:var(--raised);color:var(--text)}
+.cmp{padding:12px 14px;border-radius:10px;border:1px dashed var(--line-2);background:var(--panel)}
+.cmp p{color:var(--muted)}
+.cmp.good{border:1.5px solid color-mix(in srgb, var(--c) 55%, transparent)}
+.cmp.good p{color:var(--text)}
+@media (min-width:640px){ .compare{grid-template-columns:1fr 1fr} .cmp-prompt{grid-column:1/-1} }
+.pipeline{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:pl}
+.pipeline li{counter-increment:pl;position:relative;display:grid;gap:3px;padding:12px 14px 12px 52px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.pipeline li::before{content:counter(pl);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--on-accent);font:600 12px var(--font-mono)}
+.pipeline b{font:700 1.02rem/1.3 var(--font-display);color:var(--text)}
+.pipeline span{font-size:.9rem;color:var(--muted)}
+.loop4{list-style:none;margin:0;padding:14px;display:grid;gap:8px;counter-reset:lp;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+.loop4 li{counter-increment:lp;position:relative;padding:8px 12px 8px 44px;border-radius:9px;background:var(--raised);color:var(--text);font-size:.93rem}
+.loop4 li::before{content:counter(lp);position:absolute;left:12px;top:8px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--c);color:var(--c);font:600 11px var(--font-mono)}
+.loop4::after{content:"↻ then repeat, across many thousands of prompts";font:500 12px var(--font-mono);color:var(--c);text-align:center}
+@media (max-width:560px){ .step > .loop4{margin-left:-40px} }
+/* small interactive pieces */
+.ctl-row.stack{grid-template-columns:1fr auto;grid-template-areas:"label val" "range range";gap:2px 12px;margin-block:6px}
+.fig-read{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:10px;font:14px var(--font-mono);color:var(--text);font-variant-numeric:tabular-nums}
+.fig-read b{color:var(--text)}
+.fig-msg{margin-top:8px;font-size:.93rem;color:var(--text);min-height:1.5em}
+.fit-svg,.np-svg,.emb-svg,.xf-svg,.bp-svg{width:100%;height:auto;display:block}
+.fit-svg .pt{fill:var(--c)}
+.fit-svg .fitline{stroke:var(--text);stroke-width:2.5}
+.fit-svg .resid{stroke:var(--warn);stroke-width:1.5;stroke-dasharray:3 3}
+.axis-t{font:11px var(--font-mono);fill:var(--muted)}
+.gridl{stroke:var(--line);stroke-width:1}
+.np-grid{display:grid;gap:0 18px}
+@media (min-width:560px){ .np-grid{grid-template-columns:1fr 1fr} }
+.np-svg text{font:600 14px var(--font-mono);fill:var(--text);text-anchor:middle}
+.np-svg .small{font:500 11.5px var(--font-mono);fill:var(--muted)}
+.np-svg .wl{font:600 12px var(--font-mono);fill:var(--c)}
+.np-svg .node{fill:var(--raised);stroke:var(--c);stroke-width:1.5}
+.np-svg .edge{fill:none;stroke-linecap:round;transition:stroke-width .2s}
+.np-svg .outv{font:700 22px var(--font-display);fill:var(--c);text-anchor:start}
+.mlp-canvas{width:100%;height:230px;display:block;border-radius:10px;background:var(--sunk);border:1px solid var(--line);touch-action:pan-y}
+.emb-svg .w{font:500 13px var(--font-body);fill:var(--text);cursor:pointer}
+.emb-svg .w.on{fill:var(--c);font-weight:700}
+.emb-svg .dot{fill:var(--muted)}
+.emb-svg .dot.on{fill:var(--c)}
+.emb-svg .near{stroke:var(--c);stroke-width:1.2;stroke-dasharray:3 3;opacity:.7}
+.emb-svg .cl{font:500 10.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;fill:var(--muted);opacity:.8}
+.emb-vec{font:13px var(--font-mono);color:var(--text);overflow-wrap:anywhere}
+.bg-words{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.bg-words .chip{min-height:32px;padding:4px 11px}
+.bg-gen{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--raised);font-size:1.02rem;color:var(--text);min-height:3em}
+.am-wrap{overflow-x:auto}
+.am-table{border-collapse:collapse;width:100%;min-width:520px;font:13px var(--font-mono);font-variant-numeric:tabular-nums}
+.am-table th{font:500 10.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line-2)}
+.am-table th:first-child,.am-table td:first-child{text-align:left}
+.am-table td{white-space:nowrap;text-align:right;padding:7px 8px;border-bottom:1px solid var(--line);color:var(--text);transition:opacity .3s,color .3s}
+.am-table td.hide{opacity:.12}
+.am-table td.hot{color:var(--text);font-weight:600}
+.am-table tr.q td{color:var(--c)}
+.am-bar{display:inline-block;height:8px;border-radius:4px;background:var(--c);vertical-align:middle;margin-right:6px}
+.am-out{margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--raised);font-size:.95rem;color:var(--text)}
+.xf-svg .col{stroke:var(--line-2);stroke-width:2}
+.xf-svg .flowup{stroke:var(--c);stroke-width:2;stroke-dasharray:4 10;animation:flowUp 1.4s linear infinite}
+@keyframes flowUp{to{stroke-dashoffset:28}}
+.xf-svg .band{fill:var(--raised);stroke:var(--line)}
+.xf-svg .band-l{font:600 11.5px var(--font-mono);fill:var(--text)}
+.xf-svg .arc{fill:none;stroke:var(--l6);stroke-width:1.4;opacity:.75;stroke-dasharray:3 5;animation:flow16 1.6s linear infinite}
+.xf-svg .mlpbox{fill:color-mix(in srgb, var(--c) 22%, var(--panel));stroke:var(--c);stroke-width:1}
+.xf-svg .tok{font:600 12.5px var(--font-mono);fill:var(--text);text-anchor:middle}
+.xf-svg .emb{fill:var(--panel);stroke:var(--line-2)}
+.xf-svg .pred{font:500 12px var(--font-mono);fill:var(--text)}
+.xf-svg .pred b,.xf-svg .predhi{fill:var(--c);font-weight:700}
+.xf-svg .pulse{fill:var(--c);opacity:.12;animation:pulseUp 3.2s linear infinite}
+@keyframes pulseUp{from{transform:translateY(0)}to{transform:translateY(-300px)}}
+.tt-wrap{overflow-x:auto}
+.tt-table{border-collapse:collapse;width:100%;font-size:.92rem}
+.tt-table th{font:500 10.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line-2)}
+.tt-table td{padding:8px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:middle}
+.tt-table td.num{width:1%;font:13px var(--font-mono);text-align:right;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tt-table .tt-ctx{color:var(--muted)}
+.tt-table .tgt{color:var(--c);font-weight:600}
+.tt-bar{display:block;height:6px;border-radius:3px;background:var(--c);min-width:2px;transition:width .4s}
+.tt-foot{margin-top:10px;font:14px var(--font-mono);color:var(--text)}
+.tt-foot b{color:var(--text)}
+.bp-svg .edge{stroke:var(--line-2);stroke-width:1.5;fill:none;transition:stroke-width .5s,stroke .3s}
+.bp-svg.fwd .edge{stroke:var(--c);stroke-dasharray:4 8;animation:flow12 .8s linear infinite}
+.bp-svg.bwd .edge{stroke:var(--warn);stroke-dasharray:4 8;animation:flow12r .8s linear infinite}
+@keyframes flow12{to{stroke-dashoffset:-24}}
+@keyframes flow12r{to{stroke-dashoffset:24}}
+.bp-svg .n{fill:var(--raised);stroke:var(--text);stroke-width:1.5}
+.bp-svg .n.o{stroke:var(--c)}
+.bp-svg text{font:500 11.5px var(--font-mono);fill:var(--muted);text-anchor:middle}
+.bp-svg .grade{opacity:0;transition:opacity .3s}
+.bp-svg.grd .grade{opacity:1}
+.bp-phases{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+@media (min-width:560px){ .bp-phases{grid-template-columns:repeat(4,1fr)} }
+.bp-phases button{width:100%;text-align:left;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--raised);color:var(--text);font:13px/1.35 var(--font-body);cursor:pointer;min-height:44px}
+.bp-phases button b{display:block;font:600 11px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.bp-phases button.on{border-color:var(--c);background:color-mix(in srgb, var(--c) 14%, var(--raised));color:var(--text)}
+.bp-phases button.on b{color:var(--c)}
+.chat{display:grid;gap:8px}
+.bubble{max-width:85%;padding:10px 14px;border-radius:14px;font-size:.95rem;line-height:1.5}
+.bubble.me{justify-self:end;background:color-mix(in srgb, var(--c) 20%, var(--raised));color:var(--text);border-bottom-right-radius:4px}
+.bubble.ai{justify-self:start;background:var(--raised);color:var(--text);border-bottom-left-radius:4px}
+.ts-note{margin-top:10px;font-size:.88rem;color:var(--muted)}
+.ctx-bar{display:flex;gap:2px;height:30px;border-radius:6px;overflow:hidden;background:var(--raised);margin-top:14px}
+.ctx-seg{transition:flex-grow .6s cubic-bezier(.2,.8,.2,1);min-width:0}
+.ctx-total{margin-top:8px;font:13.5px var(--font-mono);color:var(--text)}
+.ctx-total b{color:var(--text)}
+.cd-code{font:15px var(--font-mono);padding:10px 14px;border-radius:10px;background:var(--sunk);border:1px solid var(--line);color:var(--text);margin-bottom:12px}
+.cd-code b{color:var(--c)}
+.cd-grid{display:grid;gap:14px}
+@media (min-width:560px){ .cd-grid{grid-template-columns:200px 1fr} }
+.cd-levels{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.cd-levels button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;padding:7px 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);font:500 13.5px var(--font-body);cursor:pointer;min-height:38px}
+.cd-levels button span{font:600 11px var(--font-mono);width:1.5em;text-align:center}
+.cd-levels button.seen{color:var(--text)}
+.cd-levels button.on{border-color:var(--c);background:color-mix(in srgb, var(--c) 14%, transparent);color:var(--text)}
+.cd-detail h4{font-size:1.15rem;margin-bottom:6px}
+.cd-detail p{color:var(--text)}
+.cd-detail{min-height:9.5rem}
+
+
+.primer .chip[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:var(--on-accent)}
+.primer .ctl-row{margin-top:10px}
+.primer .btn-row{margin-top:12px}
+.primer .note-s{margin-top:12px;font-size:.84rem;line-height:1.5;color:var(--muted)}
+.primer .paused,.primer .paused *{animation-play-state:paused!important}
+.xf-svg .arc{stroke:var(--l10)}
+.np-svg .edge.neg{stroke:var(--bad)}
+.np-svg .edge.pos{stroke:var(--c)}
+.count-list{display:grid;gap:5px;max-width:420px}
+.count-list div{display:grid;grid-template-columns:4.5rem 1fr 3rem;gap:10px;align-items:center;font-size:.9rem}
+.count-list span:first-child{text-align:right;color:var(--muted)}
+.count-list i{display:block;height:12px;border-radius:3px;background:var(--c)}
+.count-list b{font:600 .85rem var(--font-mono);color:var(--text)}
+.mini-fig .mini-cap{font:600 .72rem/1.3 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+@media (prefers-reduced-motion: reduce){ .primer *{animation:none!important} }
+.primer .legend{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted)}
+.primer .legend li{display:flex;align-items:center;gap:7px}
+.primer .legend i{width:11px;height:11px;border-radius:3px;flex:none}
+.primer .lg-val{font:600 .84rem var(--font-mono);color:var(--text);font-variant-numeric:tabular-nums}
+.primer .mix-bar{display:flex;gap:2px;height:26px;border-radius:6px;overflow:hidden}
+.primer .scene-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:10px}
+.primer .scene-hint{font-size:.8rem;color:var(--muted)}
+@media (min-width:760px){ .primer .scene-hint{visibility:hidden} }
+.mini-fig > .mount{margin-top:0}
+.mini-fig > .mount:empty{min-height:120px}
+.bigpic .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+@media (max-width:640px){ .bigpic .flow{display:flex} }
+@media (max-width:560px){
+  .np-svg .small,.np-svg .wl{font-size:15px}
+  .bp-svg text{font-size:17px}
+  .fit-svg .axis-t{font-size:15px}
+}
+.flow.flow-wide{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}
+@media (max-width:640px){ .flow.flow-wide{display:flex} }
+@media (max-width:560px){
+  .tt-table{font-size:.84rem}
+  .tt-table th,.tt-table td{padding:7px 4px}
+  .tt-table td.num{font-size:12px}
+}
+
 /* ---- css/quiz.css ---- */
 /* ---------- test yourself: teaser + quiz ---------- */
 .quiz-teaser {
@@ -1132,6 +1350,7 @@ h1 { margin-top: 18px; }
   <div class="howto-item"><h2>Play first</h2><p>Every figure recomputes as you drag. When you see a <b>Predict</b> card, make a guess before you touch anything.</p></div>
   <div class="howto-item"><h2>Numbers are rounded</h2><p><span class="est">~</span> means approximate and <i>est.</i> means an outside estimate. Anything dated will drift.</p></div>
   <div class="howto-item"><h2>Toy models are labeled</h2><p>Each figure ends with a <span class="simp-glyph">◇</span> <b>Simplified</b> line that says what it leaves out.</p></div>
+  <div class="howto-item"><h2>New to how AI works?</h2><p>From Layer 5 up, each layer opens with <b>Build it up, step by step</b>: it starts from scratch (what a neuron is, how a model learns, what happens when you chat) and leads into the figures.</p></div>
   <a class="quiz-teaser" href="#quiz">
     <span class="qt-pips" aria-hidden="true"><i style="--pc:var(--l1)"></i><i style="--pc:var(--l2)"></i><i style="--pc:var(--l3)"></i><i style="--pc:var(--l4)"></i><i style="--pc:var(--l5)"></i><i style="--pc:var(--l6)"></i><i style="--pc:var(--l7)"></i><i style="--pc:var(--l8)"></i><i style="--pc:var(--l9)"></i><i style="--pc:var(--l10)"></i></span>
     <span class="qt-text"><b>A test waits at the top of the stack.</b> 16 questions, one or two per layer: why a single cut cable slows a whole cluster, why models can't count the r's in “strawberry,” who really runs a chatbot's tools. Read your way up, then see how much stuck.</span>
@@ -1379,6 +1598,48 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num"><span class="est">~</span>3 hours</div><div class="stat-label">average time between unexpected interruptions on 16,000 GPUs (Meta: 419 in 54 days).</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>A chip only understands tiny instructions</h3>
+        <p>At the very bottom, a GPU carries out simple instructions: load these numbers from memory, multiply them, add them, store the result. It has no idea what a "neural network" or a "word" is. Everything in this layer exists to translate what a researcher means, such as "multiply these two grids of numbers", into the exact instructions that keep tens of thousands of cores busy, and then to do that across thousands of chips at once.</p>
+      </article>
+      <article class="step" data-n="2">
+        <h3>Follow one line of code down</h3>
+        <p>The single most common operation in AI is a matrix multiplication: multiplying a grid of inputs by a grid of learned weights. In PyTorch a researcher writes it as <code>y = x @ W</code>. Step through what happens underneath that one line.</p>
+        <div class="mini-fig"><div class="mount" data-mount="codedown"></div></div>
+      </article>
+      <article class="step" data-n="3">
+        <h3>What a framework gives you</h3>
+        <p>Frameworks such as PyTorch and JAX supply four things that make modern AI practical:</p>
+        <ul class="plain-list">
+          <li><b>Tensors.</b> Grids of numbers of any shape, stored on the GPU. A batch of sentences is a 3-D grid: sentences × tokens × numbers per token.</li>
+          <li><b>Building blocks.</b> Ready-made layers such as attention and feed-forward networks, so a whole transformer fits in a few hundred lines of code.</li>
+          <li><b>Automatic gradients.</b> The framework records every operation and can replay the record backward to work out how each weight should change. Layer 8 explains why that is the heart of training.</li>
+          <li><b>Optimizers and plumbing.</b> The code that actually nudges the weights, saves checkpoints and streams data in.</li>
+        </ul>
+      </article>
+      <article class="step" data-n="4">
+        <h3>Why one GPU isn't nearly enough</h3>
+        <p>Some quick arithmetic for training a 405-billion-parameter model:</p>
+        <div class="mathrows">
+          <div><span>Weights alone, at 2 bytes each</span><b>~0.8 TB</b></div>
+          <div><span>Plus gradients, a high-precision master copy and the optimizer's running averages (~16 bytes per parameter in all)</span><b>~6.5 TB</b></div>
+          <div><span>Memory on one H100 GPU</span><b>80 GB</b></div>
+          <div><span>GPUs needed just to hold that, before any working space</span><b>~80+</b></div>
+          <div><span>Total work: 3.8 × 10<sup>25</sup> operations at ~4 × 10<sup>14</sup> useful operations per second</span><b>~3,000 years on one GPU</b></div>
+          <div><span>…spread over 16,000 GPUs</span><b>~2–3 months</b></div>
+        </div>
+        <p>So both the model and the work have to be split across thousands of chips, and those chips have to stay perfectly coordinated.</p>
+      </article>
+      <article class="step" data-n="5">
+        <h3>Split the work, then stay in sync</h3>
+        <p>The figure below lets you choose how to split a model. Real runs combine several splits. Whatever the split, each training step ends with a synchronization: groups that trained on different data exchange their gradients and average them in an operation called an <b>all-reduce</b>, and then every copy applies the identical update so that all copies stay the same. Libraries such as NVIDIA's NCCL run this exchange over the fast links inside a rack and the network between racks (Layer 2).</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-parallel">
       <figcaption class="fig-head"><h3>Split the model</h3><p>A big model doesn't fit on one GPU, and one GPU would take centuries to train it. Choose how to divide the work.</p></figcaption>
@@ -1426,6 +1687,26 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num"><span class="est">~</span>¾ word</div><div class="stat-label">per token in typical English. Many other languages need more tokens for the same meaning.</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>Text becomes practice questions, for free</h3>
+        <p>A pretraining example isn't a question paired with an answer. It's just a chunk of text, typically a few thousand tokens long (Llama 3 used chunks of about 8,000), cut from the dataset. Every position in the chunk is a small test: given everything before this point, what comes next? So an 8,000-token chunk holds 8,000 practice questions, and a 15-trillion-token dataset holds 15 trillion. Nobody has to label anything, which is why training can use so much raw text. Layer 8 shows one of these tests being graded.</p>
+      </article>
+      <article class="step" data-n="2">
+        <h3>Where the text comes from</h3>
+        <ul class="plain-list">
+          <li><b>The web.</b> Crawls by the nonprofit Common Crawl (hundreds of billions of pages archived since 2008) and by labs' own crawlers, which are supposed to honor sites' opt-out instructions.</li>
+          <li><b>Code.</b> Public software repositories, which also seem to help with step-by-step reasoning.</li>
+          <li><b>Books, papers and reference works</b>, plus data licensed from publishers and other companies.</li>
+          <li><b>Synthetic data.</b> Text generated by other models, such as worked math solutions checked for correctness, or good documents rewritten in different styles. It fills gaps where human text is scarce, but models trained heavily on unfiltered model output can degrade, so it's filtered and mixed carefully.</li>
+        </ul>
+        <p>High-quality public human text is finite: Epoch AI has estimated that frontier training could use up the stock sometime between roughly 2026 and 2032. Before any of it is used, it has to be cut into tokens and cleaned, which the two figures below let you try.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-tokens">
       <figcaption class="fig-head"><h3>Tokenizer playground</h3><p>Type anything. This is a real byte-pair-encoding tokenizer, trained for this page. Slide the vocabulary size to watch pieces merge.</p></figcaption>
@@ -1459,12 +1740,41 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="3">
+        <h3>The mix is a deliberate recipe</h3>
+        <p>Labs choose proportions carefully because the mix shapes the model's skills. Meta published an unusually specific breakdown for Llama 3:</p>
+        <div class="mini-fig">
+          <div class="mix-bar" role="img" aria-label="Llama 3 data mix: general knowledge about 50 percent, math and reasoning 25 percent, code 17 percent, other languages 8 percent">
+            <span style="flex:50 1 0;background:var(--l6)"></span><span style="flex:25 1 0;background:var(--l8)"></span><span style="flex:17 1 0;background:var(--l5)"></span><span style="flex:8 1 0;background:var(--warn)"></span>
+          </div>
+          <ul class="legend">
+            <li><i style="background:var(--l6)"></i><span>General knowledge</span><b class="lg-val">~50%</b></li>
+            <li><i style="background:var(--l8)"></i><span>Math and reasoning</span><b class="lg-val">~25%</b></li>
+            <li><i style="background:var(--l5)"></i><span>Code</span><b class="lg-val">~17%</b></li>
+            <li><i style="background:var(--warn)"></i><span>Other languages</span><b class="lg-val">~8%</b></li>
+          </ul>
+        </div>
+        <p>Near the end of training, labs often switch to a smaller set of especially high-quality text for a final stretch (called annealing), which measurably improves results.</p>
+      </article>
+      <article class="step" data-n="4">
+        <h3>A second, much smaller kind of data</h3>
+        <p>After pretraining, models learn from carefully made data (Layer 8 shows how it's used):</p>
+        <ul class="plain-list">
+          <li><b>Demonstrations:</b> prompts paired with high-quality answers, written by people or generated by models and checked. Thousands to millions of examples.</li>
+          <li><b>Comparisons:</b> two answers to the same prompt and a judgment of which is better, made by people or by an AI following written principles.</li>
+          <li><b>Checkable problems:</b> math with known answers, code with tests, puzzles with verifiable solutions.</li>
+        </ul>
+        <p>These sets are tiny next to the pretraining data, yet they decide much of how the finished assistant behaves.</p>
+      </article>
+    </div>
+  </div>
+
+
   <aside class="analogy"><p><b>Analogy</b> Tokens are like syllables for a machine: common words are one piece, rare words break into chunks.</p><p class="breaks"><b>Where it breaks</b> Token boundaries follow statistics, not sound or meaning. "dog", " dog" (with a leading space) and "Dog" can be three different tokens.</p></aside>
 
   <div class="deepers">
-    <details class="deeper"><summary>Go deeper: where the text comes from</summary><div class="body">
-      <p>Web crawls (the nonprofit Common Crawl has archived hundreds of billions of pages since 2008), code, books, scientific papers, encyclopedias, licensed data, transcripts, and synthetic text written by other models. High-quality public human text is finite; Epoch AI has estimated that frontier training could use up the stock sometime between roughly 2026 and 2032.</p>
-    </div></details>
     <details class="deeper"><summary>Go deeper: why tokens cause odd mistakes</summary><div class="body">
       <p>Long numbers are split into awkward chunks, which complicates arithmetic. Many non-English languages need more tokens for the same meaning, so they cost more and fit less into the model's window. Try the Hindi and German presets in the playground.</p>
     </div></details>
@@ -1486,6 +1796,51 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num"><span class="est">~</span>80%</div><div class="stat-label">of those parameters sit in the feed-forward blocks; most of the rest are in attention.</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>The big picture: build once, use many times</h3>
+        <p>Two phases are easy to blur together, so separate them first.</p>
+        <p><b>Building the model</b> happens once and takes months. A training program reads trillions of words and slowly adjusts a huge list of numbers. When it finishes, the result is literally a file of numbers, called the <b>weights</b> or <b>parameters</b>: hundreds of gigabytes for a large model.</p>
+        <p><b>Using the model</b> happens every time you send a message and takes seconds. Your text is turned into numbers and pushed through a fixed recipe of arithmetic that uses those weights. Out comes a probability for every possible next piece of text. One piece is picked and added to the text, and the whole thing runs again.</p>
+        <div class="bigpic" aria-label="Diagram of the two phases">
+          <div class="lane">
+            <p class="lane-h">Building the model <span>once · months · enormous compute</span></p>
+            <ol class="flow"><li>Trillions of words of text</li><li>Training adjusts the numbers, step by step</li><li class="out">A file of numbers: the weights</li></ol>
+          </div>
+          <p class="lane-link">the same weights are loaded onto GPUs ↓</p>
+          <div class="lane">
+            <p class="lane-h">Using the model <span>every message · seconds</span></p>
+            <ol class="flow"><li>Your text, as tokens</li><li>Arithmetic using the weights</li><li>A probability for every next token</li><li class="out">Pick one, add it, repeat</li></ol>
+          </div>
+        </div>
+        <p>So a model is not a database of stored sentences, and it is not a program of rules that someone wrote. It is arithmetic whose billions of numbers were tuned by example. The rest of this layer builds that arithmetic up from scratch.</p>
+      </article>
+
+      <article class="step" data-n="2">
+        <h3>A model is a function with knobs</h3>
+        <p>Start tiny. Say you want to predict an apartment's monthly rent from its size. A simple guess: <b>rent = w × size + b</b>. The numbers <b>w</b> (dollars per square foot) and <b>b</b> (a base amount) are <b>parameters</b>: knobs you can turn. Each setting draws a different line.</p>
+        <p><b>Learning</b> means finding the knob settings that make predictions match known examples. We score the mismatch with a single number, the <b>loss</b>; here it's the typical size of the error (the dashed lines). Drag the knobs yourself, then press Auto-fit. The computer repeatedly nudges each knob in whichever direction lowers the loss. That's <b>gradient descent</b>, and it is exactly how large models are trained, just with billions of knobs instead of two.</p>
+        <div class="mini-fig"><div class="mount" data-mount="fitline"></div></div>
+      </article>
+
+      <article class="step" data-n="3">
+        <h3>A neuron: a weighted sum, then a bend</h3>
+        <p>An artificial <b>neuron</b> is the same idea with more inputs. It multiplies each input by its own weight, adds them up along with a bias, then passes the total through a simple <b>bend</b>. The networks on this page use an S-shaped curve that squashes any number into the range 0 to 1, so a neuron acts like a soft switch: off for big negative sums, on for big positive ones.</p>
+        <p>Why bend at all? Without it, stacking neurons only ever gives another straight line, because a weighted sum of weighted sums is still a weighted sum. The bend is what lets a network represent curves, thresholds and "only if" behavior. Try the weights below: thicker lines are bigger weights, and dashed red lines are negative ones.</p>
+        <div class="mini-fig"><div class="mount" data-mount="neuron"></div></div>
+      </article>
+
+      <article class="step" data-n="4">
+        <h3>A network: many bends add up to any shape</h3>
+        <p>Put many neurons side by side and you have a <b>layer</b>. Feed one layer's outputs into another and you have a <b>network</b>. Each neuron can only draw one soft boundary, but the output combines them, so together they can carve out shapes no single neuron can.</p>
+        <p>The figure below is a real network with two inputs (a point's position) and up to six hidden neurons, coloring every point on a map. Tune its weights by hand, then press Learn and watch gradient descent do it for you. The XOR pattern needs at least two neurons. In Layer 8 you can watch a network learn to trace a curve you draw.</p>
+        <p>A large language model is this recipe at enormous scale. Instead of two inputs it takes thousands of numbers per token. Instead of one hidden layer it has around a hundred stacked blocks. Instead of one output it produces a score for every token in its vocabulary. The principle doesn't change: weighted sums, bends, and weights tuned by gradient descent.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-nn">
       <figcaption class="fig-head"><h3>Tune a network by hand</h3><p>Each line is a weight, a number its input gets multiplied by. Drag a line up or down (or select it and use the slider) and watch the output map change. Then let it learn.</p></figcaption>
@@ -1502,6 +1857,16 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="5">
+        <h3>Turning words into numbers: embeddings</h3>
+        <p>Networks only do arithmetic, so text has to become numbers. The tokenizer (Layer 6) turns text into token IDs, but an ID like 1282 is just a label; its size means nothing. So the model keeps a big table with one row per token in its vocabulary. Each row is a list of numbers called an <b>embedding</b>: 4,096 numbers per token in Llama 3 8B, and 16,384 in the 405B model. The model's first step is to look up each token's row.</p>
+        <p>The rows start out random and are tuned during training like every other weight. Tokens used in similar ways get nudged in similar directions, so related words end up with similar lists of numbers: close together, if you picture each list as a point in space. The figure below shows the idea with hand-built vectors.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-embed">
       <figcaption class="fig-head"><h3>Words as points</h3><p>A model turns every token into a list of numbers, a point in space. Related words land near each other, and some directions carry meaning. Hover or tap a word; try the arithmetic.</p></figcaption>
@@ -1512,6 +1877,42 @@ h1 { margin-top: 18px; }
       <div class="note"><h4>Arithmetic on meaning</h4><p>Take the step from "man" to "woman" and add it to "king". The nearest word is "queen". The same step works for other pairs, which suggests the space has a rough "gender" direction.</p></div>
       <div class="note"><h4>Inside a transformer</h4><p>These starting vectors get rewritten at every layer as each token absorbs context, so "bank" ends up in different places in "river bank" and "bank loan".</p></div>
     </aside>
+  </div>
+
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="6">
+        <h3>Predicting the next word, the naive way</h3>
+        <p>A language model has exactly one job: given the text so far, give a probability for every possible next token. The simplest possible version just counts. Read some text, record which words followed which, and turn the counts into probabilities. In a tiny sample of seven short sentences about cats and dogs, the word “the” was followed by:</p>
+        <div class="mini-fig">
+          <p class="mini-cap">After “the”, in the sample text</p>
+          <div class="count-list">
+            <div><span>dog</span><i style="width:100%"></i><b>4 / 12</b></div>
+            <div><span>cat</span><i style="width:50%"></i><b>2 / 12</b></div>
+            <div><span>mat</span><i style="width:50%"></i><b>2 / 12</b></div>
+            <div><span>rug</span><i style="width:25%"></i><b>1 / 12</b></div>
+            <div><span>ball</span><i style="width:25%"></i><b>1 / 12</b></div>
+            <div><span>sofa</span><i style="width:25%"></i><b>1 / 12</b></div>
+            <div><span>door</span><i style="width:25%"></i><b>1 / 12</b></div>
+          </div>
+        </div>
+        <p>So this “model” says the next word is “dog” with probability 4/12. Generate text by repeatedly sampling a next word and you get locally sensible babble that goes nowhere (“The cat slept on the dog sat on the ball.”), because each choice looks back only one word. Layer 9's “Pick the next word” figure is a slightly smarter counter that looks back two.</p>
+        <p>To finish “The trophy didn't fit in the suitcase because <i>it</i> was too…” you need to connect “it” to words far back. Real models solve that with attention. They also don't count; they compute the probabilities with a network, which lets them handle sentences they've never seen.</p>
+      </article>
+
+      <article class="step" data-n="7">
+        <h3>Attention: letting each word gather context</h3>
+        <p>Attention lets every token pull in information from the earlier tokens that matter to it. Using learned weights, each token computes three short lists of numbers from its embedding:</p>
+        <ul class="plain-list">
+          <li>a <b>query</b>: what am I looking for?</li>
+          <li>a <b>key</b>: what do I contain?</li>
+          <li>a <b>value</b>: what would I pass along?</li>
+        </ul>
+        <p>Then it makes three moves: <b>score</b> each earlier token by how well its key matches the query; <b>weigh</b> the scores into percentages that add up to 100%; and <b>mix</b> the earlier tokens' values in those proportions. Here it is with made-up two-number vectors, from the point of view of “it” in “The cat sat because it”.</p>
+        <div class="mini-fig"><div class="mount" data-mount="attnmath"></div></div>
+        <p>In a real model the vectors have about 128 numbers each. Every layer runs dozens of these “attention heads” side by side, each with its own learned weights and its own idea of what to look for, and every token does this at the same time. The figure below shows the patterns a few idealized heads might produce across a whole sentence.</p>
+      </article>
+    </div>
   </div>
 
   <div class="bench">
@@ -1530,12 +1931,36 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="8">
+        <h3>A transformer block, and the running notes</h3>
+        <p>A transformer stacks the same block many times. Picture each token carrying its own running set of notes: a vector that starts as its embedding and flows upward through the model. Researchers call it the <b>residual stream</b>. Each block does two things, and each one <i>adds</i> what it found to the notes instead of replacing them:</p>
+        <ul class="plain-list">
+          <li><b>Attention</b> (Step 7): each token gathers relevant information from earlier tokens. This is the only place tokens exchange information.</li>
+          <li><b>Feed-forward network</b> (Step 4): each token, on its own, runs its notes through a wide layer of neurons. This part holds most of the parameters (about 80% in Llama 3.1 405B), and much of what the model “knows” seems to be stored here.</li>
+        </ul>
+        <p>Early blocks tend to deal with local details such as word pieces and grammar; later blocks build more abstract features. The same two operations, repeated from a few dozen to over a hundred times, are essentially all there is.</p>
+        <div class="mini-fig"><div class="mount" data-mount="xformer"></div></div>
+      </article>
+
+      <article class="step" data-n="9">
+        <h3>From notes to a prediction</h3>
+        <p>After the last block, the final notes of the last token are compared against a second big table with one row per vocabulary token (some models reuse the embedding table for this). That comparison gives one score, called a <b>logit</b>, for each of more than 100,000 tokens. A softmax turns the scores into probabilities that add up to 100%, and a sampler picks one (see “Pick the next word” in Layer 9).</p>
+        <p>Every position gets a prediction like this. During training, all of them are graded at once. When generating text, only the last one is used.</p>
+      </article>
+
+      <article class="step" data-n="10">
+        <h3>What's inside, and what isn't</h3>
+        <p>No sentences are stored to be looked up, and nobody wrote rules like “if asked about France, say Paris”. What the model knows is spread across billions of weights, in a form researchers can only partly read. It can still memorize passages it saw many times. And because it was trained to produce <i>likely</i> text, not verified truth, it can state false things fluently. Layers 8 and 9 show where that comes from.</p>
+      </article>
+    </div>
+  </div>
+
+
   <aside class="analogy"><p><b>Analogy</b> "Neuron" is borrowed from biology, and attention is like a reader glancing back to work out what "it" refers to.</p><p class="breaks"><b>Where it breaks</b> A brain cell is a living cell with complex chemistry and timing; an artificial neuron is one line of arithmetic. And attention runs for every word at once, in many heads per layer, most doing things far less tidy than resolving a pronoun.</p></aside>
 
   <div class="deepers">
-    <details class="deeper"><summary>Go deeper: the transformer block</summary><div class="body">
-      <p>A transformer (2017) repeats one block from a few dozen to over a hundred times. Each block has an <b>attention</b> step, where every token gathers information from earlier tokens, and a <b>feed-forward</b> step, where each token is processed on its own by a wide layer of neurons. At the end, the last vector is turned into a score for every token in the vocabulary.</p>
-    </div></details>
     <details class="deeper"><summary>Go deeper: attention in one paragraph</summary><div class="body">
       <p>Each token's query is compared with every earlier token's key by multiplying them. The scores go through a softmax, which turns them into weights that add up to 1, and the token takes the weighted average of the values. Standard attention compares every token with every other, so its cost grows with the square of the text length, one reason long contexts are expensive.</p>
     </div></details>
@@ -1560,6 +1985,35 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num"><span class="est">~</span>31 million</div><div class="stat-label">H100 GPU-hours for that run, roughly $60 million at typical rental prices (est.).</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>Every word is a practice question</h3>
+        <p>Training turns ordinary text into fill-in-the-next-word questions. Take “The cat sat on the mat.” In a single pass the model guesses at every position: after “The”, what's next? After “The cat”? And so on. Each guess is a probability for every token in the vocabulary, and it's graded against the word that actually came next. Switch between an untrained and a trained model to see the difference.</p>
+        <div class="mini-fig"><div class="mount" data-mount="gradeone"></div></div>
+      </article>
+
+      <article class="step" data-n="2">
+        <h3>Measuring wrongness: the loss</h3>
+        <p>The grade for one guess is the <b>loss</b>: −log(probability the model gave the right answer). If the model was nearly certain and right, the loss is close to 0. If it gave the right word 1%, the loss is 4.6. A brand-new model spreads its bets roughly evenly over about 128,000 tokens, so its loss starts near 11.8.</p>
+        <p>Training has exactly one goal: make the average loss over all those practice questions as low as possible. Nothing in that goal mentions facts, grammar or helpfulness. Those emerge because they help predict text.</p>
+      </article>
+
+      <article class="step" data-n="3">
+        <h3>Passing the blame backward</h3>
+        <p>Once a guess is graded, the model needs to know how to change. <b>Backpropagation</b> answers a question for every single weight: if I nudged this weight up a little, would the loss go up or down, and by how much? It starts at the output (“the right token's score should have been higher”) and works backward layer by layer, using the chain rule from calculus to pass the blame along each connection. Weights that pushed hardest toward the wrong answer get the most blame.</p>
+        <p>The result is the <b>gradient</b>: one number per weight, together pointing in the direction that increases the loss fastest. Step the opposite way and the loss goes down.</p>
+        <div class="mini-fig"><div class="mount" data-mount="backprop"></div></div>
+      </article>
+
+      <article class="step" data-n="4">
+        <h3>Nudge every weight, a little</h3>
+        <p><b>Gradient descent</b> moves every weight a small step downhill, just like Auto-fit in Layer 7. The step size is the <b>learning rate</b>: too small and training crawls, too big and it overshoots. Try it in the figure below, which shrinks the problem to two weights so the “landscape” fits on screen. In practice each step averages the gradients from a batch of millions of tokens, which makes the direction more reliable. An optimizer called Adam also adapts the step size for each weight, and the learning rate starts small, rises, then slowly decays over the run.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-landscape">
       <figcaption class="fig-head"><h3>Roll downhill</h3><p>Training searches for the lowest point of a "loss" landscape. Each step goes downhill, and the learning rate sets how far. Pick a learning rate and press Run. Tap the map to move the start.</p></figcaption>
@@ -1576,6 +2030,22 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="5">
+        <h3>The whole loop, at scale</h3>
+        <p>Put the pieces together and pretraining is one loop, repeated:</p>
+<pre class="pseudo"><span class="kw">repeat</span> about a million times:
+    take the next batch of text        <span class="cm">// millions of tokens</span>
+    predict every next token           <span class="cm">// forward pass</span>
+    grade every prediction             <span class="cm">// loss</span>
+    work out each weight's blame       <span class="cm">// backpropagation</span>
+    nudge every weight a little        <span class="cm">// optimizer step</span></pre>
+        <p>For Llama 3 405B, this loop ran for a couple of months on about 16,000 GPUs. The earliest steps produce gibberish; after enough of them, the model writes fluent text. Along the way the software saves checkpoints so a crash doesn't lose weeks of work, and engineers watch the loss curve for trouble. The figure below runs the same loop on a tiny network, live.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-fit">
       <figcaption class="fig-head"><h3>Watch a network learn</h3><p>Draw a curve with your finger or mouse, or pick one. A tiny network learns to trace it, one gradient step at a time, right here in your browser.</p></figcaption>
@@ -1586,6 +2056,23 @@ h1 { margin-top: 18px; }
       <div class="note"><h4>Built from bends</h4><p>Each faint line is one neuron's contribution: a single S-shaped step, stretched and shifted. The network adds them up. With too few neurons it can't make enough bends to follow a wiggly curve.</p></div>
       <div class="note"><h4>From predictor to assistant</h4><p>Pretraining teaches next-token prediction. <b>Post-training</b> then shapes behavior: fine-tuning on example conversations, learning from people's preferences between answers (RLHF), training against written principles (constitutional AI), and reinforcement learning on tasks with checkable answers, such as math and code.</p></div>
     </aside>
+  </div>
+
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="6">
+        <h3>Why predicting words teaches so much</h3>
+        <p>To lower its loss, the model has to get better at blanks like these, each of which needs a different skill:</p>
+        <div class="blanks">
+          <div><span>“The capital of Japan is ___”</span><b>a fact</b></div>
+          <div><span>“If you drop a glass on a stone floor, it will probably ___”</span><b>everyday physics</b></div>
+          <div><span>“def area(r): return 3.14159 * r * ___”</span><b>code</b></div>
+          <div><span>“17 + 25 = ___”</span><b>arithmetic</b></div>
+          <div><span>“She laughed so hard at his joke that she ___”</span><b>reading people</b></div>
+        </div>
+        <p>So the weights come to represent facts, grammar, styles and reusable patterns of reasoning. But the model learns whatever helps prediction, which includes the errors, biases and contradictions in its data. And more data plus a bigger model keeps lowering the loss in a predictable way, which the figure below explores.</p>
+      </article>
+    </div>
   </div>
 
   <div class="bench">
@@ -1603,6 +2090,39 @@ h1 { margin-top: 18px; }
       <div class="note"><h4>Loss isn't ability</h4><p>Loss measures the model's average surprise at the next token. Lower loss has tracked better abilities, but specific skills don't improve smoothly, and loss says nothing about honesty or judgment.</p></div>
     </aside>
   </div>
+
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="7">
+        <h3>From text predictor to assistant</h3>
+        <p>A freshly pretrained model, called a <b>base model</b>, continues documents; it doesn't answer you. Here's the kind of difference post-training makes (illustrative):</p>
+        <div class="compare">
+          <div class="cmp-prompt"><span>Prompt</span>What is the capital of Australia?</div>
+          <div class="cmp"><span>Base model continues the “document”</span><p>What is the capital of Canada? What is the capital of Brazil? Test your knowledge with these 50 geography questions…</p></div>
+          <div class="cmp good"><span>After post-training</span><p>The capital of Australia is Canberra. Many people guess Sydney, but Canberra was purpose-built as a compromise between Sydney and Melbourne.</p></div>
+        </div>
+        <p>Getting from one to the other takes three stages:</p>
+        <ol class="pipeline">
+          <li><b>Pretraining</b><span>Predict the next token on trillions of tokens of text. Takes most of the compute. Result: a base model with broad knowledge.</span></li>
+          <li><b>Supervised fine-tuning</b><span>Keep training on example conversations: prompts paired with high-quality answers. Thousands to millions of examples. Result: it follows the assistant format.</span></li>
+          <li><b>Reinforcement learning</b><span>The model answers, answers are scored, and it's nudged toward higher-scoring behavior. Much of the recent progress in step-by-step reasoning came from this stage.</span></li>
+        </ol>
+      </article>
+
+      <article class="step" data-n="8">
+        <h3>Where the scores come from</h3>
+        <p>Reinforcement learning needs a way to score answers. There are three main sources, and labs combine them. The first two work like this:</p>
+        <ol class="loop4">
+          <li>The model writes two answers to the same prompt.</li>
+          <li>A person picks the better one, or an AI does, following a written set of principles (a “constitution”).</li>
+          <li>A <b>reward model</b> learns to predict those picks.</li>
+          <li>The model is trained to produce answers the reward model scores highly.</li>
+        </ol>
+        <p>With human picks, this is <b>RLHF</b> (reinforcement learning from human feedback). With AI picks guided by principles, it's the <b>constitutional</b> approach, which scales further and makes the intended values explicit. The third source needs no judge: for math and code, answers can often be checked automatically against known results or tests. Each source has weaknesses. Models can learn to please the judge rather than be right, which is why labs test for flattery and loophole-seeking.</p>
+      </article>
+    </div>
+  </div>
+
 
   <aside class="analogy"><p><b>Analogy</b> Gradient descent is like walking downhill in thick fog, feeling the slope under your feet and stepping the steepest way down.</p><p class="breaks"><b>Where it breaks</b> The real landscape has billions of dimensions, not two, and it shifts with every batch of data. And the walker takes hundreds of thousands of steps without ever seeing the valley.</p></aside>
 
@@ -1634,6 +2154,29 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num"><span class="est">~</span>0.3 MB</div><div class="stat-label">of memory per token of context for a 70-billion-parameter model's KV cache, so ~40 GB for a 128,000-token conversation.</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>The whole conversation is one document</h3>
+        <p>A chat looks like messages going back and forth. To the model, it's a single document with special marker tokens showing who said what. Its only task is to continue that document. When it writes the end-of-turn marker, the app stops and shows you the text.</p>
+        <div class="mini-fig"><div class="mount" data-mount="transcript"></div></div>
+      </article>
+
+      <article class="step" data-n="2">
+        <h3>The generation loop</h3>
+        <p>Writing a reply is the prediction from Layer 7, run in a loop:</p>
+<pre class="pseudo">text = the whole conversation so far
+<span class="kw">repeat</span>:
+    run the model on text        <span class="cm">// a probability for each of ~100,000+ tokens</span>
+    pick one token               <span class="cm">// temperature decides how adventurous</span>
+    <span class="kw">if</span> it's the end-of-turn marker: <span class="kw">stop</span>
+    add it to text, and show it to you</pre>
+        <p>That's why answers appear word by word: each token is shown as soon as it's picked. The figure below lets you be the sampler, choosing each next word from a tiny model's probabilities.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-gen">
       <figcaption class="fig-head"><h3>Pick the next word</h3><p>The model gives every possible next word a probability. You decide how to choose: sample at random, take the favorite, or tap a bar yourself.</p></figcaption>
@@ -1648,6 +2191,15 @@ h1 { margin-top: 18px; }
       </div>
       <div class="note"><h4>Temperature and top-p</h4><p><b>Temperature</b> reshapes the odds: below 1 it sharpens them toward the favorite, above 1 it flattens them. <b>Top-p</b> keeps only the most likely words that together cover p of the probability, and drops the long tail.</p></div>
     </aside>
+  </div>
+
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="3">
+        <h3>No memory, and no learning, in between</h3>
+        <p>Between your messages, nothing is running on your behalf. When you send the next message, the app sends the entire conversation again and the model reads it from the start. Providers cache the part they've already processed, which saves time and money but doesn't change the result. The weights never change as you chat. When a conversation outgrows the context window, older parts have to be dropped or summarized. “Memory” features are the app saving notes and pasting them back into the document.</p>
+      </article>
+    </div>
   </div>
 
   <div class="bench">
@@ -1676,6 +2228,21 @@ h1 { margin-top: 18px; }
       <div class="note"><h4>The catch is memory</h4><p>The cache grows with every token: about 0.3 MB per token for a 70B model. A long conversation's cache can outgrow a chip's memory, which limits how many people one GPU can serve at once.</p></div>
     </aside>
   </div>
+
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="4">
+        <h3>Why answers can be confidently wrong</h3>
+        <p>Each token is chosen because it is likely given the text so far, not because anything checked it. If a false answer is common in the training data, or the true answer is rare or obscure, the most plausible-sounding continuation can be wrong, and it comes out with the same fluency as a right one. This is called <b>hallucination</b>. Once a wrong token is written, later tokens build on it, because the model continues its own text.</p>
+        <p>Search and retrieval tools, careful post-training for honesty (including saying “I don't know”), and checking answers against sources all reduce this, but none eliminates it.</p>
+      </article>
+      <article class="step" data-n="5">
+        <h3>“Thinking” before answering</h3>
+        <p>Reasoning models run the same loop, but they first write out intermediate steps, often hidden from you, before the final answer. Each token of reasoning is another full pass through the network, so writing more steps means spending more computation on the question. That lets the model break problems down, try approaches and catch some of its own mistakes. It's trained mostly with the reinforcement learning from Layer 8, on problems whose answers can be checked. The cost is time and energy: a hard question can take thousands of reasoning tokens.</p>
+      </article>
+    </div>
+  </div>
+
 
   <aside class="analogy"><p><b>Analogy</b> Writing an essay one word at a time, while keeping notes on everything so far. The KV cache is the notes: you never reread the whole essay.</p><p class="breaks"><b>Where it breaks</b> The "notes" aren't words. They're numbers for every layer, they grow with every token, and eventually their size limits how long a context can be.</p></aside>
 
@@ -1710,6 +2277,45 @@ h1 { margin-top: 18px; }
     <div class="stat"><div class="stat-num">36%</div><div class="stat-label">chance a 20-step task goes right if each step is 95% reliable (0.95<sup>20</sup>). That's why agents need checks.</div></div>
   </div>
 
+  <div class="primer">
+    <div class="steps">
+      <p class="steps-kicker">Build it up, step by step</p>
+      <article class="step" data-n="1">
+        <h3>Everything must fit in the context window</h3>
+        <p>Whatever an application wants the model to consider has to be written into the document it continues (Layer 9): instructions, the conversation, your files, search results, tool output. All of it competes for the same limited <b>context window</b>. Designing an AI application is largely deciding what goes in.</p>
+        <div class="mini-fig"><div class="mount" data-mount="ctxbudget"></div></div>
+      </article>
+
+      <article class="step" data-n="2">
+        <h3>Tool use: the model asks, the app does</h3>
+        <p>A model can't browse, run code or check the weather by itself. It's trained to write a structured request instead. The application notices the request, carries it out, and pastes the result back into the document as more text. The model then continues with that result in view.</p>
+<pre class="transcript"><span class="t-role">user</span>What's the weather in Paris tomorrow?
+<span class="t-role">assistant</span><span class="t-model">{"tool": "get_forecast", "city": "Paris", "day": "tomorrow"}</span>   <span class="t-note">← written by the model</span>
+<span class="t-role">tool result</span><span class="t-app">{"high_c": 19, "low_c": 11, "rain_chance": 0.7}</span>   <span class="t-note">← run by the app, pasted in</span>
+<span class="t-role">assistant</span><span class="t-model">Tomorrow in Paris: a high of 19 °C, a low of 11 °C and a 70% chance of rain, so take an umbrella.</span></pre>
+        <p>The application tells the model which tools exist, and what inputs they take, by describing them in the system prompt. Open standards such as the Model Context Protocol (2024) give applications one common way to plug tools in.</p>
+      </article>
+
+      <article class="step" data-n="3">
+        <h3>Retrieval: bringing in your own documents</h3>
+        <p>A model knows only its training data, which ends at a cutoff date and doesn't include your files. <b>Retrieval-augmented generation (RAG)</b> fixes that by searching first and answering second:</p>
+        <ol class="flow flow-wide">
+          <li><span class="flow-tag">in advance</span>Split your documents into passages and turn each into an embedding (Layer 7, Step 5)</li>
+          <li>Turn your question into an embedding too</li>
+          <li>Find the passages whose embeddings are closest in meaning</li>
+          <li>Paste them into the prompt with an instruction to answer from them</li>
+          <li class="out">The model answers, citing those passages</li>
+        </ol>
+        <p>It reduces made-up answers but doesn't eliminate them: the search can miss the right passage, and the model can misread one.</p>
+      </article>
+
+      <article class="step" data-n="4">
+        <h3>Agents: tool use in a loop</h3>
+        <p>An <b>agent</b> is a model given tools and a goal, running the tool-use cycle over and over until it decides the task is done: plan, act, look at the result, adjust. Each lap is another full inference call on an ever-longer document, which is why agents are slow and token-hungry, and why a small error rate per step compounds. Step through one below, and break its tools to see what happens.</p>
+      </article>
+    </div>
+  </div>
+
   <div class="bench">
     <figure class="fig" id="fig-agent">
       <figcaption class="fig-head"><h3>Run an agent</h3><p>The model can't touch the world. It writes a request; the app runs the tool and pastes the result back in. Step through the loop, then break a tool and see how the agent copes.</p></figcaption>
@@ -1726,15 +2332,26 @@ h1 { margin-top: 18px; }
     </aside>
   </div>
 
+  <div class="primer cont">
+    <div class="steps cont">
+      <article class="step" data-n="5">
+        <h3>Keeping it reliable and safe</h3>
+        <p>Because outputs are probabilistic and can be wrong, good applications wrap the model in checks:</p>
+        <ul class="plain-list">
+          <li><b>Verification:</b> run the tests, check the citation, validate the format.</li>
+          <li><b>Permissions:</b> ask before sending an email, spending money or deleting files.</li>
+          <li><b>Guarding against injected instructions:</b> text inside a web page or document (“ignore your instructions and…”) is data, and apps and models must be built to treat it that way.</li>
+          <li><b>Evaluation:</b> measure quality on large sets of realistic tasks before and after every change.</li>
+          <li><b>A human in the loop</b> wherever mistakes are costly.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+
+
   <aside class="analogy"><p><b>Analogy</b> The model is an engine; the application is the car built around it.</p><p class="breaks"><b>Where it breaks</b> An engine does the same thing every time. A model's output varies with sampling and phrasing and can be confidently wrong, so good apps add checks, sources, retries and human review.</p></aside>
 
   <div class="deepers">
-    <details class="deeper"><summary>Go deeper: how tool use works</summary><div class="body">
-      <p>The model is trained to emit a structured message such as <code>{"tool": "weather", "city": "Paris"}</code>. The application, not the model, runs the tool and appends the result to the conversation, and the model continues from there. Open standards such as the Model Context Protocol (2024) give apps a common way to plug tools in.</p>
-    </div></details>
-    <details class="deeper"><summary>Go deeper: retrieval, step by step</summary><div class="body">
-      <p>Documents are split into passages and each passage becomes an embedding vector (Layer 7). At question time the question is embedded too, the closest passages are found, and they're pasted into the prompt with an instruction to answer from them. That reduces made-up answers but doesn't eliminate them: the search can miss, and the model can misread a source.</p>
-    </div></details>
     <details class="deeper"><summary>Go deeper: memory</summary><div class="body">
       <p>Models don't remember past conversations on their own. "Memory" features are the app saving notes and pasting them back into later prompts, inside the same context window from Layer 9.</p>
     </div></details>
@@ -8041,6 +8658,321 @@ defineMount("quiz", (root) => {
 
   intro();
   Actions.quiz = () => { start(); focusHead(); };
+});
+
+/* ---- p00-primers.js ---- */
+/* =====================================================================
+   "Build it up, step by step" figures for the software layers (5–10).
+   Small, mostly static-until-touched pieces that lead into the main
+   figures of each layer.
+   ===================================================================== */
+
+function primerPause(root) {
+  const b = button("Pause motion", () => {
+    const p = root.classList.toggle("paused");
+    b.setLabel(p ? "Play motion" : "Pause motion");
+  }, { small: true });
+  return b;
+}
+
+/* ---- L5: one line of code, followed down ---- */
+defineMount("codedown", (root) => {
+  const LV = [
+    ["Your code (Python)", "One line asks for a matrix multiplication. Python itself is far too slow to do the arithmetic; it just hands the request to the framework."],
+    ["Framework (PyTorch)", "PyTorch knows x and W are tensors (grids of numbers) already sitting in GPU memory. It checks their shapes and number format, records the operation so it can compute gradients later, and picks a routine to run."],
+    ["Library or compiler", "A tuned library (such as NVIDIA's cuBLAS) or a compiler (torch.compile, Triton) supplies the kernel: a GPU program that cuts the matrices into tiles small enough to fit in fast on-chip memory. It may fuse this step with the next one to save trips to memory."],
+    ["Runtime and driver (CUDA)", "The CUDA runtime queues the kernel on the GPU: run this program on a grid of many thousands of threads, reading from these memory addresses. Python doesn't wait; it moves straight on to queue the next operation."],
+    ["The GPU", "The GPU spreads blocks of threads across its 100-plus streaming multiprocessors. Each block loads a tile of x and a tile of W from high-bandwidth memory, and its tensor cores multiply and add them in bulk: billions of transistors switching (Layers 3 and 4)."],
+    ["The result", "Finished tiles are written back to memory as y, ready for the next kernel. For a big matrix the whole trip takes microseconds to milliseconds, and one training step runs thousands of kernels like it."],
+  ];
+  let i = 0;
+  const list = h("ol", { class: "cd-levels" });
+  const detail = h("div", { class: "cd-detail", "aria-live": "polite" });
+  const back = button("← Up", () => { i = Math.max(0, i - 1); paint(); });
+  const next = button("Down →", () => { i = Math.min(LV.length - 1, i + 1); paint(); }, { kind: "primary" });
+  function paint() {
+    list.replaceChildren(...LV.map(([t], j) => h("li", {}, h("button", {
+      type: "button", class: (j === i ? "on " : "") + (j <= i ? "seen" : ""), "aria-current": j === i ? "step" : "false",
+      onclick: () => { i = j; paint(); },
+    }, h("span", {}, String(j + 1)), t))));
+    detail.replaceChildren(h("h4", {}, `${i + 1}. ${LV[i][0]}`), h("p", {}, LV[i][1]));
+    back.disabled = i === 0; next.disabled = i === LV.length - 1;
+  }
+  root.append(h("div", { class: "cd-code" }, "y = x ", h("b", {}, "@"), " W", h("span", { class: "muted" }, "    # multiply inputs by weights")),
+    h("div", { class: "cd-grid" }, list, h("div", {}, detail, h("div", { class: "btn-row" }, back, next))));
+  paint();
+});
+
+/* ---- L7: a model is a function with knobs (fit a line) ---- */
+defineMount("fitline", (root) => {
+  const X = [420, 500, 560, 640, 700, 780, 850, 920, 1000, 1080, 1150, 1250, 1400];
+  const NZ = [180, -120, 90, -220, 135, -60, 195, -165, 60, -90, 225, -135, 30];
+  const Y = X.map((x, i) => 1.5 * x + 400 + NZ[i]);
+  const n = X.length, mx = X.reduce((a, b) => a + b) / n, my = Y.reduce((a, b) => a + b) / n;
+  const sx = Math.sqrt(X.reduce((a, x) => a + (x - mx) ** 2, 0) / n), sy = Math.sqrt(Y.reduce((a, y) => a + (y - my) ** 2, 0) / n);
+  let w = 0.5, b = 900, anim = 0;
+  const W = 560, H = 290, m = { l: 58, r: 14, t: 12, b: 40 };
+  const px = (x) => m.l + (x - 300) / 1200 * (W - m.l - m.r), py = (y) => m.t + (1 - y / 3000) * (H - m.t - m.b);
+  const clipId = uid("clip");
+  const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, class: "fit-svg", role: "img", "aria-label": "Scatter plot of apartment size against rent, with an adjustable line" });
+  svg.append(sv("defs", {}, sv("clipPath", { id: clipId }, sv("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b }))));
+  [0, 1000, 2000, 3000].forEach((v) => svg.append(sv("line", { class: "gridl", x1: m.l, x2: W - m.r, y1: py(v), y2: py(v) }), sv("text", { class: "axis-t", x: m.l - 6, y: py(v) + 4, "text-anchor": "end", text: "$" + v.toLocaleString("en-US") })));
+  [400, 800, 1200].forEach((v) => svg.append(sv("text", { class: "axis-t", x: px(v), y: H - m.b + 16, "text-anchor": "middle", text: v + " sq ft" })));
+  svg.append(sv("text", { class: "axis-t", x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle", text: "apartment size → monthly rent" }));
+  const resid = sv("g", { "clip-path": `url(#${clipId})` }), line = sv("line", { class: "fitline", "clip-path": `url(#${clipId})` });
+  svg.append(resid, line, ...X.map((x, i) => sv("circle", { class: "pt", cx: px(x), cy: py(Y[i]), r: 4.5 })));
+  const rmse = () => Math.sqrt(X.reduce((a, x, i) => a + (w * x + b - Y[i]) ** 2, 0) / n);
+  const read = h("div", { class: "fig-read" }), msg = h("p", { class: "fig-msg", "aria-live": "polite" });
+  const stop = () => { cancelAnimationFrame(anim); anim = 0; };
+  const sw = slider({ label: "w · dollars per sq ft", min: 0, max: 4, step: 0.05, value: w, fmt: (v) => "$" + v.toFixed(2), onInput: (v) => { stop(); w = v; draw(); } });
+  const sb = slider({ label: "b · base amount", min: -500, max: 1500, step: 10, value: b, fmt: (v) => "$" + Math.round(v), onInput: (v) => { stop(); b = v; draw(); } });
+  function draw(sync) {
+    line.setAttribute("x1", px(300)); line.setAttribute("y1", py(w * 300 + b)); line.setAttribute("x2", px(1500)); line.setAttribute("y2", py(w * 1500 + b));
+    resid.replaceChildren(...X.map((x, i) => sv("line", { class: "resid", x1: px(x), x2: px(x), y1: py(Y[i]), y2: py(w * x + b) })));
+    read.innerHTML = `<span>rent = <b>${w.toFixed(2)}</b> × size + <b>${Math.round(b)}</b></span><span>typical error (the loss): <b>$${fmtInt(rmse())}</b></span>`;
+    if (sync) { sw.set(clamp(w, 0, 4)); sb.set(clamp(b, -500, 1500)); }
+  }
+  function gd(steps) {
+    let a = w * sx / sy, c = (w * mx + b - my) / sy;
+    const xs = X.map((x) => (x - mx) / sx), ys = Y.map((y) => (y - my) / sy);
+    for (let k = 0; k < steps; k++) {
+      let ga = 0, gc = 0;
+      xs.forEach((x, i) => { const e = a * x + c - ys[i]; ga += 2 * e * x / n; gc += 2 * e / n; });
+      a -= 0.06 * ga; c -= 0.06 * gc;
+    }
+    w = a * sy / sx; b = c * sy + my - w * mx;
+  }
+  const auto = button("Auto-fit (gradient descent)", () => {
+    stop();
+    if (reducedMotion()) { gd(400); draw(true); msg.textContent = "Fitted by gradient descent."; return; }
+    let k = 0;
+    const tick = () => {
+      gd(2); k += 2; draw(true);
+      msg.textContent = `Step ${k}: each knob moved a little downhill.`;
+      if (k < 120) anim = requestAnimationFrame(tick);
+      else { anim = 0; msg.textContent = `Done after ${k} small steps. The leftover error is noise that no straight line can explain.`; }
+    };
+    anim = requestAnimationFrame(tick);
+  }, { kind: "primary" });
+  const reset = button("Reset", () => { stop(); w = 0.5; b = 900; msg.textContent = ""; draw(true); });
+  root.append(svg, read, h("div", { class: "ctl-row" }, sw.el, sb.el), h("div", { class: "btn-row" }, auto, reset), msg,
+    h("p", { class: "note-s" }, "Made-up example data. Real rents depend on much more than size, which is why the next steps add more inputs and bends."));
+  draw();
+});
+
+/* ---- L7: one neuron ---- */
+defineMount("neuron", (root) => {
+  const x = [2, 1, 3], w = [0.5, -0.3, 0.4]; let bias = 0;
+  const ys = [35, 95, 155], SX = 250, SY = 95;
+  const sig = (z) => 1 / (1 + Math.exp(-z));
+  const svg = sv("svg", { viewBox: "0 0 470 195", class: "np-svg", role: "img" });
+  const edges = ys.map((y) => sv("path", { class: "edge", d: `M60 ${y} L${SX - 30} ${SY}` }));
+  const wls = ys.map((y) => sv("text", { class: "wl", x: 138, y: (y + SY) / 2 - 6 }));
+  const sumT = sv("text", { class: "small", x: SX, y: SY + 50 });
+  const outT = sv("text", { class: "outv", x: 404, y: SY + 8 });
+  let curve = "";
+  for (let i = 0; i <= 24; i++) { const z = -6 + i / 2; curve += (i ? "L" : "M") + (316 + i * 2).toFixed(1) + " " + (SY + 18 - sig(z) * 36).toFixed(1); }
+  const dot = sv("circle", { r: 3.5, fill: "var(--c)" });
+  svg.append(...edges, ...wls,
+    ...ys.map((y, i) => sv("g", {}, sv("circle", { class: "node", cx: 40, cy: y, r: 19 }), sv("text", { x: 40, y: y + 5, text: String(x[i]) }))),
+    sv("text", { class: "small", x: 40, y: 190, text: "inputs" }),
+    sv("circle", { class: "node", cx: SX, cy: SY, r: 28 }), sv("text", { x: SX, y: SY + 6, style: "font-size:20px", text: "Σ" }), sumT,
+    sv("path", { d: `M${SX + 28} ${SY} L310 ${SY}`, stroke: "var(--line-2)", "stroke-width": 2 }),
+    sv("rect", { x: 310, y: SY - 26, width: 60, height: 52, rx: 8, fill: "var(--raised)", stroke: "var(--line-2)" }),
+    sv("path", { d: curve, fill: "none", stroke: "var(--c)", "stroke-width": 2.2 }), dot,
+    sv("text", { class: "small", x: 340, y: SY + 44, text: "S-curve" }),
+    sv("path", { d: `M370 ${SY} L398 ${SY}`, stroke: "var(--line-2)", "stroke-width": 2 }), outT,
+    sv("text", { class: "small", x: 404, y: SY + 28, "text-anchor": "start", text: "output" }));
+  const read = h("div", { class: "fig-read", "aria-live": "polite" });
+  const f1 = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  function draw() {
+    const sum = x.reduce((a, xi, i) => a + xi * w[i], 0) + bias, out = sig(sum);
+    edges.forEach((e, i) => {
+      e.setAttribute("class", "edge " + (w[i] < 0 ? "neg" : "pos"));
+      e.setAttribute("stroke-width", (1 + Math.abs(w[i]) * 5).toFixed(1));
+      e.setAttribute("stroke-dasharray", w[i] < 0 ? "6 4" : "none");
+      e.setAttribute("opacity", w[i] === 0 ? 0.25 : 1);
+    });
+    wls.forEach((t, i) => { t.textContent = "× " + f1(w[i]); t.setAttribute("fill", w[i] < 0 ? "var(--bad)" : "var(--c)"); });
+    sumT.textContent = `sum ${f1(sum)}`;
+    outT.textContent = out.toFixed(2);
+    const zc = clamp(sum, -6, 6);
+    dot.setAttribute("cx", (316 + (zc + 6) * 4).toFixed(1)); dot.setAttribute("cy", (SY + 18 - sig(zc) * 36).toFixed(1));
+    svg.setAttribute("aria-label", `One neuron: inputs 2, 1 and 3; sum ${f1(sum)}; output ${out.toFixed(2)}`);
+    const terms = x.map((xi, i) => `${xi}×${w[i] < 0 ? "(" + f1(w[i]) + ")" : f1(w[i])}`).join(" + ");
+    read.innerHTML = `<span>${terms} ${bias < 0 ? "−" : "+"} ${Math.abs(bias).toFixed(1)} = <b>${f1(sum)}</b></span><span>after the S-curve: <b>${out.toFixed(2)}</b>${sum < -2 ? " (nearly off)" : sum > 2 ? " (nearly fully on)" : ""}</span>`;
+  }
+  const sls = w.map((v, i) => slider({ label: `weight ${i + 1}`, min: -1, max: 1, step: 0.1, value: v, fmt: f1, onInput: (nv) => { w[i] = nv; draw(); } }));
+  const sb = slider({ label: "bias", min: -4, max: 4, step: 0.1, value: 0, fmt: f1, onInput: (nv) => { bias = nv; draw(); } });
+  root.append(svg, read, h("div", { class: "ctl-row" }, ...sls.map((s) => s.el), sb.el),
+    h("p", { class: "note-s" }, "The S-curve squashes any sum into the range 0 to 1: big negative sums give nearly 0 (the neuron is quiet), big positive sums nearly 1. Large language models use smooth ramp-shaped bends instead, but the role is the same."));
+  draw();
+});
+
+/* ---- L7: attention, with the arithmetic ---- */
+defineMount("attnmath", (root) => {
+  const q = [1, 2];
+  const R = [["The", [0.1, 0.2], [0, 0]], ["cat", [1.2, 1.4], [0.9, 0.1]], ["sat", [0.8, -0.6], [0.1, 0.9]], ["because", [-0.3, 0.3], [0, 0.2]], ["it (itself)", [0.5, 0.5], [0.3, 0.1]]];
+  const sc = R.map((r) => (q[0] * r[1][0] + q[1] * r[1][1]) / Math.SQRT2);
+  const ex = sc.map(Math.exp), tot = ex.reduce((a, b) => a + b), wt = ex.map((e) => e / tot);
+  const out = [0, 1].map((d) => R.reduce((a, r, i) => a + wt[i] * r[2][d], 0));
+  const f = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(2), f1 = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const fv = (v) => `(${f(v[0])}, ${f(v[1])})`, fv1 = (v) => `(${f1(v[0])}, ${f1(v[1])})`;
+  let step = 1;
+  const EXPL = {
+    1: "Score: multiply the query and each key number by number, add, then divide by √2 (the square root of the vector length, a standard step that keeps scores in a sensible range). “cat” scores highest because its key points the same way as the query.",
+    2: "Weigh: a softmax turns scores into weights that add up to 100%. It raises e to the power of each score and divides by the total, so bigger scores get disproportionately more. “cat” now gets most of the attention.",
+    3: `Mix: multiply each value by its weight and add them up. The result, ${fv(out)}, is mostly “cat”: “it” has pulled in information about the cat. This blend is added to the running notes for “it”.`,
+  };
+  const table = h("table", { class: "am-table" });
+  const expl = h("p", { class: "fig-msg", "aria-live": "polite" });
+  const outBox = h("p", { class: "am-out" });
+  const seg = segmented({ label: "Step", options: [{ value: 1, label: "1 · Score" }, { value: 2, label: "2 · Weigh" }, { value: 3, label: "3 · Mix" }], value: step, onChange: (v) => { step = v; draw(); } });
+  function draw() {
+    const H = (lvl, v) => h("td", { class: step >= lvl ? (step === lvl ? "hot" : "") : "hide" }, v);
+    table.replaceChildren(
+      h("thead", {}, h("tr", {}, ["earlier token", "key", "score", "weight", "value", "weight × value"].map((t) => h("th", {}, t)))),
+      h("tbody", {},
+        h("tr", { class: "q" }, h("td", {}, "query of “it”"), h("td", {}, fv1(q)), h("td"), h("td"), h("td"), h("td")),
+        ...R.map((r, i) => h("tr", {}, h("td", {}, r[0]), h("td", {}, fv1(r[1])), H(1, f(sc[i])),
+          H(2, h("span", {}, h("span", { class: "am-bar", style: `width:${Math.round(wt[i] * 60)}px` }), Math.round(wt[i] * 100) + "%")),
+          H(3, fv1(r[2])), H(3, fv([wt[i] * r[2][0], wt[i] * r[2][1]]))))));
+    expl.textContent = EXPL[step];
+    outBox.innerHTML = step === 3 ? `New information for “it” = sum of the last column = <b>${fv(out)}</b>` : "Step through to see the result.";
+  }
+  root.append(seg.el, h("div", { class: "am-wrap", style: "margin-top:12px" }, table), expl, outBox,
+    h("p", { class: "note-s" }, "Made-up two-number vectors so the arithmetic fits on screen. Real models learn how to compute each token's query, key and value; nobody sets them by hand."));
+  draw();
+});
+
+/* ---- L7: a transformer, animated ---- */
+defineMount("xformer", (root) => {
+  const T = ["The", "cat", "sat", "because", "it"], XS = [70, 165, 260, 355, 450];
+  const blocks = [{ a: 300, m: 262, n: "Block 1" }, { a: 212, m: 174, n: "Block 2" }, { a: 104, m: 66, n: "Last block" }];
+  const svg = sv("svg", { viewBox: "0 0 640 400", class: "xf-svg", role: "img", "aria-label": "Animated transformer: five token columns flow upward through repeated blocks of attention, which links columns, and feed-forward networks, which process each column separately, ending in next-token predictions" });
+  const g = [];
+  XS.forEach((x) => g.push(sv("line", { class: "col", x1: x, y1: 342, x2: x, y2: 48 }), sv("line", { class: "flowup", x1: x, y1: 342, x2: x, y2: 48 })));
+  blocks.forEach((b) => {
+    g.push(sv("rect", { class: "band", x: 36, y: b.a - 14, width: 452, height: 26, rx: 6 }), sv("text", { class: "band-l", x: 500, y: b.a + 4, text: "attention" }));
+    for (let j = 1; j < XS.length; j++) for (let i = 0; i < j; i++) if (j === XS.length - 1 || j - i === 1) g.push(sv("path", { class: "arc", d: `M${XS[i]} ${b.a + 4} Q${(XS[i] + XS[j]) / 2} ${b.a - 22 - (j - i) * 4} ${XS[j]} ${b.a + 4}` }));
+    XS.forEach((x) => g.push(sv("rect", { class: "mlpbox", x: x - 20, y: b.m - 9, width: 40, height: 18, rx: 4 })));
+    g.push(sv("text", { class: "band-l", x: 500, y: b.m + 4, text: "feed-forward" }), sv("text", { class: "band-l", x: 500, y: b.a - 20, style: "fill:var(--muted)", text: b.n }));
+  });
+  g.push(sv("rect", { x: 70, y: 134, width: 380, height: 20, rx: 10, fill: "var(--panel)", stroke: "var(--line)" }),
+    sv("text", { class: "band-l", x: 260, y: 148, "text-anchor": "middle", style: "fill:var(--muted)", text: "⋮  the same block repeats, dozens to 100+ times  ⋮" }));
+  XS.forEach((x, i) => g.push(sv("rect", { class: "emb", x: x - 34, y: 344, width: 68, height: 20, rx: 4 }), sv("text", { class: "tok", x, y: 358, text: T[i] }), sv("text", { class: "band-l", x, y: 384, "text-anchor": "middle", style: "fill:var(--muted)", text: "embedding" })));
+  g.push(sv("rect", { class: "pulse", x: 30, y: 340, width: 462, height: 14, rx: 7 }));
+  g.push(sv("path", { d: "M450 46 L450 30 L500 30", fill: "none", stroke: "var(--c)", "stroke-width": 1.6 }),
+    sv("text", { class: "pred", x: 506, y: 26, text: "next token:" }),
+    sv("text", { class: "pred", x: 506, y: 42 }, sv("tspan", { class: "predhi", text: "was" }), " 38% · had 11%"));
+  svg.append(...g);
+  root.append(h("div", { style: "overflow-x:auto" }, h("div", { style: "min-width:520px" }, svg)),
+    h("div", { class: "scene-bar" }, h("span", { class: "scene-hint" }, "Swipe sideways on small screens."), primerPause(root)),
+    h("p", { class: "note-s" }, "Pink arcs: attention moving information between tokens (only a few are drawn; each token can look at all earlier ones). Boxes: each token's own feed-forward network. Upward lines: the running notes. Prediction numbers are illustrative."));
+});
+
+/* ---- L8: one sentence, graded ---- */
+defineMount("gradeone", (root) => {
+  const W = ["The", "cat", "sat", "on", "the", "mat", "."];
+  const TR = [0.02, 0.15, 0.55, 0.7, 0.25, 0.45];
+  const UN = 1 / 128000;
+  let mode = "un";
+  const table = h("table", { class: "tt-table" });
+  const foot = h("p", { class: "tt-foot", "aria-live": "polite" });
+  const pct = (p) => (p >= 0.01 ? Math.round(p * 100) + "%" : (p * 100).toFixed(4) + "%");
+  function draw() {
+    const ps = mode === "un" ? TR.map(() => UN) : TR;
+    const ls = ps.map((p) => -Math.log(p));
+    table.replaceChildren(h("thead", {}, h("tr", {}, ["text so far", "next word", "probability", "loss"].map((t) => h("th", {}, t)))),
+      h("tbody", {}, ...ps.map((p, i) => h("tr", {},
+        h("td", { class: "tt-ctx" }, W.slice(0, i + 1).join(" ") + " …"),
+        h("td", { class: "tgt" }, W[i + 1] === "." ? "“.”" : W[i + 1]),
+        h("td", { class: "num" }, h("span", {}, pct(p)), h("span", { class: "tt-bar", style: `width:${Math.max(2, p * 100)}%` })),
+        h("td", { class: "num" }, ls[i].toFixed(1))))));
+    const avg = ls.reduce((a, b) => a + b) / ls.length;
+    foot.innerHTML = mode === "un"
+      ? `Average loss: <b>${avg.toFixed(1)}</b>. An untrained model spreads its bets roughly evenly over ~128,000 tokens, so every right answer gets about 0.0008%.`
+      : `Average loss: <b>${avg.toFixed(2)}</b>. Much better, but not perfect: “mat” was only one of many reasonable endings, so some loss can never go away.`;
+  }
+  const seg = segmented({ label: "Model", options: [{ value: "un", label: "Untrained" }, { value: "tr", label: "Trained" }], value: mode, onChange: (v) => { mode = v; draw(); } });
+  root.append(seg.el, h("div", { class: "tt-wrap", style: "margin-top:12px" }, table), foot,
+    h("p", { class: "note-s" }, "Words shown as whole tokens for readability. Trained-model probabilities are illustrative."));
+  draw();
+});
+
+/* ---- L8: backpropagation, animated ---- */
+defineMount("backprop", (root) => {
+  const L = [[60, [50, 110, 170]], [230, [35, 85, 135, 185]], [400, [80, 150]]];
+  const svg = sv("svg", { viewBox: "0 0 560 225", class: "bp-svg", role: "img", "aria-label": "A small network: signals flow forward to make a guess, the guess is graded, blame flows backward, and the weights are updated" });
+  const edges = [];
+  for (let l = 0; l < 2; l++) for (const y1 of L[l][1]) for (const y2 of L[l + 1][1]) { const e = sv("line", { class: "edge", x1: L[l][0] + 14, y1, x2: L[l + 1][0] - 14, y2 }); edges.push(e); svg.append(e); }
+  const r = rng(3);
+  const widths = edges.map(() => 0.8 + r() * 2.6);
+  L.forEach(([x, ys], l) => ys.forEach((y) => svg.append(sv("circle", { class: "n" + (l === 2 ? " o" : ""), cx: x, cy: y, r: 14 }))));
+  svg.append(sv("text", { x: 60, y: 218, text: "inputs" }), sv("text", { x: 230, y: 218, text: "hidden neurons" }), sv("text", { x: 400, y: 218, text: "scores" }),
+    sv("text", { x: 452, y: 84, "text-anchor": "start", style: "fill:var(--text)", text: "“rug” 60%" }), sv("text", { x: 452, y: 154, "text-anchor": "start", style: "fill:var(--text)", text: "“mat” 25%" }),
+    sv("g", { class: "grade" }, sv("text", { x: 452, y: 102, "text-anchor": "start", style: "fill:var(--bad)", text: "↓ should be lower" }), sv("text", { x: 452, y: 172, "text-anchor": "start", style: "fill:var(--good)", text: "↑ right answer" })));
+  const PH = [["1 · Forward", "Signals flow through the weights to make a guess.", "fwd"], ["2 · Grade", "Compare with the word that actually came next.", "grd"], ["3 · Backward", "Blame flows back along every connection.", "bwd"], ["4 · Update", "Every weight is nudged a little.", "upd"]];
+  let ph = 0, timer = 0;
+  const list = h("ol", { class: "bp-phases" });
+  const play = button("Play", () => {
+    if (timer) { stopP(); return; }
+    play.setLabel("Pause", "pause");
+    timer = setInterval(() => { ph = (ph + 1) % 4; draw(); }, 1900);
+  }, { kind: "primary", icon: "play" });
+  function stopP() { clearInterval(timer); timer = 0; play.setLabel("Play", "play"); }
+  function draw() {
+    svg.classList.remove("fwd", "grd", "bwd");
+    if (PH[ph][2] !== "upd") svg.classList.add(PH[ph][2]);
+    else widths.forEach((w, i) => { widths[i] = clamp(w + (r() - 0.5) * 1.2, 0.6, 4); });
+    edges.forEach((e, i) => e.setAttribute("stroke-width", widths[i].toFixed(2)));
+    list.replaceChildren(...PH.map(([t, d], j) => h("li", {}, h("button", {
+      type: "button", class: j === ph ? "on" : "", "aria-current": j === ph ? "step" : "false",
+      onclick: () => { stopP(); ph = j; draw(); },
+    }, h("b", {}, t), d))));
+  }
+  root.append(svg, list, h("div", { class: "btn-row" }, play), h("p", { class: "note-s" }, "Line thickness shows weight size. In a real model this cycle runs once per training step, over billions of weights at once."));
+  draw();
+});
+
+/* ---- L9: what you see vs what the model sees ---- */
+defineMount("transcript", (root) => {
+  root.innerHTML = `<div class="np-grid">
+    <div><p class="mini-cap">What you see</p>
+      <div class="chat"><div class="bubble me">Why is the sky blue?</div><div class="bubble ai">Sunlight scatters off air molecules, and blue light scatters the most…</div><div class="bubble me">So why are sunsets red?</div></div></div>
+    <div><p class="mini-cap">What the model actually sees</p>
+<pre class="transcript" style="white-space:pre-wrap"><span class="t-mark">&lt;|system|&gt;</span>You are a helpful assistant. Be accurate and concise.<span class="t-mark">&lt;|end|&gt;</span>
+<span class="t-mark">&lt;|user|&gt;</span>Why is the sky blue?<span class="t-mark">&lt;|end|&gt;</span>
+<span class="t-mark">&lt;|assistant|&gt;</span>Sunlight scatters off air molecules, and blue light scatters the most…<span class="t-mark">&lt;|end|&gt;</span>
+<span class="t-mark">&lt;|user|&gt;</span>So why are sunsets red?<span class="t-mark">&lt;|end|&gt;</span>
+<span class="t-mark">&lt;|assistant|&gt;</span><span class="t-cursor" aria-hidden="true"></span></pre></div></div>
+  <p class="ts-note">Marker names differ between models; these are illustrative. The system prompt is written by the app's makers, and you normally don't see it. The model continues from the cursor.</p>`;
+});
+
+/* ---- L10: context-window budget ---- */
+defineMount("ctxbudget", (root) => {
+  const WIN = 128000;
+  const PARTS = [["Instructions and tool descriptions", "var(--faint)"], ["Conversation so far", "var(--l7)"], ["Documents and tool results", "var(--l5)"], ["Room for the reply", "var(--warn)"]];
+  const SC = { chat: [1500, 2500, 0, 800], docs: [1500, 600, 12000, 1000], agent: [12000, 4000, 70000, 2000] };
+  const bar = h("div", { class: "ctx-bar", role: "img" });
+  const segs = PARTS.map(([, c]) => h("span", { class: "ctx-seg", style: `background:${c}` }));
+  const empty = h("span", { class: "ctx-seg" });
+  bar.append(...segs, empty);
+  const legend = h("ul", { class: "legend" });
+  const total = h("p", { class: "ctx-total", "aria-live": "polite" });
+  function draw(k) {
+    const v = SC[k], used = v.reduce((a, b) => a + b);
+    v.forEach((n, i) => { segs[i].style.flexGrow = n; segs[i].hidden = n === 0; });
+    empty.style.flexGrow = WIN - used;
+    bar.setAttribute("aria-label", PARTS.map(([t], i) => `${t}: ${fmtInt(v[i])} tokens`).join("; "));
+    legend.replaceChildren(...PARTS.map(([t, c], i) => h("li", {}, h("i", { style: `background:${c}` }), h("span", {}, t), h("b", { class: "lg-val" }, fmtInt(v[i])))));
+    total.innerHTML = `Using <b>${fmtInt(used)}</b> of a ${fmtInt(WIN)}-token window (${Math.round(used / WIN * 100)}%). Every token the model writes looks back over all of it.`;
+  }
+  const OPTS = [["Simple chat", "chat"], ["Questions about your documents", "docs"], ["Coding agent, mid-task", "agent"]];
+  const chips = h("div", { class: "chips", role: "group", "aria-label": "Scenario" }, OPTS.map(([t, k]) => h("button", { type: "button", class: "chip", "data-k": k, "aria-pressed": String(k === "chat") }, t)));
+  chips.addEventListener("click", (e) => { const c = e.target.closest(".chip"); if (!c) return; $$(".chip", chips).forEach((x) => x.setAttribute("aria-pressed", String(x === c))); draw(c.dataset.k); });
+  root.append(chips, bar, legend, total, h("p", { class: "note-s" }, "Illustrative token counts. Context windows for leading models ranged from about 128,000 to over a million tokens as of 2026."));
+  draw("chat");
 });
 
 /* ---- zz-boot.js ---- */

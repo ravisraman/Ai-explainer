@@ -2,7 +2,7 @@
 
 An explorable explanation of how modern AI works end to end, from the power plant to the chatbot
 reply. Ten layers (energy, data centers, silicon, chips, systems software, data, the model, training,
-inference, applications), each built around interactives you can drag, toggle and break, plus a
+inference, applications), each built around interactives you can drag, toggle and break, with step-by-step primers in the software layers that start from scratch, plus a
 scale zoom from a transistor to a campus and a "follow one prompt" journey through the whole stack.
 
 **Live site:** https://ravisraman.github.io/Ai-explainer/
@@ -27,6 +27,7 @@ python3 tools/build.py
 | `src/js/01-nav.js` | The persistent stack diagram (desktop rail, phone elevator bar and sheet), scroll tracking, theme toggle |
 | `src/js/02-hero.js` | Hero stack animation |
 | `src/js/l01…l11-*.js` | One file per layer, plus the scale zoom (`l045`) and the journey (`l11`) |
+| `src/js/p00-primers.js`, `src/css/primer.css` | The "Build it up, step by step" figures that open each software layer (5–10): code followed down to the GPU, fitting a line, one neuron, attention arithmetic, the transformer block, a graded sentence, backpropagation, the chat as one document, the context-window budget |
 | `src/data/bpe.txt` | The tokenizer's merge table, injected into the JS at build time |
 | `tools/train_bpe.py` | Retrains that merge table from English word frequencies (`pip install wordfreq`) |
 | `PLAN.md` | The design plan: every interactive's controls, updates and intended insight |
