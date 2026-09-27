@@ -6,7 +6,9 @@ An interactive, single-page explainer of how modern AI works end to end, from th
 
 The page climbs ten layers (energy, data centers, silicon, chips, systems software, data, the model, training, inference, applications). Each layer has a one-sentence summary, a few rounded key numbers, and "go deeper" panels. Then it follows one prompt through the whole stack and closes with open questions and limits.
 
-Interactive figures include a tokenizer, an attention visualizer, a gradient-descent toy, a temperature sampler, a token-by-token decode animation, a transistor-to-campus scale explorer, and a cost-of-one-answer calculator.
+From Layer 5 up, each software layer has a "Build it up, step by step" section that starts from scratch: a model as a function with knobs, a single neuron, a small network trained live in the browser, embeddings, a word-counting language model, attention worked through with real arithmetic, the transformer block, how training grades and corrects a model, and what actually happens when you chat.
+
+Other interactive figures include a tokenizer, an attention visualizer, a gradient-descent toy, a temperature sampler, a token-by-token decode animation, a transistor-to-campus scale explorer, and a cost-of-one-answer calculator.
 
 ## Running it
 
