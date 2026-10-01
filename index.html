@@ -973,7 +973,7 @@ h1 { margin-top: 18px; }
 .credit a:hover { text-decoration-color: var(--c); }
 .credit-mark { color: var(--c); margin-right: 8px; }
 .credit-top {
-  display: inline-block; margin-top: 20px;
+  display: inline-block;
   padding: 7px 14px 7px 12px; border: 1px solid var(--line-2); border-radius: 999px;
   background: color-mix(in srgb, var(--panel) 85%, transparent);
   font: 600 0.88rem/1.2 var(--font-body); color: var(--muted);
@@ -989,6 +989,9 @@ h1 { margin-top: 18px; }
 .credit-end-main a:hover { text-decoration-color: var(--c); }
 .credit-end-sub a { font: 600 0.95rem/1.3 var(--font-body); color: var(--c); text-decoration: none; }
 .credit-end-sub a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.credit-bar { max-width: 1120px; margin-inline: auto; padding-top: 20px; }
+.credit-bar + .hero { padding-top: 36px; }
+@media (min-width: 900px) { .credit-bar + .hero { padding-top: 56px; } }
 
 /* ---- css/primer.css ---- */
 /* =====================================================================
@@ -1353,6 +1356,10 @@ h1 { margin-top: 18px; }
 
 <main id="main">
 
+<div class="credit-bar">
+  <p class="credit credit-top"><span class="credit-mark" aria-hidden="true">✦</span>Prompted by <a href="https://raviraman.com/" target="_blank" rel="noopener">Ravi Raman</a></p>
+</div>
+
 <!-- ================= HERO ================= -->
 <header class="hero" id="top">
   <div class="hero-text">
@@ -1363,7 +1370,6 @@ h1 { margin-top: 18px; }
       <a class="btn primary" href="#energy">Start at the bottom</a>
       <a class="btn" href="#journey">Follow one prompt</a>
     </div>
-    <p class="credit credit-top"><span class="credit-mark" aria-hidden="true">✦</span>Prompted by <a href="https://raviraman.com/" target="_blank" rel="noopener">Ravi Raman</a></p>
   </div>
   <div class="hero-visual">
     <div class="mount hero-mount" data-mount="hero" aria-label="The ten layers of the AI stack, energy at the bottom and applications at the top"></div>

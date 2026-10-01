@@ -3,7 +3,7 @@
 .credit a:hover { text-decoration-color: var(--c); }
 .credit-mark { color: var(--c); margin-right: 8px; }
 .credit-top {
-  display: inline-block; margin-top: 20px;
+  display: inline-block;
   padding: 7px 14px 7px 12px; border: 1px solid var(--line-2); border-radius: 999px;
   background: color-mix(in srgb, var(--panel) 85%, transparent);
   font: 600 0.88rem/1.2 var(--font-body); color: var(--muted);
@@ -19,3 +19,6 @@
 .credit-end-main a:hover { text-decoration-color: var(--c); }
 .credit-end-sub a { font: 600 0.95rem/1.3 var(--font-body); color: var(--c); text-decoration: none; }
 .credit-end-sub a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.credit-bar { max-width: 1120px; margin-inline: auto; padding-top: 20px; }
+.credit-bar + .hero { padding-top: 36px; }
+@media (min-width: 900px) { .credit-bar + .hero { padding-top: 56px; } }
